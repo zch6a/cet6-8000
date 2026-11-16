@@ -743,7 +743,24 @@ window.CET6 = {
   const saveSrs = () => store.set('cet6-srs', srs);
   const dueList = () => Object.keys(srs).filter(w => byWord.has(w) && srs[w].due <= Date.now() + 60e3);
   function updateDue(){ const n = dueList().length; $('#dueBadge').textContent = n ? n : ''; }
+  /* 打卡记录：每天评过多少个词 { 'YYYY-MM-DD': n } */
+  const dayKey = (t = Date.now()) => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const daylog = store.get('cet6-daylog', {});
+  function logReview(){ const k = dayKey(); daylog[k] = (daylog[k] || 0) + 1; store.set('cet6-daylog', daylog); }
+  function streak(){
+    let n = 0, t = Date.now();
+    if (!daylog[dayKey(t)]) t -= DAY;            // 今天还没背也不算断
+    while (daylog[dayKey(t)]) { n++; t -= DAY; }
+    return n;
+  }
+  function weekHtml(){
+    const days = [...Array(7)].map((_, i) => { const t = Date.now() - (6 - i) * DAY; return {k: dayKey(t), n: daylog[dayKey(t)] || 0, d: '日一二三四五六'[new Date(t).getDay()]}; });
+    const max = Math.max(10, ...days.map(d => d.n));
+    return `<div style="display:flex;gap:8px;justify-content:center;align-items:flex-end;height:70px;margin:14px 0 4px">${days.map(d =>
+      `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--ink3)"><span>${d.n || ''}</span><i style="display:block;width:22px;border-radius:4px 4px 0 0;background:${d.n ? 'var(--accent)' : 'var(--line)'};height:${d.n ? Math.max(4, Math.round(d.n / max * 44)) : 3}px"></i><span>${d.d}</span></div>`).join('')}</div>`;
+  }
   function grade(w, q){ // q: 0 忘了 1 模糊 2 记得 3 太简单
+    logReview();
     const s = srs[w] || {e:2.5, i:0, r:0, due:0, l:0};
     if (q === 0) { s.r = 0; s.l++; s.i = 0; s.e = Math.max(1.3, s.e - .2); s.due = Date.now() + 60e3; }
     else {
@@ -782,8 +799,11 @@ window.CET6 = {
     const suggest = dl ? Math.ceil(left / Math.max(1, dl - 7)) : 0;
     $('#ovMeta').textContent = '';
     $('#ovBar').style.width = '0';
+    const sk = streak(), learned = Object.keys(srs).length;
     fc.innerHTML = `
       <div class="done-big">今天：复习 ${due} 个 · 新词 ${Math.max(0, plan.daily - nt)} 个</div>
+      <p class="fc-sub" style="margin-top:8px">${sk ? `🔥 已连续打卡 <b>${sk}</b> 天` : '今天开始第一天打卡'} · 学过 <b>${learned.toLocaleString()}</b> 词 · 已掌握 <b>${known.size.toLocaleString()}</b> 词</p>
+      ${weekHtml()}
       <p class="fc-sub" style="margin-top:10px">新词取自当前列表的顺序（${esc($('#resinfo').textContent)}）${st.lv === 'all' ? '，已跳过中学基础词' : ''}。<br>想先背高频词，就先切到「真题频率」排序再点背诵；只背会写词就切到「会写词汇」。</p>
       <div class="setrow" style="justify-content:center">每天新词 <input id="pDaily" type="number" min="5" max="500" value="${plan.daily}" style="width:80px">
         考试日期 <input id="pExam" type="date" value="${esc(plan.exam)}"></div>
