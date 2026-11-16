@@ -1027,13 +1027,13 @@ window.CET6 = {
     const pa = $('#printArea');
     const groupBy = st.sort === 'alpha' || (st.sort === 'write' && !st.wfreq);
     let html = `<div class="p-head"><h1>${esc(title)}</h1><p>${esc($('#resinfo').textContent)} · 近六年 ${(meta.sittings||[]).length} 次六级真题词频 · 生成于 ${new Date().toLocaleDateString('zh-CN')}</p>
-      <p class="p-key">级别：基 = 基础　四 = 四级　六 = 六级　超 = 超纲　｜　数字 = 近六年真题出现次数　｜　★ = 高频 / 必考　｜　✎ = 会写词</p></div><div class="p-cols">`;
+      <p class="p-key">级别：基 = 基础　四 = 四级　六 = 六级　超 = 超纲　｜　数字 = 近六年真题出现次数　｜　★ = 高频 / 必考　｜　✎ = 会写词　｜　僻 = 熟词僻义</p></div><div class="p-cols">`;
     let g = null;
     const LVS = {basic:'基', cet4:'四', cet6:'六', ext:'超'};
     for (const w of list) {
       if (groupBy && w.w[0] !== g) { g = w.w[0]; html += `<h2 class="p-g">${g.toUpperCase()}</h2>`; }
       const pt = partsText(w);
-      html += `<div class="p-e"><div class="p-l"><b>${esc(w.w)}</b><span class="p-lv">${LVS[w.lv]}</span>${w.n ? `<span class="p-n">${w.n}</span>` : ''}${w.b >= 3 ? '<span class="p-s">★</span>' : ''}${w.wr ? '<span class="p-s">✎</span>' : ''}</div>
+      html += `<div class="p-e"><div class="p-l"><b>${esc(w.w)}</b><span class="p-lv">${LVS[w.lv]}</span>${w.n ? `<span class="p-n">${w.n}</span>` : ''}${w.b >= 3 ? '<span class="p-s">★</span>' : ''}${w.wr ? '<span class="p-s">✎</span>' : ''}${w.rs ? '<span class="p-s">僻</span>' : ''}</div>
         <div class="p-z">${w.zh.map(([p,t]) => `${p ? `<i>${esc(p)}</i> ` : ''}${esc(t)}`).join('　')}</div>
         ${pt ? `<div class="p-p">${esc(pt)}</div>` : ''}${w.mem ? `<div class="p-m">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="p-m">易混：${esc(w.vs)}</div>` : ''}</div>`;
     }
