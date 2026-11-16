@@ -522,6 +522,15 @@ window.CET6 = {
   }
   const firstMeanShort = w => w.zh.map(([p,t]) => (p ? p + ' ' : '') + t).join('；');
 
+  // 中文反查：搜「重要的」时不要匹配「不重要的」
+  const NEG = /[不无非未没](太|令人|令|使人|使|很|够|大)?$/;
+  function zhHit(w, q){
+    return w.zh.some(z => z[1].split(/[；;]/).some(s => {
+      let i = s.indexOf(q);
+      while (i >= 0) { if (!(q.length > 1 && NEG.test(s.slice(0, i)) && !NEG.test(q[0]))) return true; i = s.indexOf(q, i + 1); }
+      return false;
+    }));
+  }
   /* ---------- filtering ---------- */
   function apply(scrollUp){
     save();
@@ -534,7 +543,7 @@ window.CET6 = {
       (st.sort !== 'write' || w.wr) &&
       (st.letter === 'all' || w.w[0] === st.letter) &&
       (!st.hideKnown || !known.has(w.w)) &&
-      (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && w.zh.some(z => z[1].includes(q))) || (q.length > 2 && w.w.includes(q)))
+      (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && zhHit(w, q)) || (q.length > 2 && w.w.includes(q)))
     );
     if (st.sort === 'freq') current.sort((a,b) => (b.n - a.n) || (b.s - a.s) || a.w.localeCompare(b.w));
     else if (st.sort === 'write' && st.wfreq) current.sort((a,b) => (b.wt - a.wt) || (b.n - a.n) || a.w.localeCompare(b.w));
