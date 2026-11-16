@@ -196,7 +196,7 @@ CET6.add("d", [
 ["determine",[["v.","决定；确定；下决心"]],"de(加强)+termin(界限，同 terminal)+e → 划定界限 → **决定**；be determined to 决心","cet4",40,11,[7,5,9,8,4,7],[14,26,0,0,0],4,614,[["de","加强"],["termin","界限"],["e","动词"]],"","",1],
 ["detrimental",[["adj.","有害的"]],"de(向下)+tri(磨，同 trite)+ment+al → 磨损坏了 → **有害的**；be detrimental to","ext",19,11,[5,3,4,2,3,2],[2,17,0,0,0],4,1148,[["de","向下"],["tri","磨"],["ment","名词"],["al","…的"]],"","",1],
 ["devastate",[["v.","摧毁；使震惊悲痛"]],"de(加强)+vast(荒，同 waste)+ate → 变成荒地 → **摧毁**；devastated 悲痛欲绝","ext",9,6,[5,0,2,1,0,1],[3,6,0,0,0],3,2041,[["de","加强"],["vast","荒芜"],["ate","动词"]],"","",1],
-["develop",[["v.","发展；开发；养成；患（病）"]],"develop a habit **养成**习惯；develop cancer 患癌；developing country 发展中国家","basic",114,13,[27,33,14,11,17,12],[38,68,0,8,0],4,190,0,"","",1],
+["develop",[["v.","发展；开发；养成；患（病）"]],"develop a habit **养成**习惯；develop cancer 患癌；developing countries 发展中国家 / developed countries 发达国家","basic",114,13,[27,33,14,11,17,12],[38,68,0,8,0],4,190,0,"","",1],
 ["developer",[["n.","开发者；开发商"]],"develop+er → 软件**开发者**；房地产开发商也叫 developer","ext",6,5,[1,0,2,2,0,1],[1,4,0,1,0],2,2541,[["develop","开发"],["er","人"]],"","",0],
 ["development",[["n.","发展；进展；开发"]],"sustainable development **可持续发展**；new developments 新进展","basic",83,13,[13,17,19,12,12,10],[18,37,1,27,0],4,266,[["develop","发展"],["ment","名词"]],"","",1],
 ["developmental",[["adj.","发育的；发展的"]],"development+al → **发育的**；developmental psychology 发展心理学","ext",3,2,[1,0,0,2,0,0],[2,1,0,0,0],2,3866,[["develop","发展"],["ment","名词"],["al","…的"]],"","",0],
