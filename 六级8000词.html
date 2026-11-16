@@ -718,7 +718,7 @@ window.CET6 = {
       <p><b>2. 每天点「背诵」</b>：填上考试日期会自动算出每天背多少；看英文先想意思，再按空格看答案，按 1–4 评「忘了 / 模糊 / 记得 / 太简单」。忘了的词这一轮会再出现，之后按间隔自动安排复习（1 天、3 天、一周…），到期的数量显示在「背诵」按钮上。</p>
       <p><b>3. 用「自测」巩固</b>：看词选义、看义拼词（练写作拼写）、听音辨义（练听力）、易混辨析（affect / effect 这类）。答错的词自动加入复习。</p>
       <p><b>4. 用「词根」成串记</b>：点卡片里任意一块彩色积木，就能看到同一个词根的所有词；学一个词根能顺带认出一串词。</p>
-      <p><b>小提示</b>：勾选「遮住释义自测」可以把整页变成自测卡；点「✓」标记已掌握，配合「隐藏已掌握」只看没记住的。所有进度只存在你自己的浏览器里。</p>
+      <p><b>小提示</b>：勾选「遮住释义自测」可以把整页变成自测卡；点「✓」标记已掌握，配合「隐藏已掌握」只看没记住的。所有进度只存在你自己的浏览器里；换设备或清缓存前，在「背诵」页点「导出进度」存个备份，新设备上「导入进度」即可接着背。</p>
       <h3 style="margin-top:14px">下载打印版 PDF</h3>
       <p><a class="go" href="pdf/六级8000词-字母版.pdf" download>字母版（8000 词）</a>　·　<a class="go" href="pdf/六级8000词-真题频率版.pdf" download>真题频率版（8000 词）</a>　·　<a class="go" href="pdf/六级会写词汇.pdf" download>会写词汇版</a>　｜　想导出自己筛选的范围，用上方「导出 PDF」按钮。</p>
       <h3 style="margin-top:14px">说明</h3>
@@ -809,11 +809,43 @@ window.CET6 = {
         考试日期 <input id="pExam" type="date" value="${esc(plan.exam)}"></div>
       <p class="fc-sub">${dl ? `距考试 ${dl} 天，还没掌握 ${left.toLocaleString()} 词；留一周冲刺的话，建议每天新词 ≈ <a class="go" id="useSug">${suggest}</a>` : '填上考试日期，会自动算每天该背多少'}</p>
       <div class="fc-acts"><button class="primary" id="goStudy">开始（Enter）</button></div>
-      <div class="fc-keys">背的时候：空格 = 看答案，1 忘了 · 2 模糊 · 3 记得 · 4 太简单。忘了的词这一轮会再出现，直到记住。</div>`;
+      <div class="fc-keys">背的时候：空格 = 看答案，1 忘了 · 2 模糊 · 3 记得 · 4 太简单。忘了的词这一轮会再出现，直到记住。</div>
+      <div class="fc-acts" style="margin-top:18px"><button id="expP" title="把进度存成文件，换设备时导入">导出进度</button><button id="impP">导入进度</button><input type="file" id="impF" accept=".json,application/json" hidden></div>
+      <p class="fc-sub" id="pMsg">进度只保存在这个浏览器里；换手机、换电脑或清缓存前，先导出备份。</p>`;
+    $('#expP').onclick = exportProgress;
+    $('#impP').onclick = () => $('#impF').click();
+    $('#impF').onchange = e => importProgress(e.target.files[0]);
     $('#pDaily').onchange = e => { plan.daily = Math.max(5, +e.target.value || 40); store.set('cet6-plan', plan); studyHome(); };
     $('#pExam').onchange = e => { plan.exam = e.target.value; store.set('cet6-plan', plan); studyHome(); };
     const us = $('#useSug'); if (us) us.onclick = () => { plan.daily = suggest; store.set('cet6-plan', plan); studyHome(); };
     $('#goStudy').onclick = startStudy;
+  }
+  /* 进度备份：导出 / 导入（掌握标记、复习排程、打卡、计划） */
+  const PROGRESS_KEYS = ['cet6-known', 'cet6-srs', 'cet6-daylog', 'cet6-plan', 'cet6-newlog'];
+  function exportProgress(){
+    const data = {app: 'cet6-8000', version: 1, exported: new Date().toISOString(), data: {}};
+    for (const k of PROGRESS_KEYS) data.data[k] = store.get(k, null);
+    const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = `六级8000词-进度-${dayKey()}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    const m = $('#pMsg'); if (m) m.textContent = `已导出：学过 ${Object.keys(srs).length} 词、已掌握 ${known.size} 词。`;
+  }
+  function importProgress(file){
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const m = $('#pMsg');
+      try {
+        const obj = JSON.parse(r.result);
+        if (!obj || obj.app !== 'cet6-8000' || !obj.data) throw new Error('不是本词表导出的进度文件');
+        const nSrs = Object.keys(obj.data['cet6-srs'] || {}).length;
+        if (!confirm(`导入后会覆盖当前进度（文件里学过 ${nSrs} 词）。继续？`)) return;
+        for (const k of PROGRESS_KEYS) if (obj.data[k] != null) store.set(k, obj.data[k]);
+        location.reload();
+      } catch (err) { if (m) m.textContent = '导入失败：' + err.message; }
+    };
+    r.readAsText(file);
   }
   function startStudy(){
     const due = dueList().sort((a,b) => srs[a].due - srs[b].due).map(w => byWord.get(w));
@@ -949,7 +981,7 @@ window.CET6 = {
   }
   function mark(w, ok){
     const s = session;
-    if (ok) s.right++; else { s.wrongs.push(w); grade(w.w, 0); }
+    if (ok) { s.right++; logReview(); } else { s.wrongs.push(w); grade(w.w, 0); }
   }
   function next(){ session.idx++; quizCard(); }
 
