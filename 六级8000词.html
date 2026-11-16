@@ -534,7 +534,7 @@ window.CET6 = {
       (st.sort !== 'write' || w.wr) &&
       (st.letter === 'all' || w.w[0] === st.letter) &&
       (!st.hideKnown || !known.has(w.w)) &&
-      (!q || w.w.startsWith(q) || (q.length > 1 && /[^\x00-\x7f]/.test(q) && w.zh.some(z => z[1].includes(q))) || (q.length > 2 && w.w.includes(q)))
+      (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && w.zh.some(z => z[1].includes(q))) || (q.length > 2 && w.w.includes(q)))
     );
     if (st.sort === 'freq') current.sort((a,b) => (b.n - a.n) || (b.s - a.s) || a.w.localeCompare(b.w));
     else if (st.sort === 'write' && st.wfreq) current.sort((a,b) => (b.wt - a.wt) || (b.n - a.n) || a.w.localeCompare(b.w));
