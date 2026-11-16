@@ -541,12 +541,18 @@ window.CET6 = {
     else current.sort((a,b) => a.w.localeCompare(b.w));
     $('#wfreqWrap').hidden = st.sort !== 'write';
     if (q && /^[a-z]/.test(q)) current.sort((a,b) => (b.w === q) - (a.w === q) || (b.w.startsWith(q)) - (a.w.startsWith(q)));
+    // 中文反查：意思完全等于搜索词的排最前，其余按真题出现次数从高到低
+    if (q && /[^\x00-\x7f]/.test(q)) {
+      const exact = w => w.zh.some(z => z[1].split(/[；;，,]/).some(s => s.replace(/[（(].*?[）)]/g, '').trim() === q));
+      current.sort((a,b) => exact(b) - exact(a) || b.n - a.n || a.w.localeCompare(b.w));
+    }
     $('#list').innerHTML = ''; shown = 0; lastGroup = null;
     const parts = [];
     if (st.letter !== 'all') parts.push('字母 ' + st.letter.toUpperCase());
     if (st.lv !== 'all') parts.push(LV[st.lv]);
     if (st.band !== 'all') parts.push(BAND[st.band]);
-    const how = st.sort === 'freq' ? ' · 按真题出现次数从高到低'
+    const how = (q && /[^\x00-\x7f]/.test(q)) ? ' · 中文反查：完全匹配优先，再按真题出现次数'
+      : st.sort === 'freq' ? ' · 按真题出现次数从高到低'
       : st.sort === 'write' ? (st.wfreq ? ' · 会写词汇 · 按写作+翻译出现次数' : ' · 会写词汇 · 按字母顺序') : ' · 按字母顺序';
     $('#resinfo').textContent = `共 ${current.length.toLocaleString()} 词` + (parts.length ? ' · ' + parts.join(' · ') : '') + how;
     if (!current.length) { $('#list').innerHTML = '<div class="empty">没有符合条件的词</div>'; $('#more').hidden = true; return; }
