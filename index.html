@@ -30,6 +30,7 @@
   --mem-bg:#2a2519; --mem-line:#4a3f26; --shadow:none; --known:#6cc28c;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);
   font:15px/1.6 "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif}
@@ -149,18 +150,43 @@ main{padding:18px 0 60px}
   font-size:12px;line-height:19px;text-align:center;font-weight:700}
 .mem b{color:var(--ink);font-weight:600}
 .pic{font-size:28px;line-height:1.2;margin-top:8px;letter-spacing:2px}
-.parts-d{display:flex;flex-wrap:wrap;align-items:center;gap:3px;margin-top:8px}
-.blk{display:inline-flex;flex-direction:column;align-items:center;border-radius:8px;padding:3px 9px 4px;min-width:38px;
-  border:1px solid transparent;opacity:0;transform:translateY(-8px) scale(.9)}
-.in .blk{animation:drop .45s cubic-bezier(.2,.9,.3,1.3) forwards;animation-delay:var(--d)}
+/* ---------- 词根算式卡：[前缀] + [词根] + [后缀] = 意思 ---------- */
+.parts-d{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;margin:10px 0 2px}
+.blk{position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border-radius:11px;
+  padding:7px 12px 6px;min-width:54px;border:1.5px solid transparent;opacity:0;transform:translateY(-14px) rotate(-3deg) scale(.85);
+  cursor:pointer;transition:transform .15s,box-shadow .15s}
+.blk:hover{transform:translateY(-2px)!important;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.in .blk{animation:drop .5s cubic-bezier(.2,.9,.3,1.35) forwards;animation-delay:var(--d)}
 @keyframes drop{to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.blk{opacity:1;transform:none}.in .blk{animation:none}}
-.blk b{font:600 16px/1.3 Georgia,serif;letter-spacing:.02em}
-.blk em{font-style:normal;font-size:11px;line-height:1.3;opacity:.85}
-.blk.pre{background:var(--teal-soft);color:var(--teal);border-color:color-mix(in srgb,var(--teal) 25%,transparent)}
-.blk.root{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
-.blk.suf{background:var(--violet-soft);color:var(--violet);border-color:color-mix(in srgb,var(--violet) 25%,transparent)}
-.plus{color:var(--ink3);font-size:12px}
+.blk i{font-style:normal;font-size:10px;letter-spacing:.12em;opacity:.75;line-height:1;margin-bottom:3px}
+.blk b{font:700 19px/1.2 Georgia,"Times New Roman",serif;letter-spacing:.03em}
+.blk em{font-style:normal;font-size:12px;line-height:1.35;margin-top:2px;font-weight:600}
+.blk.pre{background:var(--teal-soft);color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
+.blk.root{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
+.blk.suf{background:var(--violet-soft);color:var(--violet);border-color:color-mix(in srgb,var(--violet) 40%,transparent);border-style:dashed}
+.blk.pre::after{content:"";position:absolute;right:-5px;top:50%;width:8px;height:8px;margin-top:-4px;background:inherit;border:inherit;border-left:0;border-bottom:0;transform:rotate(45deg)}
+.plus,.eq{align-self:center;color:var(--ink3);font:600 15px/1 Georgia,serif;opacity:0}
+.in .plus,.in .eq{animation:fade .3s forwards;animation-delay:var(--d)}
+@keyframes fade{to{opacity:1}}
+.res{align-self:center;display:inline-flex;align-items:center;border-radius:11px;padding:8px 13px;background:var(--ink);color:var(--paper);
+  font-weight:700;font-size:15px;opacity:0;transform:scale(.6)}
+.in .res{animation:pop .45s cubic-bezier(.2,.9,.3,1.5) forwards;animation-delay:var(--d)}
+@keyframes pop{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.blk,.plus,.eq,.res{opacity:1;transform:none}.in .blk,.in .plus,.in .eq,.in .res{animation:none}}
+.legend-role{display:inline-flex;gap:6px;align-items:center;margin-left:6px}
+.legend-role span{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600}
+/* ---------- 词根视图 ---------- */
+.roots-sec h2{font:700 18px/1.3 "PingFang SC","Microsoft YaHei",sans-serif;margin:24px 4px 10px;display:flex;gap:8px;align-items:baseline}
+.roots-sec h2 small{font-weight:400;font-size:13px;color:var(--ink3)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.rcard{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
+.rcard .rh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.rcard .rh .blk{opacity:1;transform:none;cursor:default}
+.rcard .rh span{color:var(--ink3);font-size:12px}
+.rcard .rw{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:14px}
+.rcard .rw a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--ink3);cursor:pointer}
+.rcard .rw a small{color:var(--ink3);margin-left:3px;font-size:11px}
+.rcard .more-w{color:var(--accent);cursor:pointer;font-size:12px;border:0;background:none;padding:0}
 .vs{margin-top:6px;font-size:13px;color:var(--ink2)}
 .vs span{font-size:11px;background:var(--gray-soft);color:var(--ink2);border-radius:4px;padding:1px 6px;margin-right:6px;font-weight:600}
 .fam{margin-top:6px}
@@ -265,6 +291,7 @@ main{padding:18px 0 60px}
         <button data-sort="alpha" aria-pressed="true">字母 A–Z</button>
         <button data-sort="freq" aria-pressed="false">真题频率</button>
         <button data-sort="write" aria-pressed="false" title="四级常用词 + 重要六级词：写作、翻译要会拼会用">会写词汇</button>
+        <button data-sort="roots" aria-pressed="false" title="按词根词缀成串记忆">词根</button>
       </div>
       <button class="cta" id="studyBtn" title="间隔复习背单词">背诵<span id="dueBadge"></span></button>
       <button class="cta ghost" id="quizBtn" title="选择题 / 拼写 / 听音自测">自测</button>
@@ -438,9 +465,54 @@ window.CET6 = {
   }
   function save(){ const {q, ...rest} = st; store.set('cet6-view', rest); }
 
+  /* ---------- 词根词缀索引：同一角色 + 同一拼写 = 一张卡 ---------- */
+  const affIdx = new Map();
+  for (const w of words) {
+    if (!w.parts) continue;
+    const n = w.parts.length;
+    w.parts.forEach(([seg, m], i) => {
+      const r = role(seg, i, n), k = r + ':' + seg.toLowerCase();
+      if (seg.toLowerCase() === w.w) return;
+      if (!affIdx.has(k)) affIdx.set(k, {seg: seg.toLowerCase(), r, means: {}, ws: []});
+      const e = affIdx.get(k);
+      e.means[m] = (e.means[m] || 0) + 1; e.ws.push(w);
+    });
+  }
+  for (const e of affIdx.values()) {
+    e.m = Object.entries(e.means).sort((a,b) => b[1] - a[1]).slice(0, 2).map(x => x[0]).join(' / ');
+    e.ws.sort((a,b) => b.n - a.n);
+  }
+  function renderRoots(){
+    const q = st.q;
+    let list = [...affIdx.values()].filter(e => e.ws.length >= 2);
+    if (st.letter !== 'all') list = list.filter(e => e.seg[0] === st.letter);
+    if (q) list = list.filter(e => e.seg === q || e.seg.startsWith(q) || (/[^\x00-\x7f]/.test(q) && e.m.includes(q)));
+    const score = e => e.ws.reduce((s, w) => s + Math.min(w.n, 30), 0) + e.ws.length * 3;
+    list.sort((a,b) => (q && (b.seg === q) - (a.seg === q)) || score(b) - score(a));
+    const sec = {root: [], pre: [], suf: []};
+    for (const e of list) sec[e.r].push(e);
+    const titles = {root: ['词根', '一个词根记住一串词'], pre: ['前缀', '放在词首，决定方向、否定、程度'], suf: ['后缀', '放在词尾，决定词性']};
+    const cardH = e => {
+      const shown = e.ws.slice(0, 14);
+      return `<div class="rcard"><div class="rh"><span class="blk ${e.r}"><i>${ROLE_ZH[e.r]}</i><b>${esc(e.seg)}</b><em>${esc(e.m)}</em></span><span>${e.ws.length} 个词</span></div>
+        <div class="rw">${shown.map(w => `<a data-go="${esc(w.w)}" title="${esc(firstMeanShort(w))}">${esc(w.w)}<small>${esc(shortMean(w))}</small></a>`).join('')}${e.ws.length > 14 ? `<button class="more-w" data-root="${esc(e.r + ':' + e.seg)}">全部 ${e.ws.length} 个 ›</button>` : ''}</div></div>`;
+    };
+    let html = '';
+    for (const r of ['root', 'pre', 'suf']) {
+      if (!sec[r].length) continue;
+      html += `<section class="roots-sec"><h2>${titles[r][0]}<small>${sec[r].length} 个 · ${titles[r][1]}</small></h2><div class="rgrid">${sec[r].slice(0, q ? 60 : 240).map(cardH).join('')}</div></section>`;
+    }
+    $('#list').innerHTML = html || '<div class="empty">没有找到这个词根</div>';
+    $('#more').hidden = true;
+    $('#resinfo').textContent = `词根 ${sec.root.length} · 前缀 ${sec.pre.length} · 后缀 ${sec.suf.length}` + (q ? ` · 搜索「${q}」` : ' · 按覆盖的高频词多少排序');
+  }
+  const firstMeanShort = w => w.zh.map(([p,t]) => (p ? p + ' ' : '') + t).join('；');
+
   /* ---------- filtering ---------- */
   function apply(scrollUp){
     save();
+    $('#wfreqWrap').hidden = st.sort !== 'write';
+    if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
     current = words.filter(w =>
       (st.lv === 'all' || w.lv === st.lv) &&
@@ -476,11 +548,17 @@ window.CET6 = {
     // 支持 **重点** 加粗
     return esc(m).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
   }
-  function partsHtml(w){
+  const ROLE_ZH = {pre:'前缀', root:'词根', suf:'后缀'};
+  function shortMean(w){ const t = (w.zh[0] || ['',''])[1]; return t.split(/[；;，,]/)[0]; }
+  function partsHtml(w, opt){
     if (!w.parts) return '';
-    const n = w.parts.length;
-    return `<div class="parts-d" aria-label="词根拆解">${w.parts.map(([seg, m], i) =>
-      `${i ? '<span class="plus">+</span>' : ''}<span class="blk ${role(seg, i, n)}" style="--d:${i * 90}ms"><b>${esc(seg)}</b><em>${esc(m)}</em></span>`).join('')}</div>`;
+    const n = w.parts.length, step = 160;
+    const blocks = w.parts.map(([seg, m], i) => {
+      const r = role(seg, i, n);
+      return `${i ? `<span class="plus" style="--d:${i * step - 60}ms">+</span>` : ''}<span class="blk ${r}" style="--d:${i * step}ms" data-seg="${esc(seg.toLowerCase())}" data-role="${r}" title="点我看同${ROLE_ZH[r]}的词"><i>${ROLE_ZH[r]}</i><b>${esc(seg)}</b><em>${esc(m)}</em></span>`;
+    }).join('');
+    const res = opt && opt.noResult ? '' : `<span class="eq" style="--d:${n * step}ms">=</span><span class="res" style="--d:${n * step + 80}ms">${esc(shortMean(w))}</span>`;
+    return `<div class="parts-d" aria-label="词根拆解">${blocks}${res}</div>`;
   }
   function familyHtml(w){
     if (!w.parts) return '';
@@ -504,8 +582,7 @@ window.CET6 = {
     const isK = known.has(w.w);
     return `<article class="card${isK ? ' known' : ''}" data-w="${esc(w.w)}">
       <div class="head"><div class="w">${rank}${esc(w.w)}</div>
-        <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}</div>
-        ${w.pic ? `<div class="pic" aria-hidden="true">${esc(w.pic)}</div>` : ''}</div>
+        <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}</div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${partsHtml(w)}
         ${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}
@@ -555,7 +632,13 @@ window.CET6 = {
   new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => {
     if (n.nodeType === 1) n.querySelectorAll ? n.querySelectorAll('.card').forEach(c => animIO.observe(c)) : 0;
   }))).observe($('#list'), {childList:true, subtree:true});
+  function openRoot(seg){
+    st.sort = 'roots'; st.letter = 'all'; markLetters();
+    document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === 'roots')));
+    $('#q').value = seg; st.q = seg; apply(true);
+  }
   function goWord(x){
+    if (st.sort === 'roots') { st.sort = 'alpha'; document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === 'alpha'))); }
     st.letter = 'all'; st.lv = 'all'; st.band = 'all'; markLetters();
     document.querySelectorAll('#lvChips .chip,#bandChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === 'all')));
     $('#q').value = x; st.q = x; apply(true);
@@ -563,6 +646,10 @@ window.CET6 = {
   $('#list').addEventListener('click', e => {
     const g = e.target.closest('[data-go]');
     if (g) { e.preventDefault(); goWord(g.dataset.go); return; }
+    const mw = e.target.closest('[data-root]');
+    if (mw) { const ent = affIdx.get(mw.dataset.root); mw.parentElement.innerHTML = ent.ws.map(w => `<a data-go="${esc(w.w)}">${esc(w.w)}<small>${esc(shortMean(w))}</small></a>`).join(''); return; }
+    const blk = e.target.closest('.blk[data-seg]');
+    if (blk) { openRoot(blk.dataset.seg); return; }
     const c = e.target.closest('.card'); if (!c) return;
     const w = c.dataset.w;
     if (e.target.closest('.ok')) {
@@ -685,7 +772,7 @@ window.CET6 = {
       <div class="fc-sub">先在心里说出意思，再看答案</div>
       <div class="fc-pic" id="fcHint"></div>
       <div class="fc-acts"><button id="hintB">提示（H）</button><button id="spkB">朗读（S）</button><button class="primary" id="showB">看答案（空格）</button></div>`;
-    $('#hintB').onclick = () => { $('#fcHint').innerHTML = (w.pic ? esc(w.pic) : '') + (w.parts ? `<div class="in">${partsHtml({...w, parts: w.parts.map(([a]) => [a, '?'])})}</div>` : ''); };
+    $('#hintB').onclick = () => { $('#fcHint').innerHTML = w.parts ? `<div class="in" style="display:flex;justify-content:center">${partsHtml(w, {noResult: true})}</div>` : '<div class="fc-sub">这个词没有词根拆解，看看首字母和长度：' + esc(w.w[0]) + ' · ' + w.w.length + ' 个字母</div>'; };
     $('#spkB').onclick = () => speak(w.w);
     $('#showB').onclick = reveal;
   }
@@ -693,7 +780,7 @@ window.CET6 = {
     const s = session; if (!s || s.shown) return;
     s.shown = true;
     const w = s.q[s.idx].w;
-    fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div><div class="fc-pic">${esc(w.pic || '')}</div>${backHtml(w)}
+    fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div>${backHtml(w)}
       <div class="fc-acts"><button class="again" data-g="0">忘了<small>1</small></button><button class="hard" data-g="1">模糊<small>2</small></button>
       <button class="good" data-g="2">记得<small>3</small></button><button class="easy" data-g="3">太简单<small>4</small></button></div>`;
     fc.querySelectorAll('[data-g]').forEach(b => b.onclick = () => rate(+b.dataset.g));
@@ -818,7 +905,7 @@ window.CET6 = {
     for (const w of list) {
       if (groupBy && w.w[0] !== g) { g = w.w[0]; html += `<h2 class="p-g">${g.toUpperCase()}</h2>`; }
       const pt = partsText(w);
-      html += `<div class="p-e"><div class="p-l"><b>${esc(w.w)}</b><span class="p-lv">${LVS[w.lv]}</span>${w.n ? `<span class="p-n">${w.n}</span>` : ''}${w.b >= 3 ? '<span class="p-s">★</span>' : ''}${w.wr ? '<span class="p-s">✎</span>' : ''}${w.pic ? `<span class="p-pic">${esc(w.pic)}</span>` : ''}</div>
+      html += `<div class="p-e"><div class="p-l"><b>${esc(w.w)}</b><span class="p-lv">${LVS[w.lv]}</span>${w.n ? `<span class="p-n">${w.n}</span>` : ''}${w.b >= 3 ? '<span class="p-s">★</span>' : ''}${w.wr ? '<span class="p-s">✎</span>' : ''}</div>
         <div class="p-z">${w.zh.map(([p,t]) => `${p ? `<i>${esc(p)}</i> ` : ''}${esc(t)}`).join('　')}</div>
         ${pt ? `<div class="p-p">${esc(pt)}</div>` : ''}${w.mem ? `<div class="p-m">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="p-m">易混：${esc(w.vs)}</div>` : ''}</div>`;
     }
