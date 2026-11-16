@@ -670,7 +670,9 @@ window.CET6 = {
     const nS = (meta.sittings||[]).length;
     const sitList = (meta.sittings||[]).map(s => s.replace('-', ' 年 ').replace(/ 0?(\d+)$/, ' $1 月')).join('、');
     $('#legend').innerHTML = `
-      <h3>说明</h3>
+      <h3>下载打印版 PDF</h3>
+      <p><a class="go" href="pdf/六级8000词-字母版.pdf" download>字母版（8000 词）</a>　·　<a class="go" href="pdf/六级8000词-真题频率版.pdf" download>真题频率版（8000 词）</a>　·　<a class="go" href="pdf/六级会写词汇.pdf" download>会写词汇版</a>　｜　想导出自己筛选的范围，用上方「导出 PDF」按钮。</p>
+      <h3 style="margin-top:14px">说明</h3>
       <p><b>词频来源</b>：统计了 ${nS} 次六级考试的真题文本（${sitList || '—'}），包括听力原文、阅读、写作题目和翻译参考译文，词形变化（复数、过去式、比较级等）合并到原形计数。“次”指该词在全部真题中出现的总次数，柱状图是 ${YEARS[0]}–${YEARS[YEARS.length-1]} 年逐年次数。</p>
       <p><b>频率分档</b>：必考 = 在 70% 以上的考次中出现；高频 = 40% 以上；常见 = 至少出现在 2 次考试；偶考 = 只出现在 1 次考试；未考 = 近六年真题中没出现。</p>
       <p><b>级别</b>：基础 = 中学阶段词汇；四级 / 六级 = 四六级考纲词汇；超纲 = 考纲外但在真题中出现过的词。</p>
