@@ -830,13 +830,18 @@ window.CET6 = {
         <button class="mode" data-m="pick"><b>看词选义</b><span>看英文，四选一中文</span></button>
         <button class="mode" data-m="spell"><b>看义拼词</b><span>看中文和词根提示，拼出单词</span></button>
         <button class="mode" data-m="listen"><b>听音辨义</b><span>只听发音，四选一（练听力反应）</span></button>
+        <button class="mode" data-m="vs"><b>易混辨析</b><span>看中文，从形近词里挑出对的那个（affect / effect）</span></button>
       </div>${n < 4 ? '<p class="fc-sub" style="margin-top:16px">当前列表的词太少，先放宽筛选条件。</p>' : ''}`;
     fc.querySelectorAll('[data-m]').forEach(b => b.onclick = () => startQuiz(b.dataset.m));
   }
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const firstMean = w => w.zh.map(([p,t]) => (p ? p + ' ' : '') + t).join('；');
+  // 易混词：从 vs 字段里取出词表中真实存在的形近词
+  const rivalsOf = w => [...new Set((w.vs.match(/\b[a-z][a-z-]+\b/g) || []).filter(x => x !== w.w && byWord.has(x)))].map(x => byWord.get(x));
   function startQuiz(mode){
-    const p = pool(); if (p.length < 4) return;
+    let p = pool();
+    if (mode === 'vs') { p = p.filter(w => w.vs && rivalsOf(w).length); if (p.length < 4) p = words.filter(w => w.vs && rivalsOf(w).length); }
+    if (p.length < 4) return;
     session = {quiz: mode, q: shuffle(p.slice()).slice(0, 20), idx: 0, right: 0, wrongs: []};
     quizCard();
   }
@@ -870,11 +875,16 @@ window.CET6 = {
       }
       return;
     }
-    const others = shuffle(words.filter(x => x !== w && x.lv === w.lv && firstMean(x) !== firstMean(w))).slice(0, 3);
+    const isVs = s.quiz === 'vs';
+    const others = isVs ? rivalsOf(w).slice(0, 3)
+      : shuffle(words.filter(x => x !== w && x.lv === w.lv && firstMean(x) !== firstMean(w))).slice(0, 3);
     const opts = shuffle([w, ...others]);
     const isListen = s.quiz === 'listen';
-    fc.innerHTML = `${isListen ? `<div class="fc-word" style="font-size:60px;cursor:pointer" id="lsn" title="再听一遍">🔊</div><div class="fc-sub">点喇叭或按 S 再听一遍</div>` : `<div class="fc-word">${esc(w.w)}</div>`}
-      <div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${i + 1}. ${esc(firstMean(o))}</button>`).join('')}</div><div id="qRes"></div>`;
+    const head = isListen ? `<div class="fc-word" style="font-size:60px;cursor:pointer" id="lsn" title="再听一遍">🔊</div><div class="fc-sub">点喇叭或按 S 再听一遍</div>`
+      : isVs ? `<div class="fc-back" style="text-align:center">${meanHtml(w)}</div><div class="fc-sub" style="margin-top:10px">哪个单词是这个意思？</div>`
+      : `<div class="fc-word">${esc(w.w)}</div>`;
+    fc.innerHTML = `${head}
+      <div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}" ${isVs ? 'style="font:600 20px Georgia,serif;text-align:center"' : ''}>${i + 1}. ${esc(isVs ? o.w : firstMean(o))}</button>`).join('')}</div><div id="qRes"></div>`;
     if (isListen) { speak(w.w); $('#lsn').onclick = () => speak(w.w); }
     fc.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i));
     s.choose = choose;
@@ -883,7 +893,8 @@ window.CET6 = {
       const ok = opts[i] === w;
       fc.querySelectorAll('.opt').forEach((b, k) => { if (opts[k] === w) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); });
       mark(w, ok);
-      $('#qRes').innerHTML = `${isListen ? `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>` : ''}${ok ? '' : backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题（Enter）</button></div>`;
+      const vsExplain = isVs ? `<div class="fc-back">${opts.map(o => `<div style="margin:3px 0"><b style="font-family:Georgia,serif">${esc(o.w)}</b>　${esc(firstMean(o))}</div>`).join('')}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}</div>` : '';
+      $('#qRes').innerHTML = `${isListen ? `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>` : ''}${isVs ? vsExplain : (ok ? '' : backHtml(w))}<div class="fc-acts"><button class="primary" id="nx">下一题（Enter）</button></div>`;
       $('#nx').onclick = next; if (!isListen) speak(w.w);
     }
   }
