@@ -241,6 +241,9 @@ main{padding:18px 0 60px}
   .stat{min-width:0;flex:1 1 40%;padding:8px 12px}
   .stat b{font-size:18px}
   #hint{display:none}
+  /* 手机上往下滚动时收起筛选行和字母行，只保留搜索与视图切换 */
+  .bar.compact .row2,.bar.compact .letters{display:none}
+  .bar.compact .wrap{padding-top:8px;padding-bottom:8px}
 }
 .chip.pdf{border-color:var(--ink3);color:var(--ink)}
 #printArea{display:none}
@@ -363,7 +366,7 @@ window.CET6 = {
   const byWord = new Map(words.map(w => [w.w, w]));
   /* 词根词缀角色：用于给积木上色、建立同根词索引 */
   const PREFIX = new Set(('a ab abs ad ac af ag al an ap ar as at ante anti auto be bene bi by circum co col com con cor contra counter de dia dis di dif e ec en em ex extra fore hyper hypo il im in ir inter intro mal micro mis mono multi non ob oc of op out over para per post pre pro re retro se semi sub suc suf sup sur super sus sym syn tele trans tri ultra un under uni up with').split(' '));
-  const SUFFIX = new Set(('able ible al ial ance ence ancy ency ant ent ar ary ery ory ate ative itive cy dom ed ee eer en er or ess est ful fy ify hood ic ical ics ion tion sion ation ish ism ist ity ty ive ize ise less let ly ment ness ous ious eous ship some ure ture ward wise y ing age al ism th ster ling ite').split(' '));
+  const SUFFIX = new Set(('ual ian ese ary ory ics ology logy graphy eer ette let ling ster ward wards wise itude tude ture iety ety acy ency ancy ient ier ator itor ative itive ation ition ization ism ist ally ily ingly edly ise ize ify fy en ed er or ess ful ness ment ship hood dom able ible al ial ance ence ancy ency ant ent ar ary ery ory ate ative itive cy dom ed ee eer en er or ess est ful fy ify hood ic ical ics ion tion sion ation ish ism ist ity ty ive ize ise less let ly ment ness ous ious eous ship some ure ture ward wise y ing age al ism th ster ling ite').split(' '));
   function role(seg, i, n){
     const s = seg.toLowerCase();
     if (n > 1 && i === 0 && PREFIX.has(s)) return 'pre';
@@ -458,7 +461,15 @@ window.CET6 = {
     };
     const th = store.get('cet6-theme', null); if (th) document.documentElement.dataset.theme = th;
     $('#toTop').onclick = () => scrollTo({top:0, behavior:'smooth'});
-    addEventListener('scroll', () => $('#toTop').classList.toggle('show', scrollY > 800), {passive:true});
+    let lastY = 0;
+    addEventListener('scroll', () => {
+      $('#toTop').classList.toggle('show', scrollY > 800);
+      const bar = $('.bar'), top = $('main').offsetTop;
+      if (scrollY < top - 40) bar.classList.remove('compact');
+      else if (scrollY > lastY + 6) bar.classList.add('compact');      // 向下滚：收起
+      else if (scrollY < lastY - 30) bar.classList.remove('compact');  // 明显向上滚：展开
+      lastY = scrollY;
+    }, {passive:true});
   }
   function markLetters(){
     document.querySelectorAll('#letters button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === st.letter)));
@@ -471,9 +482,12 @@ window.CET6 = {
     if (!w.parts) continue;
     const n = w.parts.length;
     w.parts.forEach(([seg, m], i) => {
-      const r = role(seg, i, n), k = r + ':' + seg.toLowerCase();
+      const r = role(seg, i, n);
       if (seg.toLowerCase() === w.w) return;
-      if (!affIdx.has(k)) affIdx.set(k, {seg: seg.toLowerCase(), r, means: {}, ws: []});
+      // 同形不同义的词根分开成卡：man「人」≠ man「手」；词缀按角色合并（意思本就多样）
+      const sense = r === 'root' ? String(m).replace(/[（(].*$/, '').slice(0, 2) : '';
+      const k = r + ':' + seg.toLowerCase() + (sense ? ':' + sense : '');
+      if (!affIdx.has(k)) affIdx.set(k, {k, seg: seg.toLowerCase(), r, means: {}, ws: []});
       const e = affIdx.get(k);
       e.means[m] = (e.means[m] || 0) + 1; e.ws.push(w);
     });
@@ -495,7 +509,7 @@ window.CET6 = {
     const cardH = e => {
       const shown = e.ws.slice(0, 14);
       return `<div class="rcard"><div class="rh"><span class="blk ${e.r}"><i>${ROLE_ZH[e.r]}</i><b>${esc(e.seg)}</b><em>${esc(e.m)}</em></span><span>${e.ws.length} 个词</span></div>
-        <div class="rw">${shown.map(w => `<a data-go="${esc(w.w)}" title="${esc(firstMeanShort(w))}">${esc(w.w)}<small>${esc(shortMean(w))}</small></a>`).join('')}${e.ws.length > 14 ? `<button class="more-w" data-root="${esc(e.r + ':' + e.seg)}">全部 ${e.ws.length} 个 ›</button>` : ''}</div></div>`;
+        <div class="rw">${shown.map(w => `<a data-go="${esc(w.w)}" title="${esc(firstMeanShort(w))}">${esc(w.w)}<small>${esc(shortMean(w))}</small></a>`).join('')}${e.ws.length > 14 ? `<button class="more-w" data-root="${esc(e.k)}">全部 ${e.ws.length} 个 ›</button>` : ''}</div></div>`;
     };
     let html = '';
     for (const r of ['root', 'pre', 'suf']) {
