@@ -531,6 +531,13 @@ window.CET6 = {
       return false;
     }));
   }
+  // 助记里的固定搭配也能被中文搜到：搜「碳中和」找到 neutrality（carbon neutrality 碳中和）
+  function memHit(w, q){
+    const m = (w.mem || '').replace(/\*\*/g, '');
+    let i = m.indexOf(q);
+    while (i >= 0) { if (!NEG.test(m.slice(0, i))) return true; i = m.indexOf(q, i + 1); }
+    return false;
+  }
   /* ---------- filtering ---------- */
   function apply(scrollUp){
     save();
@@ -543,7 +550,7 @@ window.CET6 = {
       (st.sort !== 'write' || w.wr) &&
       (st.letter === 'all' || w.w[0] === st.letter) &&
       (!st.hideKnown || !known.has(w.w)) &&
-      (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && zhHit(w, q)) || (q.length > 2 && w.w.includes(q)))
+      (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && (zhHit(w, q) || (q.length > 1 && memHit(w, q)))) || (q.length > 2 && w.w.includes(q)))
     );
     if (st.sort === 'freq') current.sort((a,b) => (b.n - a.n) || (b.s - a.s) || a.w.localeCompare(b.w));
     else if (st.sort === 'write' && st.wfreq) current.sort((a,b) => (b.wt - a.wt) || (b.n - a.n) || a.w.localeCompare(b.w));
@@ -553,14 +560,15 @@ window.CET6 = {
     // 中文反查：意思完全等于搜索词的排最前，其余按真题出现次数从高到低
     if (q && /[^\x00-\x7f]/.test(q)) {
       const exact = w => w.zh.some(z => z[1].split(/[；;，,]/).some(s => s.replace(/[（(].*?[）)]/g, '').trim() === q));
-      current.sort((a,b) => exact(b) - exact(a) || b.n - a.n || a.w.localeCompare(b.w));
+      const inZh = w => zhHit(w, q);
+      current.sort((a,b) => exact(b) - exact(a) || inZh(b) - inZh(a) || b.n - a.n || a.w.localeCompare(b.w));
     }
     $('#list').innerHTML = ''; shown = 0; lastGroup = null;
     const parts = [];
     if (st.letter !== 'all') parts.push('字母 ' + st.letter.toUpperCase());
     if (st.lv !== 'all') parts.push(LV[st.lv]);
     if (st.band !== 'all') parts.push(BAND[st.band]);
-    const how = (q && /[^\x00-\x7f]/.test(q)) ? ' · 中文反查：完全匹配优先，再按真题出现次数'
+    const how = (q && /[^\x00-\x7f]/.test(q)) ? ' · 中文反查：释义完全匹配 → 释义包含 → 助记搭配包含，同类按真题出现次数'
       : st.sort === 'freq' ? ' · 按真题出现次数从高到低'
       : st.sort === 'write' ? (st.wfreq ? ' · 会写词汇 · 按写作+翻译出现次数' : ' · 会写词汇 · 按字母顺序') : ' · 按字母顺序';
     $('#resinfo').textContent = `共 ${current.length.toLocaleString()} 词` + (parts.length ? ' · ' + parts.join(' · ') : '') + how;
