@@ -574,6 +574,12 @@ window.CET6 = {
     const res = opt && opt.noResult ? '' : `<span class="eq" style="--d:${n * step}ms">=</span><span class="res" style="--d:${n * step + 80}ms">${esc(shortMean(w))}</span>`;
     return `<div class="parts-d" aria-label="词根拆解">${blocks}${res}</div>`;
   }
+  // 易混词：词表里有的英文词变成可点击链接，方便来回对比
+  function vsHtml(w){
+    if (!w.vs) return '';
+    const body = esc(w.vs).replace(/\b([a-z][a-z-]{1,})\b/g, (m) => byWord.has(m) && m !== w.w ? `<a class="go" data-go="${m}">${m}</a>` : m);
+    return `<div class="vs"><span>易混</span>${body}</div>`;
+  }
   function familyHtml(w){
     if (!w.parts) return '';
     const out = [];
@@ -600,7 +606,7 @@ window.CET6 = {
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${partsHtml(w)}
         ${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}
-        ${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}</div>
+        ${vsHtml(w)}</div>
       <div class="freq"><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span> 次</div>
         <div class="spark">${spark}</div><div class="yrs">${yrs}</div></div>
       <div class="tools"><button class="ib spk" title="朗读" aria-label="朗读">${ICON_SPK}</button>
@@ -732,7 +738,7 @@ window.CET6 = {
   function speak(w){ try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){} }
   const meanHtml = w => `<ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`;
   function backHtml(w){
-    return `<div class="fc-back in">${meanHtml(w)}${partsHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${familyHtml(w)}</div>`;
+    return `<div class="fc-back in">${meanHtml(w)}${partsHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${familyHtml(w).replace(/<a href="#" data-go="[^"]*">([^<]*)<\/a>/g, '$1')}</div>`;
   }
   function pool(){ // 当前筛选范围（不含已掌握）
     const base = current.length ? current : words;
