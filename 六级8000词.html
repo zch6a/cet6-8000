@@ -314,6 +314,7 @@ main{padding:18px 0 60px}
       <div class="chips" id="bandChips"><span class="lbl">频率</span></div>
       <label class="toggle"><input type="checkbox" id="cover">遮住释义自测</label>
       <label class="toggle"><input type="checkbox" id="hideKnown">隐藏已掌握</label>
+      <label class="toggle" title="熟悉的词在考试里用了不常见的意思，如 address 处理、fine 罚款"><input type="checkbox" id="rareOnly">只看熟词僻义</label>
       <label class="toggle" id="wfreqWrap" hidden><input type="checkbox" id="wfreq">按写作翻译出现次数排</label>
       <button class="chip pdf" id="pdfBtn" title="把当前列表导出为 PDF（在打印窗口选「另存为 PDF」）">导出 PDF</button>
     </div>
@@ -367,7 +368,7 @@ window.CET6 = {
   const YEARS = meta.years;
   // row: [w, zh[[pos,text]], mem, lv, n, s, y[], pt[], band, rank]
   const words = CET6.rows.map(r => ({w:r[0], zh:r[1], mem:r[2]||'', lv:r[3], n:r[4], s:r[5], y:r[6], pt:r[7], b:r[8], r:r[9],
-    parts:r[10]||null, pic:r[11]||'', vs:r[12]||'', wr:!!r[13]}));
+    parts:r[10]||null, pic:r[11]||'', vs:r[12]||'', wr:!!r[13], rs:!!r[14]}));
   // 写作+翻译部分出现次数，用于「会写词汇」排序
   for (const w of words) w.wt = ((w.pt||[])[2]||0) + ((w.pt||[])[3]||0);
   const byWord = new Map(words.map(w => [w.w, w]));
@@ -456,6 +457,8 @@ window.CET6 = {
     $('#cover').checked = st.cover; $('#hideKnown').checked = st.hideKnown;
     $('#cover').onchange = e => { st.cover = e.target.checked; document.body.classList.toggle('cover', st.cover); save(); };
     $('#hideKnown').onchange = e => { st.hideKnown = e.target.checked; apply(); };
+    $('#rareOnly').checked = !!st.rareOnly;
+    $('#rareOnly').onchange = e => { st.rareOnly = e.target.checked; apply(true); };
     $('#wfreq').checked = !!st.wfreq;
     $('#wfreq').onchange = e => { st.wfreq = e.target.checked; apply(true); };
     $('#pdfBtn').onclick = () => exportPdf();
@@ -557,6 +560,7 @@ window.CET6 = {
       (st.sort !== 'write' || w.wr) &&
       (st.letter === 'all' || w.w[0] === st.letter) &&
       (!st.hideKnown || !known.has(w.w)) &&
+      (!st.rareOnly || w.rs) &&
       (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && (zhHit(w, q) || (q.length > 1 && memHit(w, q)))) || (q.length > 2 && w.w.includes(q)))
     );
     if (st.sort === 'freq') current.sort((a,b) => (b.n - a.n) || (b.s - a.s) || a.w.localeCompare(b.w));
@@ -575,6 +579,7 @@ window.CET6 = {
     if (st.letter !== 'all') parts.push('字母 ' + st.letter.toUpperCase());
     if (st.lv !== 'all') parts.push(LV[st.lv]);
     if (st.band !== 'all') parts.push(BAND[st.band]);
+    if (st.rareOnly) parts.push('熟词僻义');
     const how = (q && /[^\x00-\x7f]/.test(q)) ? ' · 中文反查：释义完全匹配 → 释义包含 → 助记搭配包含，同类按真题出现次数'
       : st.sort === 'freq' ? ' · 按真题出现次数从高到低'
       : st.sort === 'write' ? (st.wfreq ? ' · 会写词汇 · 按写作+翻译出现次数' : ' · 会写词汇 · 按字母顺序') : ' · 按字母顺序';
@@ -632,7 +637,7 @@ window.CET6 = {
     const isK = known.has(w.w);
     return `<article class="card${isK ? ' known' : ''}" data-w="${esc(w.w)}">
       <div class="head"><div class="w">${rank}${esc(w.w)}</div>
-        <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}</div></div>
+        <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${partsHtml(w)}
         ${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}
@@ -725,6 +730,7 @@ window.CET6 = {
       <p><b>2. 每天点「背诵」</b>：填上考试日期会自动算出每天背多少；看英文先想意思，再按空格看答案，按 1–4 评「忘了 / 模糊 / 记得 / 太简单」。忘了的词这一轮会再出现，之后按间隔自动安排复习（1 天、3 天、一周…），到期的数量显示在「背诵」按钮上。</p>
       <p><b>3. 用「自测」巩固</b>：看词选义、看义拼词（练写作拼写）、听音辨义（练听力）、易混辨析（affect / effect 这类）。答错的词自动加入复习。</p>
       <p><b>4. 用「词根」成串记</b>：点卡片里任意一块彩色积木，就能看到同一个词根的所有词；学一个词根能顺带认出一串词。</p>
+      <p><b>5. 专攻熟词僻义</b>：勾选「只看熟词僻义」，集中看 address「处理」、fine「罚款」、story「楼层」这类阅读最爱设坑的词，卡片上标着「僻义」。</p>
       <p><b>小提示</b>：勾选「遮住释义自测」可以把整页变成自测卡；点「✓」标记已掌握，配合「隐藏已掌握」只看没记住的。所有进度只存在你自己的浏览器里；换设备或清缓存前，在「背诵」页点「导出进度」存个备份，新设备上「导入进度」即可接着背。</p>
       <h3 style="margin-top:14px">下载打印版 PDF</h3>
       <p><a class="go" href="pdf/六级8000词-字母版.pdf" download>字母版（8000 词）</a>　·　<a class="go" href="pdf/六级8000词-真题频率版.pdf" download>真题频率版（8000 词）</a>　·　<a class="go" href="pdf/六级会写词汇.pdf" download>会写词汇版</a>　｜　想导出自己筛选的范围，用上方「导出 PDF」按钮。</p>
