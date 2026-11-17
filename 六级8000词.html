@@ -945,6 +945,15 @@ window.CET6 = {
     compass: `<circle cx="32" cy="32" r="18"/><g ${A('kTurn', 2.4)}><path d="M32 16l5 16-5 16-5-16z" fill="currentColor" opacity=".8"/></g><path d="M32 8v4M32 52v4M8 32h4M52 32h4" opacity=".5"/>`,
     heal:    `<g ${A('kBeat', 1.2)}><path d="M26 14h12v12h12v12H38v12H26V38H14V26h12z" fill="currentColor" opacity=".8"/></g>`,
     law:     `<path d="M32 12v38M20 50h24M12 20h40"/><g ${A('kTurn', 2.4, 'transform-origin:32px 20px;transform-box:view-box;animation-name:kLook')}><path d="M12 20l-6 14h12zM52 20l-6 14h12z"/></g>`,
+    twist:   `<path d="M12 32h6M46 32h6" opacity=".5"/><g ${A('kTurn', 1.6)}><path d="M18 22q14 0 14 10t14 10M18 42q14 0 14-10t14-10"/></g>`,
+    hard:    `<rect x="18" y="30" width="28" height="20" rx="2" fill="currentColor" opacity=".8"/><g ${A('kPress', 1)}><path d="M32 8v14"/><rect x="24" y="8" width="16" height="7" rx="1"/></g><g ${A('kGlow', 1)}><path d="M12 26l4 3M52 26l-4 3"/></g>`,
+    soft:    `<path d="M10 50h44" opacity=".3"/><g ${A('kBeat', 1.8, 'transform-origin:32px 50px;transform-box:view-box')}><path d="M14 50q0-22 18-22t18 22z" fill="currentColor" opacity=".35"/><path d="M14 50q0-22 18-22t18 22"/></g>`,
+    angle:   `<path d="M12 50h40M12 50 44 14"/><path d="M30 50a18 18 0 0 0-6-13" stroke-dasharray="40" ${A('kDraw', 1.6)}/>`,
+    surface: `<path d="M8 40 24 28h32L40 40z" opacity=".5"/><g ${A('kGlow', 1.8)}><path d="M8 40 24 28h32L40 40z" fill="currentColor" opacity=".35"/></g>`,
+    feather: `<g ${A('kFlow', 2.2, 'animation-direction:alternate')}><path d="M20 46q4-26 26-32-2 22-26 32zM20 46l14-18"/></g><path d="M10 54h44" opacity=".3"/>`,
+    stable:  `<path d="M8 52h48"/><g ${A('kStack1', 2)}><rect x="14" y="40" width="36" height="12" rx="1" fill="currentColor" opacity=".8"/></g><g ${A('kStack2', 2)}><rect x="20" y="28" width="24" height="12" rx="1"/></g><g ${A('kStack3', 2)}><rect x="26" y="16" width="12" height="12" rx="1"/></g>`,
+    pure:    `<path d="M32 10q16 20 16 30a16 16 0 0 1-32 0q0-10 16-30z"/><g ${A('kGlow', 1.6)}><path d="M48 14l2-5 2 5 5 2-5 2-2 5-2-5-5-2z" fill="currentColor"/></g>`,
+    slide:   `<path d="M6 20l52 30" opacity=".6"/><g ${A('kRight', 1.8)}><circle cx="16" cy="20" r="5" fill="currentColor"/></g>`,
   };
   // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
   const ANIM_WORDS = {
@@ -980,6 +989,8 @@ window.CET6 = {
     far:'远 遥远', hang:'悬挂 挂 悬', full:'满 填满 装满 充满', hear:'听 听见', push:'推 驱使 驱 驱赶', close:'关闭 关 封闭 闭',
     boat:'船 航海 航行', empty:'空 空的 空虚', breathe:'呼吸 气 吸气', give:'给予 给 赠 授予', shape:'形状 形 形式 样子',
     bound:'界限 边界 界 限', law:'法律 规则 法 规定 公正 正义',
+    twist:'扭 扭曲 拧 绞', hard:'硬 坚硬 坚固', soft:'软 柔软 温和', angle:'角 角度', surface:'面 表面 平面',
+    feather:'轻 轻的 减轻', stable:'稳定 稳固 牢固', pure:'纯 纯粹 纯净 干净', slide:'滑 滑动 滑落 溜',
   };
   const ANIM_MAP = new Map();
   for (const [k, list] of Object.entries(ANIM_WORDS)) for (const m of list.split(' ')) if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k);
@@ -997,7 +1008,8 @@ window.CET6 = {
    '港口:boat 岛:water 身体:person 身份:person 服务:hand 机械:work 电的:power 电:power 拥有:grab 容纳:in 避免:apart 支付:value ' +
    '渴望:heart 幻想:heart 征服:rule 限制:bound 保持:grab 退让:backward 建议:speak 经济:value 隔代:person 承诺:speak 忍受:press ' +
    '真实:able 方式:road 主要的:head 装饰:new 有效的:able ' +
-   '宽广:big 印:write 支付:value 学校:place 店:place 箱子:thing 等级:measure 轮:around 插入:in 接近:come 论证:speak 负担得起:value')
+   '宽广:big 印:write 支付:value 学校:place 店:place 箱子:thing 等级:measure 轮:around 插入:in 接近:come 论证:speak 负担得起:value ' +
+   '种植:grow 草:grow 伤害:bad 检查:look 教育:lead 显现:light 母亲:person')
     .split(' ').forEach(p => { const [m, k] = p.split(':'); if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k); });
   // 只给明显的后缀格式留兜底规则
   const ANIM_RULES = [
