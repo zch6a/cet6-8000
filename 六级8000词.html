@@ -1168,6 +1168,7 @@ window.CET6 = {
         <span>听力 <b>${pt[0]||0}</b></span><span>阅读 <b>${pt[1]||0}</b></span><span>写作 <b>${pt[2]||0}</b></span><span>翻译 <b>${pt[3]||0}</b></span>${pt[4] ? `<span>未分题型 <b>${pt[4]}</b></span>` : ''}
         <span>频率排名 <b>#${w.r}</b></span></div>
         <div style="margin-top:4px">逐年次数：${YEARS.map((y,i) => `${y} 年 <b>${w.y[i]}</b>`).join(' · ')}</div>`
+        : w.lv === 'ext' && w.wr ? '翻译题话题词：真题翻译给的是中文原文，英文里自然出现 0 次，但译文要用到它（中国文化、社会热点类）'
         : '近六年真题中未出现（仍属考纲或常用词，建议认识）'}${synHtml(w)}</div>
     </article>`;
   }
