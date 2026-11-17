@@ -1437,7 +1437,7 @@ window.CET6 = {
     $('#ovBar').style.width = (s.idx / s.q.length * 100) + '%';
     fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div><div id="flowBack" class="flow-back"></div>
       <div class="fc-acts flow-acts"><button id="fPrev" title="上一个（←）">←</button><button class="primary" id="fPlay">${s.paused ? '▶ 继续' : '❚❚ 暂停'}<span class="kh">（空格）</span></button><button id="fNext" title="下一个（→）">→</button>
-        <button id="fSpeed" title="切换速度">速度：${FLOW_ZH[s.speed]}</button><button id="fKnow" title="已经会了，以后不再出现（K）">会了 ✓（K）</button></div>
+        <button id="fSpeed" title="切换速度">速度：${FLOW_ZH[s.speed]}</button><button id="fKnow" title="已经会了，以后不再出现（K）">会了 ✓<span class="kh">（K）</span></button></div>
       <div class="fc-keys">自动播放：先看词、听发音，自己想一下，意思和助记随后出现。← → 前后翻，K 标为已掌握。</div>`;
     $('#fPrev').onclick = () => flowGo(-1);
     $('#fNext').onclick = () => flowGo(1);
@@ -1610,7 +1610,7 @@ window.CET6 = {
     if (!isVs && others.length < 3) others = others.concat(pool3(x => !others.includes(x))).slice(0, 3);
     const opts = shuffle([w, ...others]);
     const isListen = s.quiz === 'listen';
-    const head = isListen ? `<div class="fc-word" style="font-size:60px;cursor:pointer" id="lsn" title="再听一遍">🔊</div><div class="fc-sub">点喇叭或按 S 再听一遍</div>`
+    const head = isListen ? `<div class="fc-word" style="font-size:60px;cursor:pointer" id="lsn" title="再听一遍"><span style="display:inline-block;width:64px;height:64px">${ICON_SPK}</span></div><div class="fc-sub">点喇叭或按 S 再听一遍</div>`
       : isVs ? `<div class="fc-back" style="text-align:center">${meanHtml(w)}</div><div class="fc-sub" style="margin-top:10px">哪个单词是这个意思？</div>`
       : `<div class="fc-word">${esc(w.w)}</div>`;
     fc.innerHTML = `${head}
