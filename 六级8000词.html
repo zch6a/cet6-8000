@@ -374,7 +374,7 @@ window.CET6 = {
   const byWord = new Map(words.map(w => [w.w, w]));
   /* 词根词缀角色：用于给积木上色、建立同根词索引 */
   const PREFIX = new Set(('a ab abs ad ac af ag al an ap ar as at ante anti auto be bene bi by circum co col com con cor contra counter de dia dis di dif e ec en em ex extra fore hyper hypo il im in ir inter intro mal micro mis mono multi non ob oc of op out over para per post pre pro re retro se semi sub suc suf sup sur super sus sym syn tele trans tri ultra un under uni up with').split(' '));
-  const SUFFIX = new Set(('ual ian ese ary ory ics ology logy graphy eer ette let ling ster ward wards wise itude tude ture iety ety acy ency ancy ient ier ator itor ative itive ation ition ization ism ist ally ily ingly edly ise ize ify fy en ed er or ess ful ness ment ship hood dom able ible al ial ance ence ancy ency ant ent ar ary ery ory ate ative itive cy dom ed ee eer en er or ess est ful fy ify hood ic ical ics ion tion sion ation ish ism ist ity ty ive ize ise less let ly ment ness ous ious eous ship some ure ture ward wise y ing age al ism th ster ling ite').split(' '));
+  const SUFFIX = new Set(('r d n s y t e es ty ier ery ory ure ual ian ese ary ory ics ology logy graphy eer ette let ling ster ward wards wise itude tude ture iety ety acy ency ancy ient ier ator itor ative itive ation ition ization ism ist ally ily ingly edly ise ize ify fy en ed er or ess ful ness ment ship hood dom able ible al ial ance ence ancy ency ant ent ar ary ery ory ate ative itive cy dom ed ee eer en er or ess est ful fy ify hood ic ical ics ion tion sion ation ish ism ist ity ty ive ize ise less let ly ment ness ous ious eous ship some ure ture ward wise y ing age al ism th ster ling ite').split(' '));
   function role(seg, i, n){
     const s = seg.toLowerCase();
     if (n > 1 && i === 0 && PREFIX.has(s)) return 'pre';
@@ -494,6 +494,7 @@ window.CET6 = {
     w.parts.forEach(([seg, m], i) => {
       const r = role(seg, i, n);
       if (seg.toLowerCase() === w.w) return;
+      if (seg.replace(/[^a-z]/gi, '').length < 2) return;   // 单个字母（advise+r）不成卡
       // 同形不同义的词根分开成卡：man「人」≠ man「手」；词缀按角色合并（意思本就多样）
       const sense = r === 'root' ? String(m).replace(/[（(].*$/, '').slice(0, 2) : '';
       const k = r + ':' + seg.toLowerCase() + (sense ? ':' + sense : '');
