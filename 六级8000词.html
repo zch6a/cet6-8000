@@ -616,6 +616,37 @@ window.CET6 = {
     const body = esc(w.vs).replace(/\b([a-z][a-z-]{1,})\b/g, (m) => byWord.has(m) && m !== w.w ? `<a class="go" data-go="${m}">${m}</a>` : m);
     return `<div class="vs"><span>易混</span>${body}</div>`;
   }
+  /* 近义词：会写词之间，某个义项完全相同 → 写作时可以互相替换 */
+  // 词性归类：vt./vi./v. 都算动词；n./v. 这种合并行拆开
+  const posKey = p => p.split('/').map(x => /^v/.test(x) ? 'v' : x.replace('.', '')).filter(Boolean);
+  // 每个义项带词性：[{pos, s}]
+  const sensesOf = w => {
+    const out = [];
+    for (const [p, z] of w.zh) for (const s0 of z.split(/[；;]/)) {
+      const s = s0.replace(/[（(].*?[）)]/g, '').trim();
+      if (s.length >= 2) for (const k of posKey(p || '?')) out.push({pos: k, s});
+    }
+    return out;
+  };
+  const senseIdx = new Map();   // pos -> [{s, w}]
+  for (const w of words) if (w.wr) for (const {pos, s} of sensesOf(w)) { if (!senseIdx.has(pos)) senseIdx.set(pos, []); senseIdx.get(pos).push({s, w}); }
+  // 意思相同，或只多一两个修饰字（重要的 ~ 至关重要的）
+  const near = (a, b) => a === b || (Math.abs(a.length - b.length) <= 2 && Math.min(a.length, b.length) >= 3 && (a.endsWith(b) || b.endsWith(a)));
+  function synonymsOf(w){
+    if (!w.wr) return [];
+    const seen = new Map();
+    for (const {pos, s} of sensesOf(w)) for (const e of senseIdx.get(pos) || []) {
+      const x = e.w;
+      if (x === w || x.w.startsWith(w.w.slice(0, 5)) || w.w.startsWith(x.w.slice(0, 5))) continue; // 跳过同词族
+      if (near(s, e.s) && !seen.has(x.w)) seen.set(x.w, {x, s: e.s});
+    }
+    return [...seen.values()].sort((a, b) => b.x.n - a.x.n).slice(0, 6);
+  }
+  function synHtml(w){
+    const syn = synonymsOf(w);
+    if (!syn.length) return '';
+    return `<div class="fam">近义（写作可替换）：${syn.map(({x, s}) => `<a href="#" data-go="${esc(x.w)}" title="${esc(s)}">${esc(x.w)}</a>`).join('、')}</div>`;
+  }
   function familyHtml(w){
     if (!w.parts) return '';
     const out = [];
@@ -651,7 +682,7 @@ window.CET6 = {
         <span>听力 <b>${pt[0]||0}</b></span><span>阅读 <b>${pt[1]||0}</b></span><span>写作 <b>${pt[2]||0}</b></span><span>翻译 <b>${pt[3]||0}</b></span>${pt[4] ? `<span>未分题型 <b>${pt[4]}</b></span>` : ''}
         <span>频率排名 <b>#${w.r}</b></span></div>
         <div style="margin-top:4px">逐年次数：${YEARS.map((y,i) => `${y} 年 <b>${w.y[i]}</b>`).join(' · ')}</div>`
-        : '近六年真题中未出现（仍属考纲或常用词，建议认识）'}${familyHtml(w)}</div>
+        : '近六年真题中未出现（仍属考纲或常用词，建议认识）'}${synHtml(w)}${familyHtml(w)}</div>
     </article>`;
   }
   function renderMore(){
@@ -798,7 +829,7 @@ window.CET6 = {
   function speak(w){ try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){} }
   const meanHtml = w => `<ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`;
   function backHtml(w){
-    return `<div class="fc-back in">${meanHtml(w)}${partsHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${familyHtml(w).replace(/<a href="#" data-go="[^"]*">([^<]*)<\/a>/g, '$1')}</div>`;
+    return `<div class="fc-back in">${meanHtml(w)}${partsHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
   }
   function pool(){ // 当前筛选范围（不含已掌握）
     const base = current.length ? current : words;
