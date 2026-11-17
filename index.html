@@ -507,14 +507,14 @@ window.CET6 = {
   stories(list){ this.storyList = list; }
 };
 </script>
-<script src="data/meta.js?v=1f4e380c"></script>
-<script src="data/a.js?v=1f4e380c"></script><script src="data/b.js?v=1f4e380c"></script><script src="data/c.js?v=1f4e380c"></script><script src="data/d.js?v=1f4e380c"></script>
-<script src="data/e.js?v=1f4e380c"></script><script src="data/f.js?v=1f4e380c"></script><script src="data/g.js?v=1f4e380c"></script><script src="data/h.js?v=1f4e380c"></script>
-<script src="data/i.js?v=1f4e380c"></script><script src="data/j.js?v=1f4e380c"></script><script src="data/k.js?v=1f4e380c"></script><script src="data/l.js?v=1f4e380c"></script>
-<script src="data/m.js?v=1f4e380c"></script><script src="data/n.js?v=1f4e380c"></script><script src="data/o.js?v=1f4e380c"></script><script src="data/p.js?v=1f4e380c"></script>
-<script src="data/q.js?v=1f4e380c"></script><script src="data/r.js?v=1f4e380c"></script><script src="data/s.js?v=1f4e380c"></script><script src="data/t.js?v=1f4e380c"></script>
-<script src="data/u.js?v=1f4e380c"></script><script src="data/v.js?v=1f4e380c"></script><script src="data/w.js?v=1f4e380c"></script><script src="data/x.js?v=1f4e380c"></script>
-<script src="data/y.js?v=1f4e380c"></script><script src="data/z.js?v=1f4e380c"></script><script src="data/stories.js?v=1f4e380c"></script>
+<script src="data/meta.js?v=483d386a"></script>
+<script src="data/a.js?v=483d386a"></script><script src="data/b.js?v=483d386a"></script><script src="data/c.js?v=483d386a"></script><script src="data/d.js?v=483d386a"></script>
+<script src="data/e.js?v=483d386a"></script><script src="data/f.js?v=483d386a"></script><script src="data/g.js?v=483d386a"></script><script src="data/h.js?v=483d386a"></script>
+<script src="data/i.js?v=483d386a"></script><script src="data/j.js?v=483d386a"></script><script src="data/k.js?v=483d386a"></script><script src="data/l.js?v=483d386a"></script>
+<script src="data/m.js?v=483d386a"></script><script src="data/n.js?v=483d386a"></script><script src="data/o.js?v=483d386a"></script><script src="data/p.js?v=483d386a"></script>
+<script src="data/q.js?v=483d386a"></script><script src="data/r.js?v=483d386a"></script><script src="data/s.js?v=483d386a"></script><script src="data/t.js?v=483d386a"></script>
+<script src="data/u.js?v=483d386a"></script><script src="data/v.js?v=483d386a"></script><script src="data/w.js?v=483d386a"></script><script src="data/x.js?v=483d386a"></script>
+<script src="data/y.js?v=483d386a"></script><script src="data/z.js?v=483d386a"></script><script src="data/stories.js?v=483d386a"></script>
 <script>
 (function(){
   'use strict';
@@ -554,7 +554,9 @@ window.CET6 = {
   }
   const LV = {basic:'基础', cet4:'四级', cet6:'六级', ext:'超纲'};
   const BAND = {4:'必考', 3:'高频', 2:'常见', 1:'偶考', 0:'未考'};
-  const known = new Set(store.get('cet6-known', []));
+  // 合并了英美拼法后，旧进度里记的是另一种拼法（behaviour）：换成现在的词条（behavior）
+  const ALIAS = meta.alias || {};
+  const known = new Set(store.get('cet6-known', []).map(w => ALIAS[w] || w));
   const st = Object.assign({sort:'alpha', lv:'all', band:'all', letter:'all', q:'', cover:false, hideKnown:false}, store.get('cet6-view', {}));
   st.q = '';
   const PAGE = 120;
@@ -1235,6 +1237,7 @@ window.CET6 = {
      ===================================================================== */
   const DAY = 864e5;
   const srs = store.get('cet6-srs', {});
+  for (const [old, now] of Object.entries(ALIAS)) if (srs[old]) { if (!srs[now] || srs[now].i < srs[old].i) srs[now] = srs[old]; delete srs[old]; }
   const plan = Object.assign({daily: 40, exam: ''}, store.get('cet6-plan', {}));
   const today0 = () => { const d = new Date(); d.setHours(0,0,0,0); return +d; };
   const newToday = () => { const o = store.get('cet6-newlog', {}); return o.d === today0() ? o.n : 0; };

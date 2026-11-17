@@ -554,7 +554,9 @@ window.CET6 = {
   }
   const LV = {basic:'基础', cet4:'四级', cet6:'六级', ext:'超纲'};
   const BAND = {4:'必考', 3:'高频', 2:'常见', 1:'偶考', 0:'未考'};
-  const known = new Set(store.get('cet6-known', []));
+  // 合并了英美拼法后，旧进度里记的是另一种拼法（behaviour）：换成现在的词条（behavior）
+  const ALIAS = meta.alias || {};
+  const known = new Set(store.get('cet6-known', []).map(w => ALIAS[w] || w));
   const st = Object.assign({sort:'alpha', lv:'all', band:'all', letter:'all', q:'', cover:false, hideKnown:false}, store.get('cet6-view', {}));
   st.q = '';
   const PAGE = 120;
@@ -1235,6 +1237,7 @@ window.CET6 = {
      ===================================================================== */
   const DAY = 864e5;
   const srs = store.get('cet6-srs', {});
+  for (const [old, now] of Object.entries(ALIAS)) if (srs[old]) { if (!srs[now] || srs[now].i < srs[old].i) srs[now] = srs[old]; delete srs[old]; }
   const plan = Object.assign({daily: 40, exam: ''}, store.get('cet6-plan', {}));
   const today0 = () => { const d = new Date(); d.setHours(0,0,0,0); return +d; };
   const newToday = () => { const o = store.get('cet6-newlog', {}); return o.d === today0() ? o.n : 0; };
