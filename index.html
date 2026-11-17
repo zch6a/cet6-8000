@@ -676,7 +676,7 @@ window.CET6 = {
   function renderRoots(){
     const q = st.q;
     let list = [...affIdx.values()].filter(e => e.ws.length >= 2);
-    if (st.letter !== 'all') list = list.filter(e => e.seg[0] === st.letter);
+    if (st.letter !== 'all' && !q) list = list.filter(e => e.seg[0] === st.letter);
     if (q) list = list.filter(e => e.seg === q || e.seg.startsWith(q) || (/[^\x00-\x7f]/.test(q) && e.m.includes(q)));
     const score = e => e.ws.reduce((s, w) => s + Math.min(w.n, 30), 0) + e.ws.length * 3;
     list.sort((a,b) => (q && (b.seg === q) - (a.seg === q)) || score(b) - score(a));
@@ -705,7 +705,7 @@ window.CET6 = {
     const q = st.q;
     let list = window.CET6.storyList || [];
     const sum = s => s.ws.reduce((t, x) => t + ((byWord.get(x) || {}).n || 0), 0);
-    if (st.letter !== 'all') list = list.filter(s => s.ws.some(x => x[0] === st.letter));
+    if (st.letter !== 'all' && !q) list = list.filter(s => s.ws.some(x => x[0] === st.letter));
     if (q) list = list.filter(s => s.ws.some(x => x.startsWith(q)) || (/[^\x00-\x7f]/.test(q) && (s.t + s.key).includes(q)));
     list = [...list].sort((a, b) => sum(b) - sum(a));
     // 背诵 / 自测 / 快速过词用的就是这一页上的词
@@ -750,7 +750,7 @@ window.CET6 = {
       (st.lv === 'all' || w.lv === st.lv) &&
       (st.band === 'all' || String(w.b) === st.band) &&
       (st.sort !== 'write' || w.wr) &&
-      (st.letter === 'all' || w.w[0] === st.letter) &&
+      (st.letter === 'all' || q || w.w[0] === st.letter) &&   // 搜索时不受字母筛选限制
       (!st.hideKnown || !known.has(w.w)) &&
       (!st.rareOnly || w.rs) &&
       (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && (zhHit(w, q) || (q.length > 1 && memHit(w, q)))) || (q.length > 2 && w.w.includes(q)))
@@ -768,7 +768,7 @@ window.CET6 = {
     }
     $('#list').innerHTML = ''; shown = 0; lastGroup = null;
     const parts = [];
-    if (st.letter !== 'all') parts.push('字母 ' + st.letter.toUpperCase());
+    if (st.letter !== 'all' && !q) parts.push('字母 ' + st.letter.toUpperCase());
     if (st.lv !== 'all') parts.push(LV[st.lv]);
     if (st.band !== 'all') parts.push(BAND[st.band]);
     if (st.rareOnly) parts.push('熟词僻义');
@@ -776,7 +776,20 @@ window.CET6 = {
       : st.sort === 'freq' ? ' · 按真题出现次数从高到低'
       : st.sort === 'write' ? (st.wfreq ? ' · 会写词汇 · 按写作+翻译出现次数' : ' · 会写词汇 · 按字母顺序') : ' · 按字母顺序';
     $('#resinfo').textContent = `共 ${current.length.toLocaleString()} 词` + (parts.length ? ' · ' + parts.join(' · ') : '') + how;
-    if (!current.length) { $('#list').innerHTML = '<div class="empty">没有符合条件的词</div>'; $('#more').hidden = true; return; }
+    if (!current.length) {
+      const filtered = st.lv !== 'all' || st.band !== 'all' || st.hideKnown || st.rareOnly || st.sort === 'write';
+      $('#list').innerHTML = `<div class="empty">没有符合条件的词${filtered ? '<br><button class="chip" id="clearF" style="margin-top:12px">清除级别 / 频率等筛选再找找</button>' : ''}</div>`;
+      const cf = $('#clearF');
+      if (cf) cf.onclick = () => {
+        Object.assign(st, {lv: 'all', band: 'all', hideKnown: false, rareOnly: false});
+        if (st.sort === 'write') st.sort = 'alpha';
+        $('#hideKnown').checked = false; $('#rareOnly').checked = false;
+        document.querySelectorAll('#lvChips .chip,#bandChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === 'all')));
+        document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === st.sort)));
+        apply(true);
+      };
+      $('#more').hidden = true; return;
+    }
     renderMore();
     if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10});
   }
