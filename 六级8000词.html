@@ -1552,11 +1552,15 @@ window.CET6 = {
   // 易混词：从 vs 字段里取出词表中真实存在的形近词
   // 意思相同的拼写变体（fiber / fibre）不能当选择题
   const sameMeaning = (a, b) => firstMean(a).split(/[；;]/)[0] === firstMean(b).split(/[；;]/)[0];
+  // 只要有一个义项相同（huge 巨大的 / enormous 巨大的；庞大的），放一起出题就会有两个正确答案
+  const senseSetCache = new Map();
+  const senseSet = w => { let s = senseSetCache.get(w); if (!s) { s = new Set(sensesOf(w).map(x => x.s)); senseSetCache.set(w, s); } return s; };
+  const sharesSense = (a, b) => { const sb = senseSet(b); for (const s of senseSet(a)) if (sb.has(s)) return true; return sameMeaning(a, b); };
   // 易混词 = 卡片「易混」里的词 + 同一组串记里的词
   // 干扰项只取易混说明里每一段开头的词头（advise v. 建议 → advise），不取例句里顺带的词（read aloud 的 read、every day 的 day）
   const vsHeads = vs => vs.split(/[；;/、]/).map(s => (s.match(/^\s*([a-z][a-z-]+)(?=\s*(?:[^a-z\s]|(?:n|v|vt|vi|adj|adv|prep|conj)\.|$))/) || [])[1]).filter(Boolean);
   const rivalsOf = w => [...new Set([...vsHeads(w.vs || ''), ...((STORY_OF.get(w.w) || {}).ws || [])]
-    .filter(x => x !== w.w && byWord.has(x)))].map(x => byWord.get(x)).filter(x => !sameMeaning(w, x));
+    .filter(x => x !== w.w && byWord.has(x)))].map(x => byWord.get(x)).filter(x => !sharesSense(w, x));
   function startQuiz(mode){
     let p = pool();
     // 同背诵：级别选「全部」时不考中学基础词（print、lock 这类太简单）
@@ -1608,7 +1612,7 @@ window.CET6 = {
     const isVs = s.quiz === 'vs';
     // 干扰项优先同词性、同级别，不能只看词性就猜出答案
     const pos0 = x => (x.zh[0] && x.zh[0][0] || '').split('/')[0].replace(/^v[ti]\.$/, 'v.');
-    const pool3 = (cond) => shuffle(words.filter(x => x !== w && firstMean(x) !== firstMean(w) && cond(x)));
+    const pool3 = (cond) => shuffle(words.filter(x => x !== w && cond(x) && !sharesSense(w, x)));
     let others = isVs ? rivalsOf(w).slice(0, 3) : pool3(x => pos0(x) === pos0(w) && x.lv === w.lv).slice(0, 3);
     if (!isVs && others.length < 3) others = others.concat(pool3(x => pos0(x) === pos0(w) && !others.includes(x))).slice(0, 3);
     if (!isVs && others.length < 3) others = others.concat(pool3(x => !others.includes(x))).slice(0, 3);
