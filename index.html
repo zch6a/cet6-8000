@@ -1593,12 +1593,15 @@ window.CET6 = {
       inp.onkeydown = e => { if (e.key === 'Enter') { e.stopPropagation(); s.answered ? next() : check(); } };
       function check(){
         s.answered = true;
-        const ok = inp.value.trim().toLowerCase() === w.w;
+        const typed = inp.value.trim().toLowerCase();
+        // 英美另一种拼法（colour / color、practise / practice）也算对
+        const isAlt = typed !== w.w && ALIAS[typed] === w.w;
+        const ok = typed === w.w || isAlt;
         inp.classList.add(ok ? 'right' : 'wrong'); inp.readOnly = true;
         // 靠提示才拼出来的算「模糊」：计入复习，但不算完全记住
         if (ok && s.hinted) { s.right++; grade(w.w, 1); } else mark(w, ok);
         s.hinted = false;
-        $('#spRes').innerHTML = `${ok ? '' : `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>`}${backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题<span class="kh">（Enter）</span></button></div>`;
+        $('#spRes').innerHTML = `${ok ? '' : `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>`}${isAlt ? `<div class="fc-sub">也对：${esc(typed)} 是另一种拼法，本词表以 <b>${esc(w.w)}</b> 为准</div>` : ''}${backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题<span class="kh">（Enter）</span></button></div>`;
         $('#nx').onclick = next; speak(w.w);
       }
       return;
