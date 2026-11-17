@@ -209,6 +209,8 @@ main{padding:18px 0 60px}
 .vs{margin-top:6px;font-size:13px;color:var(--ink2)}
 .vs u.df{text-decoration:none;color:#fff;background:var(--accent);border-radius:3px;padding:0 1px;margin:0 .5px;font-weight:700}
 .vs .vsw{font-weight:600;color:var(--ink)}
+.flow-back{min-height:150px;width:100%}
+.flow-acts button#fPlay{min-width:130px}
 @media print{.vs u.df{color:inherit;background:none;text-decoration:underline;text-decoration-thickness:2px}}
 .vs span{font-size:11px;background:var(--gray-soft);color:var(--ink2);border-radius:4px;padding:1px 6px;margin-right:6px;font-weight:600}
 .fam{margin-top:6px}
@@ -1182,7 +1184,7 @@ window.CET6 = {
   const ov = $('#ov'), fc = $('#fc');
   let session = null;
   function openOv(title){ $('#ovTitle').textContent = title; ov.classList.add('show'); document.body.style.overflow = 'hidden'; }
-  function closeOv(){ ov.classList.remove('show'); document.body.style.overflow = ''; session = null; updateDue(); apply(); }
+  function closeOv(){ flowStop(); ov.classList.remove('show'); document.body.style.overflow = ''; session = null; updateDue(); apply(); }
   $('#ovClose').onclick = closeOv;
   function speak(w){ try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){} }
   const meanHtml = w => `<ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`;
@@ -1211,7 +1213,7 @@ window.CET6 = {
       <div class="setrow" style="justify-content:center">每天新词 <input id="pDaily" type="number" min="5" max="500" value="${plan.daily}" style="width:80px">
         考试日期 <input id="pExam" type="date" value="${esc(plan.exam)}"></div>
       <p class="fc-sub">${dl ? `距考试 ${dl} 天，还没掌握 ${left.toLocaleString()} 词；留一周冲刺的话，建议每天新词 ≈ <a class="go" id="useSug">${suggest}</a>` : '填上考试日期，会自动算每天该背多少'}</p>
-      <div class="fc-acts"><button class="primary" id="goStudy">开始（Enter）</button>${hardWords().length ? `<button id="goHard" title="忘过 2 次以上的词，集中再过一遍">专攻易忘词（${hardWords().length}）</button>` : ''}</div>
+      <div class="fc-acts"><button class="primary" id="goStudy">开始（Enter）</button><button id="goFlow" title="自动播放当前列表：看词 → 听音 → 出意思和助记，不打分">快速过词（自动播放）</button>${hardWords().length ? `<button id="goHard" title="忘过 2 次以上的词，集中再过一遍">专攻易忘词（${hardWords().length}）</button>` : ''}</div>
       <div class="fc-keys">背的时候：空格 = 看答案，1 忘了 · 2 模糊 · 3 记得 · 4 太简单。忘了的词这一轮会再出现，直到记住。</div>
       <div class="fc-acts" style="margin-top:18px"><button id="expP" title="把进度存成文件，换设备时导入">导出进度</button><button id="impP">导入进度</button><input type="file" id="impF" accept=".json,application/json" hidden></div>
       <p class="fc-sub" id="pMsg">进度只保存在这个浏览器里；换手机、换电脑或清缓存前，先导出备份。</p>`;
@@ -1222,6 +1224,7 @@ window.CET6 = {
     $('#pExam').onchange = e => { plan.exam = e.target.value; store.set('cet6-plan', plan); studyHome(); };
     const us = $('#useSug'); if (us) us.onclick = () => { plan.daily = suggest; store.set('cet6-plan', plan); studyHome(); };
     $('#goStudy').onclick = startStudy;
+    $('#goFlow').onclick = startFlow;
     const gh = $('#goHard'); if (gh) gh.onclick = startHard;
   }
   /* 进度备份：导出 / 导入（掌握标记、复习排程、打卡、计划） */
@@ -1260,6 +1263,62 @@ window.CET6 = {
     session = {q, idx: 0, total: q.length, done: 0, shown: false};
     $('#ovTitle').textContent = '专攻易忘词';
     showCard();
+  }
+  /* 快速过词：自动播放，像刷短视频一样一遍遍过，不打分、不考——先混个脸熟，再进背诵 */
+  const FLOW_SPEED = {slow: [2200, 4200], mid: [1400, 3000], fast: [800, 1800]};
+  const FLOW_ZH = {slow: '慢', mid: '中', fast: '快'};
+  function startFlow(){
+    const list = pool().filter(w => st.lv !== 'all' || w.lv !== 'basic'); // 同背诵：「全部」时跳过中学基础词
+    if (!list.length) return;
+    const last = store.get('cet6-flow-last', '');
+    const at = Math.max(0, list.findIndex(w => w.w === last));
+    session = {flow: true, q: list, idx: at, paused: false, speed: store.get('cet6-flow-speed', 'mid'), timer: 0, seen: 0};
+    $('#ovTitle').textContent = '快速过词';
+    flowCard();
+  }
+  function flowStop(){ const s = session; if (s && s.flow) clearTimeout(s.timer); }
+  function flowCard(){
+    const s = session; if (!s || !s.flow) return;
+    clearTimeout(s.timer);
+    if (s.idx >= s.q.length) { fc.innerHTML = `<div class="done-big">这一串过完了</div><p class="fc-sub">一共过了 ${s.seen} 个词。混个脸熟之后，去「背诵」里打分记牢。</p><div class="fc-acts"><button class="primary" id="flowAgain">从头再过一遍</button></div>`; $('#flowAgain').onclick = () => { store.set('cet6-flow-last', ''); startFlow(); }; $('#ovBar').style.width = '100%'; return; }
+    const w = s.q[s.idx];
+    store.set('cet6-flow-last', w.w);
+    $('#ovMeta').textContent = `第 ${(s.idx + 1).toLocaleString()} / ${s.q.length.toLocaleString()} 个 · ${LV[w.lv]} · 真题 ${w.n} 次`;
+    $('#ovBar').style.width = (s.idx / s.q.length * 100) + '%';
+    fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div><div id="flowBack" class="flow-back"></div>
+      <div class="fc-acts flow-acts"><button id="fPrev" title="上一个（←）">←</button><button class="primary" id="fPlay">${s.paused ? '▶ 继续' : '❚❚ 暂停'}（空格）</button><button id="fNext" title="下一个（→）">→</button>
+        <button id="fSpeed" title="切换速度">速度：${FLOW_ZH[s.speed]}</button><button id="fKnow" title="已经会了，以后不再出现（K）">会了 ✓（K）</button></div>
+      <div class="fc-keys">自动播放：先看词、听发音，自己想一下，意思和助记随后出现。← → 前后翻，K 标为已掌握。</div>`;
+    $('#fPrev').onclick = () => flowGo(-1);
+    $('#fNext').onclick = () => flowGo(1);
+    $('#fPlay').onclick = flowToggle;
+    $('#fSpeed').onclick = () => { s.speed = s.speed === 'mid' ? 'fast' : s.speed === 'fast' ? 'slow' : 'mid'; store.set('cet6-flow-speed', s.speed); $('#fSpeed').textContent = '速度：' + FLOW_ZH[s.speed]; };
+    $('#fKnow').onclick = flowKnow;
+    if (!s.paused) { speak(w.w); s.seen++; }
+    const [t1, t2] = FLOW_SPEED[s.speed];
+    const showBack = () => {
+      const b = $('#flowBack'); if (!b || b.dataset.on) return;
+      b.dataset.on = '1';
+      b.innerHTML = `<div class="fc-back in">${meanHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}</div>`;
+    };
+    if (s.paused) { showBack(); return; }
+    s.timer = setTimeout(() => {
+      showBack();
+      // 助记越长，停得越久
+      s.timer = setTimeout(() => { s.idx++; flowCard(); }, t2 + Math.min(4000, (w.mem || '').length * 25));
+    }, t1);
+  }
+  function flowGo(d){ const s = session; s.idx = Math.max(0, Math.min(s.q.length, s.idx + d)); flowCard(); }
+  // 暂停：停在当前词并直接亮出答案；继续：进入下一个
+  function flowToggle(){
+    const s = session; if (!s || !s.flow || s.idx >= s.q.length) return;
+    s.paused = !s.paused;
+    if (s.paused) flowCard(); else { s.idx++; flowCard(); }
+  }
+  function flowKnow(){
+    const s = session, w = s.q[s.idx]; if (!w) return;
+    known.add(w.w); store.set('cet6-known', [...known]); updateKnown();
+    s.q.splice(s.idx, 1); flowCard();
   }
   function startStudy(){
     const due = dueList().sort((a,b) => srs[a].due - srs[b].due).map(w => byWord.get(w));
@@ -1428,6 +1487,14 @@ window.CET6 = {
     if (e.target.tagName === 'INPUT') return;
     const s = session;
     if (!s) { if (e.key === 'Enter' && $('#goStudy')) { e.preventDefault(); startStudy(); } return; }
+    if (s.flow) {
+      if (e.key === ' ') { e.preventDefault(); flowToggle(); }
+      else if (e.key === 'ArrowRight') flowGo(1);
+      else if (e.key === 'ArrowLeft') flowGo(-1);
+      else if (e.key.toLowerCase() === 'k') flowKnow();
+      else if (e.key.toLowerCase() === 's') speak(s.q[Math.min(s.idx, s.q.length - 1)].w);
+      return;
+    }
     if (s.quiz) {
       if (s.answered && e.key === 'Enter') { e.preventDefault(); next(); }
       else if (!s.answered && /^[1-4]$/.test(e.key) && s.choose) s.choose(+e.key - 1);
