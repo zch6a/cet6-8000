@@ -1061,7 +1061,7 @@ window.CET6 = {
     small:   `<path class="mu" d="M9 9l9 9m0-6v6h-6M55 9l-9 9m0-6v6h6M9 55l9-9m0 6v-6h-6M55 55l-9-9m0 6v-6h6"/>` + G(S('qPing', 2.8, '--s0:1.3;--s1:.5'), bean(32, 32, 10)),
     big:     `<path class="mu" d="M17 17l-8-8m0 6v-6h6M47 17l8-8m0 6v-6h-6M17 47l-8 8m0-6v6h6M47 47l8 8m0-6v6h-6"/>` + G(S('qPing', 2.8, '--s0:.6;--s1:1.5'), bean(32, 32, 9)),
     many:    [[18, 44, 6], [31, 46, 6], [44, 44, 6], [24, 32, 5.5], [38, 32, 5.5], [31, 20, 5]].map(([x, y, r], i) => G(S('qPopHold', 2.8, '', i * .12, O(x, y)), bean(x, y, r))).join(''),
-    one:     num('1', 30), two: num('2', 30), three: num('3', 30), ten: num('10', 24), hundred: num('100', 18),
+    one:     num('1', 30), two: num('2', 30), three: num('3', 30), six: num('6', 30), seven: num('7', 30), ten: num('10', 24), hundred: num('100', 18),
     full:    `<path d="M18 12h28l-4 42H22z"/>` + G(S('qGrowY', 2.8, '', 0, BOT), `<path class="ff" d="M20.5 22h23l-2.8 30H23.3z" opacity=".8"/>`) + G(S('qLate', 2.8, '', 0, O(32, 18)), `<path class="mu" d="M24 16h16" stroke-dasharray="2 3"/>`),
     empty:   `<path d="M14 26v26h36V26"/><path class="mu" d="M14 26l-6-8M50 26l6-8"/>` + G(S('qFade', 1.8, '--o0:.15'), `<rect x="20" y="32" width="24" height="14" rx="2" class="mu" stroke-dasharray="3 3"/>`) + G(S('qGo', 2.8, '--y1:-14px'), `<circle cx="29" cy="24" r="1.8" class="mf"/><circle cx="36" cy="20" r="1.3" class="mf"/>`),
     part:    `<path class="sf" d="M32 32h19a19 19 0 1 1-19-19z"/>` + G(S('qPing', 2.8, '--x1:6px;--y1:-6px'), `<path class="ff" d="M32 32V13a19 19 0 0 1 19 19z"/>`),
@@ -1169,8 +1169,8 @@ window.CET6 = {
     sing:    [[0, 0], [16, .9]].map(([dx, dl]) => G(S('qGo', 2.8, '--y0:6px;--y1:-12px;--x1:6px', dl), `<path d="M${18 + dx} 44V24l10-3v19" stroke-width="2.5"/><circle cx="${15 + dx}" cy="44" r="4" class="ff"/><circle cx="${25 + dx}" cy="40" r="4" class="ff"/>`)).join(''),
   };
   // 只表示词性的后缀（-tion、-ous、-ize、-ly…）：给词挂上一张「词性标签」
-  const TAGS = {tagN: 'n.', tagA: 'adj.', tagV: 'v.', tagAdv: 'adv.'};
-  const tagArt = lab => `<circle cx="32" cy="7" r="2.4" class="ff"/>` + G(S('qSway', 2.8, '--r0:-10deg;--r1:10deg', 0, O(32, 7)), `<path d="M32 7v9" stroke-width="2"/><path class="sf" d="M19 25l13-9 13 9v24a3 3 0 0 1-3 3H22a3 3 0 0 1-3-3z" stroke-width="2.5"/><circle cx="32" cy="25" r="2.4" class="pf" stroke="currentColor" stroke-width="1.6"/><text x="32" y="${lab.length > 2 ? 43 : 44}" text-anchor="middle" font-size="${lab.length > 2 ? 11 : 14}" font-family="Georgia,serif" font-style="italic" font-weight="700" class="ff">${lab}</text>`);
+  const TAGS = {tagN: 'n.', tagA: 'adj.', tagV: 'v.', tagAdv: 'adv.', tagPl: 'pl.', tagPrep: 'prep.', tagComp: '更', tagSup: '最'};
+  const tagArt = lab => `<circle cx="32" cy="7" r="2.4" class="ff"/>` + G(S('qSway', 2.8, '--r0:-10deg;--r1:10deg', 0, O(32, 7)), `<path d="M32 7v9" stroke-width="2"/><path class="sf" d="M19 25l13-9 13 9v24a3 3 0 0 1-3 3H22a3 3 0 0 1-3-3z" stroke-width="2.5"/><circle cx="32" cy="25" r="2.4" class="pf" stroke="currentColor" stroke-width="1.6"/><text x="32" y="${lab.length > 2 ? 43 : 44}" text-anchor="middle" font-size="${lab.length > 4 ? 9.5 : lab.length > 2 ? 11 : 14}" ${/[a-z]/.test(lab) ? 'font-family="Georgia,serif" font-style="italic"' : 'font-family="PingFang SC,Microsoft YaHei,sans-serif"'} font-weight="700" class="ff">${lab}</text>`);
   // 没有合适画面的：把这一段字母写大，下面画一道线
   const letterArt = seg => { const n = seg.length, fs = n <= 2 ? 26 : n <= 4 ? 21 : n <= 6 ? 16 : 12; return `<text x="32" y="${f1(30 + fs * .34)}" text-anchor="middle" font-size="${fs}" font-family="Georgia,serif" font-weight="700" class="ff">${esc(seg)}</text><path d="M16 46h32" stroke-width="2.5" ${DRAW} ${S('qDraw')}/>`; };
   // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
@@ -1213,6 +1213,7 @@ window.CET6 = {
     pile:'堆 堆积 积累', stick:'粘 黏 粘住', center:'中心 中间的 核心',
     flask:'化学 化学的', free:'自由 解放', table:'表 表格',
     moon:'月亮 月 夜 夜晚', door:'门', net:'网 网络', shake:'发抖 颤抖 摇动 抖', stone:'石 石头 岩石',
+    six:'六', seven:'七', tagPl:'复数', tagPrep:'介词', tagComp:'更 更…', tagSup:'最',
   };
   const ANIM_MAP = new Map();
   for (const [k, list] of Object.entries(ANIM_WORDS)) for (const m of list.split(' ')) if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k);
@@ -1242,7 +1243,14 @@ window.CET6 = {
    '实验:flask 科学:flask 探索:seek 提供:give 执行:do 操作:hand 进行:walk 市场:place 结婚:together 近:come 喂养:eat ' +
    '器官:person 父亲:person 惩罚:bad 惊吓:bad 杀:die 半:part 历史:time 想法:know 理想:heart 想象:heart 期待:heart 动机:heart ' +
    '敬畏:heart 亲爱:heart 笑:good 容易:good 幸运的:good 花园:grow 纸:write 工具:hand 立即的:speed 发动机:work 标准:measure ' +
-   '失去:empty 适应:turn 千:many 倍:many 固定:stick 严格:straight 蒸汽:water 油:water')
+   '失去:empty 适应:turn 千:many 倍:many 固定:stick 严格:straight 蒸汽:water 油:water ' +
+   '在:place 处于:place 城邦:place 院子:place 办公室:place 对着:against 战争:against …方向的:compass 总称:many 附加:stick 附上:stick 坚持:stick ' +
+   '黑:moon 继承:give 纠缠:twist 混乱:twist 起来:up 加:up 唤起:up 现代的:new 提醒:know 劝:speak 做广告:speak 受欢迎的:heart 喜爱:heart 打动:heart 魅力:heart ' +
+   '有力:power 盛行:power 雷:power 称赞:good 美:good 预测:look 景:look 钦佩:look 惊奇:look 迅速的:speed 类型:shape 类:shape 公众:person ' +
+   '有活力的:grow 悲伤:bad 严重的:bad 羞耻:bad 苦的:bad 厌烦:bad 暴力:bad 销售:value 生意:value 定价:value 估价:value 缺少:empty 简单:one ' +
+   '牙:eat 周:time 古代:time 实现:full 获得:grab 合适:equal 适合:equal 躺:sleep 调整:turn 优势:forward 坚定:stable 飞行器:bird 飞:bird ' +
+   '白:light 作用:do 动作:do 允许:able 山:earth 分析:apart 裁决:law 规律:law 安排:line 协助:hand 照顾:hand 出席:come 细菌:small 计量:measure ' +
+   '喝:water 产品:thing 器物:thing 盒子:thing 碳:fire 化合物:flask 遍及:around 席位:sit')
     .split(' ').forEach(p => { const [m, k] = p.split(':'); if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k); });
   // 只给明显的后缀格式留兜底规则
   const ANIM_RULES = [
