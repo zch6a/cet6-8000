@@ -1023,16 +1023,25 @@ window.CET6 = {
     if (s.quiz === 'spell') {
       const hint = w.parts ? w.parts.map(([a,b]) => b).join(' + ') : '';
       fc.innerHTML = `<div class="fc-back" style="text-align:center">${meanHtml(w)}${hint ? `<div class="fc-sub">词根提示：${esc(hint)}</div>` : ''}</div>
-        <div class="fc-sub" style="margin-top:12px">首字母 <b>${esc(w.w[0])}</b> · 共 ${w.w.length} 个字母</div>
-        <div class="spell"><input id="spIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入单词后回车"></div>
+        <div class="fc-sub" style="margin-top:12px">共 ${w.w.length} 个字母：<b id="spMask" style="font:600 20px Georgia,serif;letter-spacing:4px">${esc(w.w[0])}${'_'.repeat(w.w.length - 1)}</b></div>
+        <div class="spell"><input id="spIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入单词后回车"><button class="cta ghost" id="spHint" type="button" title="多显示一个字母">再给一个字母</button></div>
         <div id="spRes"></div>`;
       const inp = $('#spIn'); inp.focus();
+      let shownN = 1;
+      $('#spHint').onclick = () => {
+        if (s.answered || shownN >= w.w.length - 1) return;   // 至少留最后一个字母自己拼
+        shownN++; s.hinted = true;
+        $('#spMask').textContent = w.w.slice(0, shownN) + '_'.repeat(w.w.length - shownN);
+        inp.focus();
+      };
       inp.onkeydown = e => { if (e.key === 'Enter') { e.stopPropagation(); s.answered ? next() : check(); } };
       function check(){
         s.answered = true;
         const ok = inp.value.trim().toLowerCase() === w.w;
         inp.classList.add(ok ? 'right' : 'wrong'); inp.readOnly = true;
-        mark(w, ok);
+        // 靠提示才拼出来的算「模糊」：计入复习，但不算完全记住
+        if (ok && s.hinted) { s.right++; grade(w.w, 1); } else mark(w, ok);
+        s.hinted = false;
         $('#spRes').innerHTML = `${ok ? '' : `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>`}${backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题（Enter）</button></div>`;
         $('#nx').onclick = next; speak(w.w);
       }
