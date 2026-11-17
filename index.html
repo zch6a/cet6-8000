@@ -1457,13 +1457,14 @@ window.CET6 = {
   // 易混词：从 vs 字段里取出词表中真实存在的形近词
   // 意思相同的拼写变体（fiber / fibre）不能当选择题
   const sameMeaning = (a, b) => firstMean(a).split(/[；;]/)[0] === firstMean(b).split(/[；;]/)[0];
-  const rivalsOf = w => [...new Set((w.vs.match(/\b[a-z][a-z-]+\b/g) || []).filter(x => x !== w.w && byWord.has(x)))]
-    .map(x => byWord.get(x)).filter(x => !sameMeaning(w, x));
+  // 易混词 = 卡片「易混」里的词 + 同一组串记里的词
+  const rivalsOf = w => [...new Set([...((w.vs || '').match(/\b[a-z][a-z-]+\b/g) || []), ...((STORY_OF.get(w.w) || {}).ws || [])]
+    .filter(x => x !== w.w && byWord.has(x)))].map(x => byWord.get(x)).filter(x => !sameMeaning(w, x));
   function startQuiz(mode){
     let p = pool();
     // 同背诵：级别选「全部」时不考中学基础词（print、lock 这类太简单）
     if (st.lv === 'all') { const q = p.filter(w => w.lv !== 'basic'); if (q.length >= 4) p = q; }
-    if (mode === 'vs') { p = p.filter(w => w.vs && rivalsOf(w).length); if (p.length < 4) p = words.filter(w => w.vs && rivalsOf(w).length); }
+    if (mode === 'vs') { p = p.filter(w => rivalsOf(w).length); if (p.length < 4) p = words.filter(w => rivalsOf(w).length); }
     if (p.length < 4) return;
     session = {quiz: mode, q: shuffle(p.slice()).slice(0, 20), idx: 0, right: 0, wrongs: []};
     quizCard();
@@ -1529,7 +1530,7 @@ window.CET6 = {
       const ok = opts[i] === w;
       fc.querySelectorAll('.opt').forEach((b, k) => { if (opts[k] === w) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); });
       mark(w, ok);
-      const vsExplain = isVs ? `<div class="fc-back">${opts.map(o => `<div style="margin:3px 0"><b style="font-family:Georgia,serif">${esc(o.w)}</b>　${esc(firstMean(o))}</div>`).join('')}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}</div>` : '';
+      const vsExplain = isVs ? `<div class="fc-back">${opts.map(o => `<div style="margin:3px 0"><b style="font-family:Georgia,serif">${esc(o.w)}</b>　${esc(firstMean(o))}</div>`).join('')}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${storyHtml(w, false)}</div>` : '';
       $('#qRes').innerHTML = `${isListen ? `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>` : ''}${isVs ? vsExplain : (ok ? '' : backHtml(w))}<div class="fc-acts"><button class="primary" id="nx">下一题（Enter）</button></div>`;
       $('#nx').onclick = next; if (!isListen) speak(w.w);
     }
