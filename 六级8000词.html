@@ -491,7 +491,7 @@ body.simple .pbox:not(.open) > .pbody{display:none}
 
 <main>
   <div class="wrap">
-    <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
+    <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布和近义词 · 「词根拆解」里有同根词 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
     <div id="list"><div class="empty" id="loading">正在加载 8000 词的数据（约 650 KB），网速慢时要等几秒…</div></div>
     <button class="more" id="more" hidden>继续加载</button>
     <section class="legend" id="legend"></section>
@@ -1158,7 +1158,7 @@ window.CET6 = {
         <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div>
         <div class="tools"><button class="ib spk" title="朗读" aria-label="朗读">${ICON_SPK}</button><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
-        ${w.parts ? pbox(partsHtml(w)) : ''}
+        ${w.parts ? pbox(partsHtml(w) + familyHtml(w)) : ''}
         ${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}
         ${vsHtml(w)}${storyHtml(w, true)}</div>
       <div class="freq" title="近六年真题出现 ${w.n} 次（${YEARS[0]}–${YEARS[YEARS.length-1]} 逐年）"><div class="spark">${spark}</div><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span><small>次</small></div></div>
@@ -1166,7 +1166,7 @@ window.CET6 = {
         <span>听力 <b>${pt[0]||0}</b></span><span>阅读 <b>${pt[1]||0}</b></span><span>写作 <b>${pt[2]||0}</b></span><span>翻译 <b>${pt[3]||0}</b></span>${pt[4] ? `<span>未分题型 <b>${pt[4]}</b></span>` : ''}
         <span>频率排名 <b>#${w.r}</b></span></div>
         <div style="margin-top:4px">逐年次数：${YEARS.map((y,i) => `${y} 年 <b>${w.y[i]}</b>`).join(' · ')}</div>`
-        : '近六年真题中未出现（仍属考纲或常用词，建议认识）'}${synHtml(w)}${familyHtml(w)}</div>
+        : '近六年真题中未出现（仍属考纲或常用词，建议认识）'}${synHtml(w)}</div>
     </article>`;
   }
   function renderMore(){
