@@ -1437,7 +1437,7 @@ window.CET6 = {
       <p class="fc-sub" style="margin-top:8px">${sk ? `已连续打卡 <b>${sk}</b> 天` : '今天开始第一天打卡'} · 学过 <b>${learned.toLocaleString()}</b> 词 · 已掌握 <b>${known.size.toLocaleString()}</b> 词</p>
       ${weekHtml()}
       ${dailyStoryHtml()}
-      <p class="fc-sub" style="margin-top:10px">新词取自当前列表的顺序（${esc($('#resinfo').textContent)}）${st.lv === 'all' ? '，已跳过中学基础词' : ''}。<br>想先背高频词，就先切到「真题频率」排序再点背诵；只背会写词就切到「会写词汇」。</p>
+      <p class="fc-sub" style="margin-top:10px">新词取自当前列表的顺序（${esc($('#resinfo').textContent)}）${st.lv === 'all' ? '，已跳过中学基础词' : ''}。<br>想先背高频词，就先切到「真题频率」排序再点背诵；只背会写词就切到「会写词汇」；专攻熟词僻义就在筛选里勾选「只看熟词僻义」。</p>
       <div class="setrow" style="justify-content:center">每天新词 <input id="pDaily" type="number" min="5" max="500" value="${plan.daily}" style="width:80px">
         考试日期 <input id="pExam" type="date" value="${esc(plan.exam)}"></div>
       <p class="fc-sub">${dl ? `距考试 ${dl} 天，还没掌握 ${left.toLocaleString()} 词；留一周冲刺的话，建议每天新词 ≈ <a class="go" id="useSug">${suggest}</a>` : '填上考试日期，会自动算每天该背多少'}</p>
