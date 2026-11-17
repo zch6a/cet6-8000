@@ -1,9 +1,9 @@
 // 六级 8000 词 · 离线缓存：第二次打开直接从本机读；装好之后断网（地铁、飞机）也能打开、背诵、自测
 // 词表数据（data/core.js / extra.js?v=版本号）版本一变就是新文件，所以可以放心长期缓存；
 // 页面本身先走网络拿最新版，断网时才用缓存。
-const CACHE = 'cet6-acd72a74710e9b55';
+const CACHE = 'cet6-eee40cc43cc0394d';
 const PAGE = './';
-const DATA = ['data/core.js?v=acd72a74', 'data/extra.js?v=710e9b55'];
+const DATA = ['data/core.js?v=eee40cc4', 'data/extra.js?v=3cc0394d'];
 // 安装时就把页面和两份词表数据一次存好：哪怕第一次打开没等 extra.js 下载完就关掉，之后断网也是完整的
 self.addEventListener('install', e => {
   self.skipWaiting();

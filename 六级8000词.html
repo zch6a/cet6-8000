@@ -254,6 +254,8 @@ body.simple .pbox.open > .pbody{animation:fcUp .22s ease-out}
 .sv-w a{font:700 17px/1.3 Georgia,serif;flex:none;min-width:96px}
 .sv-w span{color:var(--ink2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sv-w small{color:var(--ink3);font-size:11px;flex:none}
+.sv-w .sv-out{font:700 17px/1.3 Georgia,serif;flex:none;min-width:96px;color:var(--ink2)}
+@media (max-width:640px){.sv-w .sv-out{min-width:84px;font-size:16px}}
 /* 手机上释义换行显示，不截断 */
 @media (max-width:640px){.sv-w{align-items:flex-start}.sv-w a{min-width:84px;font-size:16px}.sv-w span{white-space:normal;overflow:visible;font-size:13px;line-height:1.5;padding-top:2px}.sv-card{padding:10px 12px}}
 .sv-card .st-k{color:var(--ink3);font-size:12.5px}
@@ -838,7 +840,9 @@ window.CET6 = {
     current = [...new Set(list.flatMap(s => s.ws))].map(x => byWord.get(x)).filter(Boolean);
     const html = list.map(s => {
       const rows = s.ws.map(x => { const w = byWord.get(x);
-        return `<div class="sv-w"><a class="go" data-go="${x}">${x}</a><span>${w ? esc(firstMeanShort(w)) : ''}</span>${w && w.n ? `<small>${w.n} 次</small>` : ''}</div>`; }).join('');
+        // 不在词表里的词：不做成链接（点了也搜不到），释义用词典简释，标上「表外」
+        if (!w) return `<div class="sv-w"><b class="sv-out">${x}</b><span>${esc((s.g || {})[x] || '')}</span><small>表外</small></div>`;
+        return `<div class="sv-w"><a class="go" data-go="${x}">${x}</a><span>${esc(firstMeanShort(w))}</span>${w.n ? `<small>${w.n} 次</small>` : ''}</div>`; }).join('');
       return `<div class="sv-card${isTopic(s) ? ' topic' : ''}">${isTopic(s) ? '<span class="sv-tag">翻译话题</span>' : ''}<div class="sv-ws">${rows}</div><div class="st-k">${memHtml(s.key)}</div><div class="st-t">${memHtml(s.t)}</div></div>`;
     }).join('');
     $('#list').innerHTML = html ? `<div class="sv-grid">${html}</div>` : '<div class="empty">没有找到相关的串记</div>';
