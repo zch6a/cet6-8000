@@ -638,7 +638,8 @@ window.CET6 = {
     if (a === b) return true;
     if (Math.abs(a.length - b.length) > 2 || Math.min(a.length, b.length) < 3) return false;
     const [s, l] = a.length < b.length ? [a, b] : [b, a];
-    return l.endsWith(s) && !/[不无非未没反]/.test(l.slice(0, l.length - s.length));
+    // 只允许加强程度的修饰：至关重要的 ≈ 重要的；多元文化的 ≠ 文化的
+    return l.endsWith(s) && /^(至关|非常|极其|极|十分|很|相当|更|最|高度|格外)$/.test(l.slice(0, l.length - s.length));
   };
   function synonymsOf(w){
     if (!w.wr) return [];
