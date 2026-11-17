@@ -1228,7 +1228,11 @@ window.CET6 = {
     const s = STORY_OF.get(w.w); if (!s) return '';
     const chips = s.ws.map(x => {
       const shown = x === w.w ? x : (markDiff(x, w.w) || x);
-      return x === w.w ? `<b class="st-me">${x}</b>` : link && byWord.has(x) ? `<a class="go st-w" data-go="${x}">${shown}</a>` : `<b class="st-w">${shown}</b>`;
+      if (x === w.w) return `<b class="st-me">${x}</b>`;
+      if (link && byWord.has(x)) return `<a class="go st-w" data-go="${x}">${shown}</a>`;
+      // 不在词表里的词：悬停 / 长按看词典简释
+      const g = !byWord.has(x) && (s.g || {})[x];
+      return `<b class="st-w"${g ? ` title="${esc(x + '：' + g + '（表外词）')}"` : ''}>${shown}</b>`;
     }).join('<i>/</i>');
     return `<div class="story"><div class="st-h"><span>串记</span>${chips}</div><div class="st-k">${memHtml(s.key)}</div><div class="st-t">${memHtml(s.t)}</div></div>`;
   }
