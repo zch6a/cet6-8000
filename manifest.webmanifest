@@ -1,0 +1,16 @@
+{
+  "name": "六级 8000 词",
+  "short_name": "六级8000词",
+  "description": "近六年真题词频 + 每词助记 + 词根动画 + 串记 + 间隔复习背诵，断网也能用。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#b8432f",
+  "theme_color": "#b8432f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
