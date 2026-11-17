@@ -863,7 +863,7 @@ window.CET6 = {
       <div class="setrow" style="justify-content:center">每天新词 <input id="pDaily" type="number" min="5" max="500" value="${plan.daily}" style="width:80px">
         考试日期 <input id="pExam" type="date" value="${esc(plan.exam)}"></div>
       <p class="fc-sub">${dl ? `距考试 ${dl} 天，还没掌握 ${left.toLocaleString()} 词；留一周冲刺的话，建议每天新词 ≈ <a class="go" id="useSug">${suggest}</a>` : '填上考试日期，会自动算每天该背多少'}</p>
-      <div class="fc-acts"><button class="primary" id="goStudy">开始（Enter）</button></div>
+      <div class="fc-acts"><button class="primary" id="goStudy">开始（Enter）</button>${hardWords().length ? `<button id="goHard" title="忘过 2 次以上的词，集中再过一遍">专攻易忘词（${hardWords().length}）</button>` : ''}</div>
       <div class="fc-keys">背的时候：空格 = 看答案，1 忘了 · 2 模糊 · 3 记得 · 4 太简单。忘了的词这一轮会再出现，直到记住。</div>
       <div class="fc-acts" style="margin-top:18px"><button id="expP" title="把进度存成文件，换设备时导入">导出进度</button><button id="impP">导入进度</button><input type="file" id="impF" accept=".json,application/json" hidden></div>
       <p class="fc-sub" id="pMsg">进度只保存在这个浏览器里；换手机、换电脑或清缓存前，先导出备份。</p>`;
@@ -874,6 +874,7 @@ window.CET6 = {
     $('#pExam').onchange = e => { plan.exam = e.target.value; store.set('cet6-plan', plan); studyHome(); };
     const us = $('#useSug'); if (us) us.onclick = () => { plan.daily = suggest; store.set('cet6-plan', plan); studyHome(); };
     $('#goStudy').onclick = startStudy;
+    const gh = $('#goHard'); if (gh) gh.onclick = startHard;
   }
   /* 进度备份：导出 / 导入（掌握标记、复习排程、打卡、计划） */
   const PROGRESS_KEYS = ['cet6-known', 'cet6-srs', 'cet6-daylog', 'cet6-plan', 'cet6-newlog'];
@@ -901,6 +902,16 @@ window.CET6 = {
       } catch (err) { if (m) m.textContent = '导入失败：' + err.message; }
     };
     r.readAsText(file);
+  }
+  // 易忘词：被评「忘了」2 次以上，且还没掌握（间隔 < 21 天）
+  const hardWords = () => Object.keys(srs).filter(w => byWord.has(w) && srs[w].l >= 2 && srs[w].i < 21)
+    .sort((a, b) => srs[b].l - srs[a].l).map(w => byWord.get(w));
+  function startHard(){
+    const q = hardWords().slice(0, 30).map(w => ({w, isNew: false}));
+    if (!q.length) return;
+    session = {q, idx: 0, total: q.length, done: 0, shown: false};
+    $('#ovTitle').textContent = '专攻易忘词';
+    showCard();
   }
   function startStudy(){
     const due = dueList().sort((a,b) => srs[a].due - srs[b].due).map(w => byWord.get(w));
