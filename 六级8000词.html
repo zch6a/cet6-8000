@@ -1409,7 +1409,7 @@ window.CET6 = {
     const showBack = () => {
       const b = $('#flowBack'); if (!b || b.dataset.on) return;
       b.dataset.on = '1';
-      b.innerHTML = `<div class="fc-back in">${meanHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}${storyHtml(w, false)}</div>`;
+      b.innerHTML = `<div class="fc-back in">${meanHtml(w)}${w.parts ? `<div class="in" style="display:flex;justify-content:center">${partsHtml(w, {noResult: true})}</div>` : ''}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}${storyHtml(w, false)}</div>`;
     };
     if (s.paused) { showBack(); return; }
     s.timer = setTimeout(() => {
