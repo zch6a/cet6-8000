@@ -892,6 +892,11 @@ window.CET6 = {
     give:    `<path d="M8 48h16l8-6" opacity=".6"/><g ${A('kRight', 1.8)}><rect x="20" y="22" width="18" height="16" rx="2" fill="currentColor" opacity=".85"/><path d="M29 22v16M20 28h18" stroke="var(--paper)"/></g>`,
     shape:   `<g ${A('kPop', 1.8)}><path d="M10 46 21 26l11 20z"/></g><g ${A('kPop', 1.8, 'animation-delay:.3s')}><circle cx="44" cy="36" r="9"/></g><g ${A('kPop', 1.8, 'animation-delay:.6s')}><rect x="26" y="10" width="12" height="12" rx="1"/></g>`,
     bound:   `<path d="M12 20v30M24 20v30M36 20v30M48 20v30M6 28h50M6 42h50"/><g ${A('kClashL', 1.2)}><circle cx="30" cy="12" r="3.5" fill="currentColor"/></g>`,
+    shield:  `<g ${A('kBeat', 1.6)}><path d="M32 10l18 6v14c0 12-8 20-18 24-10-4-18-12-18-24V16z" fill="currentColor" opacity=".25"/><path d="M32 10l18 6v14c0 12-8 20-18 24-10-4-18-12-18-24V16z"/><path d="M25 32l5 5 10-11"/></g>`,
+    sleep:   `<path d="M10 46h44" opacity=".3"/><path d="M14 46v-8h36v8M14 38q0-6 8-6h6v6" /><g ${A('kGlow', 1.8)}><text x="44" y="24" font-size="14" font-weight="700" fill="currentColor" stroke="none">z</text><text x="50" y="14" font-size="10" font-weight="700" fill="currentColor" stroke="none">z</text></g>`,
+    eat:     `<circle cx="32" cy="32" r="18"/><g ${A('kPress', .9, 'transform-origin:32px 32px;transform-box:view-box;animation-name:kBlink')}><path d="M32 32 50 22v20z" fill="var(--paper)" stroke="none"/></g><circle cx="30" cy="22" r="2" fill="currentColor"/>`,
+    compass: `<circle cx="32" cy="32" r="18"/><g ${A('kTurn', 2.4)}><path d="M32 16l5 16-5 16-5-16z" fill="currentColor" opacity=".8"/></g><path d="M32 8v4M32 52v4M8 32h4M52 32h4" opacity=".5"/>`,
+    heal:    `<g ${A('kBeat', 1.2)}><path d="M26 14h12v12h12v12H38v12H26V38H14V26h12z" fill="currentColor" opacity=".8"/></g>`,
     law:     `<path d="M32 12v38M20 50h24M12 20h40"/><g ${A('kTurn', 2.4, 'transform-origin:32px 20px;transform-box:view-box;animation-name:kLook')}><path d="M12 20l-6 14h12zM52 20l-6 14h12z"/></g>`,
   };
   // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
@@ -935,7 +940,16 @@ window.CET6 = {
   ('行动:do 尝试:do 方向:toward 移动:run 迁移:walk 脚:walk 爬:up 空中:up 伸:pull 能:able 器具:thing 石头:thing 连接:together 同伴:together ' +
    '编织:together 折叠:bend 太阳:light 射线:light 神圣:light 盖:close 命令:speak 名字:write 相信:heart 信任:heart 希望:heart 开始:new ' +
    '孩子:small 短:small 用:hand 技艺:hand 活:grow 耕种:grow 植物:grow 判断:law 竞争:against 依靠:hang 解开:apart 波浪:water ' +
-   '值得:value 变化:turn 存在:stand 始终:through 数:measure 数字:measure 使用:hand 利用:hand')
+   '值得:value 变化:turn 存在:stand 始终:through 数:measure 数字:measure 使用:hand 利用:hand ' +
+   '保护:shield 安全:shield 防:shield 防护:shield 睡:sleep 睡眠:sleep 吃:eat 咬:eat 食:eat 治疗:heal 医:heal 医治:heal 治愈:heal ' +
+   '东:compass 西:compass 南:compass 北:compass 方位:compass 动:run 活动:run 活跃:run 前进:forward 搅动:again 捆绑:together ' +
+   '伸展:pull 举起:up 升起:up 收集:together 装载:carry 居住:place 房子:place 城市:place 支持:stand 形成:build 组织:build ' +
+   '完整:full 足够:full 清楚:light 智慧:know 理解:know 想:know 读:look 雨:water 洗:water 森林:grow 重:press 改变:turn ' +
+   '卷:turn 倒:down 靠近:come 接触:hand 联系:together 关系:together 相似:equal 像:equal 比例:measure 等级:measure 计算:measure ' +
+   '尖:prick 宽:big 星:light 痛:bad 吓:bad 害怕:bad 危险:bad 快乐:good 舒适:good 国家:earth 祖国:earth 箱子:thing 邮件:send ' +
+   '港口:boat 岛:water 身体:person 身份:person 服务:hand 机械:work 电的:power 电:power 拥有:grab 容纳:in 避免:apart 支付:value ' +
+   '渴望:heart 幻想:heart 征服:rule 限制:bound 保持:grab 退让:backward 建议:speak 经济:value 隔代:person 承诺:speak 忍受:press ' +
+   '真实:able 方式:road 主要的:head 装饰:new 有效的:able')
     .split(' ').forEach(p => { const [m, k] = p.split(':'); if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k); });
   // 只给明显的后缀格式留兜底规则
   const ANIM_RULES = [
