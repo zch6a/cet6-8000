@@ -58,6 +58,9 @@ h1{margin:6px 0 8px;font:700 40px/1.15 Georgia,"Songti SC","STSong","SimSun",ser
 h1 em{font-style:normal;color:var(--accent)}
 .sub{color:var(--ink2);max-width:640px;margin:0}
 .stats{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.install-btn{display:inline-flex;align-items:center;gap:6px;margin-top:12px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);
+  border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.install-btn svg{width:15px;height:15px}
 .stat{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:120px;box-shadow:var(--shadow)}
 .stat b{display:block;font:700 22px/1.2 Georgia,serif}
 .stat span{font-size:12px;color:var(--ink3)}
@@ -523,6 +526,7 @@ body.simple .pbox:not(.open) > .pbody{display:none}
     <div class="eyebrow">CET-6 · VOCABULARY</div>
     <h1>六级 <em>8000</em> 词</h1>
     <p class="sub" id="sub">近六年 13 次真题逐词统计频率，只留考试常考的意思。每个词都有助记：词根积木和动画、形近词和翻译话题串记、熟词僻义标注、写作翻译搭配。可以按字母、真题频率、会写词汇、词根、串记浏览，配间隔复习背诵和四种自测。</p>
+    <button class="install-btn" id="installBtn" hidden title="装到手机桌面，像 App 一样全屏打开，断网也能用"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>安装到手机桌面</button>
     <div class="stats" id="stats"></div>
   </div>
 </header>
@@ -1821,6 +1825,17 @@ window.CET6 = {
   });
   $('#studyBtn').onclick = studyHome;
   $('#quizBtn').onclick = quizHome;
+
+  /* 「安装到手机桌面」：只有浏览器说能装时才出现（安卓 Chrome、电脑 Chrome/Edge）；已经当 App 打开、或装好了就隐藏 */
+  (() => {
+    const btn = $('#installBtn'); if (!btn) return;
+    const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    if (standalone) return;
+    let ev = null;
+    addEventListener('beforeinstallprompt', e => { e.preventDefault(); ev = e; btn.hidden = false; });
+    btn.onclick = async () => { if (!ev) return; ev.prompt(); try { await ev.userChoice; } catch (e) {} ev = null; btn.hidden = true; };
+    addEventListener('appinstalled', () => { btn.hidden = true; ev = null; });
+  })();
 
   /* 背诵卡手势：轻点卡片 = 看答案；看完答案后左滑 = 忘了、右滑 = 记得。卡片跟着手指走，松手飞出去
      快速过词：左滑 = 下一个、右滑 = 上一个，轻点 = 暂停 / 继续 */
