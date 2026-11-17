@@ -649,7 +649,8 @@ window.CET6 = {
   function markLetters(){
     document.querySelectorAll('#letters button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === st.letter)));
   }
-  function save(){ const {q, ...rest} = st; store.set('cet6-view', rest); }
+  // ?print=… 生成 PDF 时用临时视图，不覆盖读者自己保存的筛选
+  function save(){ if (new URLSearchParams(location.search).get('print')) return; const {q, ...rest} = st; store.set('cet6-view', rest); }
 
   /* ---------- 词根词缀索引：同一角色 + 同一拼写 = 一张卡 ---------- */
   const affIdx = new Map();
