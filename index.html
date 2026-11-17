@@ -78,7 +78,14 @@ h1 em{font-style:normal;color:var(--accent)}
 .search input{width:100%;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--paper);
   padding:0 12px 0 36px;outline:none}
 .search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.search svg{position:absolute;left:11px;top:11px;width:18px;height:18px;color:var(--ink3)}
+.search > svg{position:absolute;left:11px;top:11px;width:18px;height:18px;color:var(--ink3)}
+.search input{padding-right:40px}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.search .clr{position:absolute;right:6px;top:6px;width:28px;height:28px;border:0;border-radius:50%;background:var(--line2);color:var(--ink2);
+  display:none;place-items:center;cursor:pointer;padding:0}
+.search .clr svg{width:14px;height:14px}
+.search.has .clr{display:grid;animation:okPop .25s ease-out}
+.search .clr:hover{background:var(--line);color:var(--ink)}
 .seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
 .seg button{border:0;background:none;padding:5px 12px;border-radius:7px;cursor:pointer;color:var(--ink2);white-space:nowrap}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
@@ -148,7 +155,10 @@ main{padding:18px 0 60px}
 .list{display:grid;gap:10px}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px 13px;box-shadow:var(--shadow);
   display:grid;grid-template-columns:minmax(150px,210px) 1fr 150px;gap:6px 18px;align-items:start;position:relative}
+.card{transition:opacity .3s ease}
 .card.known{opacity:.55}
+.card.open .detail{animation:fcUp .22s ease-out}
+body.simple .pbox.open > .pbody{animation:fcUp .22s ease-out}
 .card.known .w{text-decoration:line-through;text-decoration-color:var(--known);text-decoration-thickness:2px}
 .head{min-width:0}
 .w{font:600 22px/1.25 Georgia,"Times New Roman",serif;word-break:break-word;letter-spacing:.01em}
@@ -253,7 +263,7 @@ button:active,.chip:active,.opt:active,.mode:active,.ib:active,.cta:active,.fbtn
 .search input:focus-visible,.spell input:focus-visible{outline:none}
 .ib.on{animation:okPop .35s cubic-bezier(.2,.9,.3,1.6)}
 @media (hover:hover){
-  .card{transition:border-color .18s,box-shadow .2s}
+  .card{transition:border-color .18s,box-shadow .2s,opacity .3s ease}
   .card:hover{border-color:color-mix(in srgb,var(--ink3) 40%,var(--line))}
   .mode:hover{border-color:var(--ink3);transform:translateY(-2px);box-shadow:var(--shadow)}
   .cta:hover{filter:brightness(1.07)}
@@ -510,6 +520,7 @@ body.simple .pbox:not(.open) > .pbody{display:none}
       <label class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input id="q" type="search" placeholder="搜单词或中文意思，例如 abandon / 放弃" autocomplete="off">
+        <button type="button" class="clr" id="qClr" title="清空搜索" aria-label="清空搜索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
       </label>
       <button class="cta" id="studyBtn" title="间隔复习背单词">背诵<span id="dueBadge"></span></button>
       <button class="cta ghost" id="quizBtn" title="选择题 / 拼写 / 听音自测">自测</button>
@@ -677,7 +688,9 @@ window.CET6 = {
       b.setAttribute('aria-pressed', String(b.dataset.sort === st.sort));
       b.onclick = () => { st.sort = b.dataset.sort; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); apply(true); };
     });
-    let t; $('#q').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { st.q = e.target.value.trim().toLowerCase(); apply(true); }, 120); });
+    let t; $('#q').addEventListener('input', e => { $('.search').classList.toggle('has', !!e.target.value); clearTimeout(t); t = setTimeout(() => { st.q = e.target.value.trim().toLowerCase(); apply(true); }, 120); });
+    // 搜索框里的 ×：一点就清空，光标留在框里接着搜
+    $('#qClr').addEventListener('click', e => { e.preventDefault(); const q = $('#q'); q.value = ''; q.dispatchEvent(new Event('input', {bubbles: true})); q.focus(); });
     $('#cover').checked = st.cover; $('#hideKnown').checked = st.hideKnown;
     $('#simple').checked = st.simple;
     $('#simple').onchange = e => { st.simple = e.target.checked; document.body.classList.toggle('simple', st.simple); save(); };
@@ -1259,13 +1272,13 @@ window.CET6 = {
   function openRoot(seg){
     st.sort = 'roots'; st.letter = 'all'; markLetters();
     document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === 'roots')));
-    $('#q').value = seg; st.q = seg; apply(true);
+    $('#q').value = seg; $('.search').classList.toggle('has', !!seg); st.q = seg; apply(true);
   }
   function goWord(x){
     if (st.sort === 'roots' || st.sort === 'stories') { st.sort = 'alpha'; document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === 'alpha'))); }
     st.letter = 'all'; st.lv = 'all'; st.band = 'all'; markLetters();
     document.querySelectorAll('#lvChips .chip,#bandChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === 'all')));
-    $('#q').value = x; st.q = x; apply(true);
+    $('#q').value = x; $('.search').classList.toggle('has', !!x); st.q = x; apply(true);
   }
   $('#list').addEventListener('click', e => {
     const g = e.target.closest('[data-go]');
