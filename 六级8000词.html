@@ -59,8 +59,19 @@ h1 em{font-style:normal;color:var(--accent)}
 
 /* ---------- toolbar ---------- */
 .bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);
-  backdrop-filter:saturate(1.2) blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.bar .wrap{padding-top:12px;padding-bottom:10px}
+  backdrop-filter:saturate(1.2) blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  transition:transform .25s ease}
+/* 往下滚时整条顶栏滑出屏幕，往上滚或按 / 时回来：读词时屏幕上只剩单词 */
+.bar.away{transform:translateY(-100%)}
+.bar .wrap{padding-top:8px;padding-bottom:8px}
+.panel{padding-top:2px}
+.panel[hidden]{display:none}
+.fbtn{height:40px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--paper);
+  border-radius:10px;padding:0 12px;cursor:pointer;color:var(--ink2);white-space:nowrap}
+.fbtn svg{width:16px;height:16px}
+.fbtn b{font-weight:600;color:var(--ink)}
+.fbtn[aria-expanded="true"]{border-color:var(--ink);box-shadow:0 0 0 3px var(--line2)}
+.fbtn span:not(:empty){background:var(--accent);color:#fff;border-radius:99px;padding:0 6px;font-size:12px;line-height:18px}
 .row1{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .search{flex:1 1 240px;position:relative}
 .search input{width:100%;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--paper);
@@ -229,6 +240,64 @@ main{padding:18px 0 60px}
 .top{position:fixed;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--paper);
   box-shadow:var(--shadow);cursor:pointer;display:none;place-items:center;z-index:30}
 .top.show{display:grid}
+/* ===== 词根动画 ===== */
+.anim-btn{border:1px dashed var(--line);background:none;color:var(--ink3);border-radius:8px;font-size:12px;padding:3px 9px;cursor:pointer;align-self:center;margin-left:4px}
+.anim-btn:hover{color:var(--accent);border-color:var(--accent)}
+.anim-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 2px;padding:10px;border-radius:12px;background:var(--line2)}
+.anim-tile{display:flex;flex-direction:column;align-items:center;gap:2px;opacity:0;transform:scale(.6);animation:tileIn .45s cubic-bezier(.2,.9,.3,1.4) forwards;animation-delay:var(--d)}
+@keyframes tileIn{to{opacity:1;transform:none}}
+.anim-tile svg{width:64px;height:64px;border-radius:12px;background:var(--paper);border:1.5px solid currentColor}
+.anim-tile b{font:700 15px/1.1 Georgia,serif}
+.anim-tile em{font-style:normal;font-size:11px;font-weight:600}
+.anim-tile.pre{color:var(--teal)} .anim-tile.root{color:var(--accent)} .anim-tile.suf{color:var(--violet)}
+.anim-op{color:var(--ink3);font:600 16px Georgia,serif;opacity:0;animation:fade .3s forwards;animation-delay:var(--d)}
+.anim-res{opacity:0;transform:scale(.5);animation:pop .5s cubic-bezier(.2,.9,.3,1.6) forwards;animation-delay:var(--d);
+  background:var(--ink);color:var(--paper);font-weight:700;border-radius:12px;padding:10px 14px;font-size:16px}
+.anim-replay{margin-left:auto;border:0;background:none;color:var(--ink3);cursor:pointer;font-size:12px}
+/* 各个动作：transform-box 让旋转缩放以图形自身为中心 */
+.anim-tile svg *{transform-box:fill-box;transform-origin:center}
+.a-loop{animation-iteration-count:infinite!important;animation-duration:1.8s!important;animation-timing-function:ease-in-out!important}
+@keyframes kBack{0%{transform:translateX(-14px)}40%{transform:translateX(14px)}50%{transform:translateX(14px) scaleX(-1)}90%,100%{transform:translateX(-14px) scaleX(-1)}}
+@keyframes kSpin{to{transform:rotate(360deg)}}
+@keyframes kBlink{0%,40%,60%,100%{transform:scaleY(1)}50%{transform:scaleY(.1)}}
+@keyframes kLook{0%,100%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+@keyframes kThrow{0%{transform:translate(-18px,16px) scale(.8)}60%{transform:translate(10px,-14px)}100%{transform:translate(20px,-4px);opacity:0}}
+@keyframes kRight{0%{transform:translateX(-18px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(18px);opacity:0}}
+@keyframes kLeft{0%{transform:translateX(18px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(-18px);opacity:0}}
+@keyframes kUp{0%{transform:translateY(16px);opacity:0}25%{opacity:1}100%{transform:translateY(-14px);opacity:0}}
+@keyframes kDown{0%{transform:translateY(-16px);opacity:0}25%{opacity:1}100%{transform:translateY(14px);opacity:0}}
+@keyframes kDrop{0%{transform:translateY(-22px)}60%{transform:translateY(0)}75%{transform:translateY(-4px)}100%{transform:translateY(0)}}
+@keyframes kPress{0%,100%{transform:translateY(-6px) scaleY(1)}50%{transform:translateY(2px) scaleY(.6)}}
+@keyframes kTurn{0%,100%{transform:rotate(-45deg)}50%{transform:rotate(45deg)}}
+@keyframes kBreakL{0%,30%{transform:none}100%{transform:translate(-6px,4px) rotate(-25deg)}}
+@keyframes kBreakR{0%,30%{transform:none}100%{transform:translate(6px,4px) rotate(25deg)}}
+@keyframes kBend{0%,100%{transform:rotate(0)}50%{transform:rotate(-40deg)}}
+@keyframes kDraw{from{stroke-dashoffset:120}to{stroke-dashoffset:0}}
+@keyframes kDot{0%,100%{opacity:.2}50%{opacity:1}}
+@keyframes kGrow{0%{transform:scale(.2);opacity:.3}100%{transform:scale(1);opacity:1}}
+@keyframes kShrink{0%{transform:scale(1)}100%{transform:scale(.35)}}
+@keyframes kBeat{0%,100%{transform:scale(1)}30%{transform:scale(1.25)}50%{transform:scale(.95)}}
+@keyframes kGlow{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes kInL{0%{transform:translateX(-14px)}100%{transform:translateX(0)}}
+@keyframes kInR{0%{transform:translateX(14px)}100%{transform:translateX(0)}}
+@keyframes kApartL{0%{transform:translateX(0)}100%{transform:translateX(-10px)}}
+@keyframes kApartR{0%{transform:translateX(0)}100%{transform:translateX(10px)}}
+@keyframes kIn{0%{transform:translate(-22px,0);opacity:1}70%{transform:translate(2px,0);opacity:1}100%{transform:translate(2px,0);opacity:0}}
+@keyframes kOut{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(24px,0);opacity:0}}
+@keyframes kThrough{0%{transform:translateX(-22px)}100%{transform:translateX(22px)}}
+@keyframes kStack1{0%,10%{transform:translateY(-30px);opacity:0}30%,100%{transform:none;opacity:1}}
+@keyframes kStack2{0%,35%{transform:translateY(-30px);opacity:0}55%,100%{transform:none;opacity:1}}
+@keyframes kStack3{0%,60%{transform:translateY(-30px);opacity:0}80%,100%{transform:none;opacity:1}}
+@keyframes kRise{0%{transform:scaleY(.15)}60%,100%{transform:scaleY(1)}}
+@keyframes kWave{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(15deg)}}
+@keyframes kFlow{0%{transform:translateX(-8px)}100%{transform:translateX(8px)}}
+@keyframes kFlicker{0%,100%{transform:scale(1,1)}50%{transform:scale(.85,1.15)}}
+@keyframes kPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes kDroop{0%{transform:rotate(0)}100%{transform:rotate(70deg);opacity:.4}}
+@keyframes kClashL{0%,100%{transform:translateX(-8px)}50%{transform:translateX(2px)}}
+@keyframes kClashR{0%,100%{transform:translateX(8px)}50%{transform:translateX(-2px)}}
+@keyframes kPull{0%,100%{transform:translateX(10px)}50%{transform:translateX(-8px)}}
+@media (prefers-reduced-motion: reduce){.anim-tile svg *{animation:none!important}}
 /* ===== 紧凑双栏卡片 ===== */
 .wrap{max-width:1240px}
 .list{gap:10px}
@@ -288,8 +357,12 @@ main{padding:18px 0 60px}
   .fc-acts button[data-g]{min-width:0;flex:1 1 0;padding:0 4px}
   .fc-word{font-size:38px}
   .ov-main{padding:18px 14px 30px}
-  .bar.compact .row2,.bar.compact .letters{display:none}
-  .bar.compact .wrap{padding-top:8px;padding-bottom:8px}
+  .row1{gap:6px;flex-wrap:nowrap}
+  .search{flex:1 1 0;min-width:0}
+  .search input{padding-right:6px;font-size:14px}
+  .row1 .cta{padding:0 11px}
+  .fbtn{padding:0 9px}
+  .fbtn b{display:none}
 }
 .chip.pdf{border-color:var(--ink3);color:var(--ink)}
 #printArea{display:none}
@@ -336,17 +409,23 @@ main{padding:18px 0 60px}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         <input id="q" type="search" placeholder="搜单词或中文意思，例如 abandon / 放弃" autocomplete="off">
       </label>
+      <button class="cta" id="studyBtn" title="间隔复习背单词">背诵<span id="dueBadge"></span></button>
+      <button class="cta ghost" id="quizBtn" title="选择题 / 拼写 / 听音自测">自测</button>
+      <button class="fbtn" id="filterBtn" aria-expanded="false" aria-controls="panel" title="排序、级别、频率、字母筛选">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg><b id="viewName">字母</b><span id="fCount"></span>
+      </button>
+      <button class="theme" id="theme" title="切换深浅色" aria-label="切换深浅色">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+    <div class="panel" id="panel" hidden>
+    <div class="row2">
       <div class="seg" role="group" aria-label="排序">
         <button data-sort="alpha" aria-pressed="true">字母 A–Z</button>
         <button data-sort="freq" aria-pressed="false">真题频率</button>
         <button data-sort="write" aria-pressed="false" title="四级常用词 + 重要六级词：写作、翻译要会拼会用">会写词汇</button>
         <button data-sort="roots" aria-pressed="false" title="按词根词缀成串记忆">词根</button>
       </div>
-      <button class="cta" id="studyBtn" title="间隔复习背单词">背诵<span id="dueBadge"></span></button>
-      <button class="cta ghost" id="quizBtn" title="选择题 / 拼写 / 听音自测">自测</button>
-      <button class="theme" id="theme" title="切换深浅色" aria-label="切换深浅色">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      </button>
     </div>
     <div class="row2">
       <div class="chips" id="lvChips"><span class="lbl">级别</span></div>
@@ -358,6 +437,7 @@ main{padding:18px 0 60px}
       <button class="chip pdf" id="pdfBtn" title="把当前列表导出为 PDF（在打印窗口选「另存为 PDF」）">导出 PDF</button>
     </div>
     <div class="letters" id="letters"></div>
+    </div>
   </div>
 </div>
 
@@ -494,7 +574,7 @@ window.CET6 = {
     });
     let t; $('#q').addEventListener('input', e => { clearTimeout(t); t = setTimeout(() => { st.q = e.target.value.trim().toLowerCase(); apply(true); }, 120); });
     $('#cover').checked = st.cover; $('#hideKnown').checked = st.hideKnown;
-    $('#cover').onchange = e => { st.cover = e.target.checked; document.body.classList.toggle('cover', st.cover); save(); };
+    $('#cover').onchange = e => { st.cover = e.target.checked; document.body.classList.toggle('cover', st.cover); save(); const c = $('#fCount'); c.textContent = String((+c.textContent || 0) + (st.cover ? 1 : -1)).replace(/^0$/, ''); };
     $('#hideKnown').onchange = e => { st.hideKnown = e.target.checked; apply(); };
     $('#rareOnly').checked = !!st.rareOnly;
     $('#rareOnly').onchange = e => { st.rareOnly = e.target.checked; apply(true); };
@@ -510,15 +590,24 @@ window.CET6 = {
     };
     const th = store.get('cet6-theme', null); if (th) document.documentElement.dataset.theme = th;
     $('#toTop').onclick = () => scrollTo({top:0, behavior:'smooth'});
-    let lastY = 0;
+    if (matchMedia('(max-width:640px)').matches) $('#q').placeholder = '搜单词 / 中文';
+    const bar = $('.bar'), panel = $('#panel'), fbtn = $('#filterBtn');
+    const setPanel = open => { panel.hidden = !open; fbtn.setAttribute('aria-expanded', String(open)); };
+    fbtn.onclick = () => setPanel(panel.hidden);
+    let lastY = scrollY;
     addEventListener('scroll', () => {
       $('#toTop').classList.toggle('show', scrollY > 800);
-      const bar = $('.bar'), top = $('main').offsetTop;
-      if (scrollY < top - 40) bar.classList.remove('compact');
-      else if (scrollY > lastY + 6) bar.classList.add('compact');      // 向下滚：收起
-      else if (scrollY < lastY - 30) bar.classList.remove('compact');  // 明显向上滚：展开
+      const top = $('main').offsetTop;
+      if (scrollY < top - 40) bar.classList.remove('away');
+      else if (scrollY > lastY + 6 && document.activeElement !== $('#q')) { bar.classList.add('away'); setPanel(false); } // 向下读词：整条顶栏让开
+      else if (scrollY < lastY - 30) bar.classList.remove('away');  // 明显向上滚：回来
       lastY = scrollY;
     }, {passive:true});
+    addEventListener('keydown', e => {
+      if (e.key === '/' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName) && !$('#ov').classList.contains('show')) {
+        e.preventDefault(); bar.classList.remove('away'); $('#q').focus();
+      }
+    });
   }
   function markLetters(){
     document.querySelectorAll('#letters button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === st.letter)));
@@ -592,6 +681,9 @@ window.CET6 = {
   function apply(scrollUp){
     save();
     $('#wfreqWrap').hidden = st.sort !== 'write';
+    $('#viewName').textContent = {alpha:'字母', freq:'频率', write:'会写', roots:'词根'}[st.sort] || '筛选';
+    const nf = [st.lv !== 'all', st.band !== 'all', st.letter !== 'all', st.cover, st.hideKnown, st.rareOnly].filter(Boolean).length;
+    $('#fCount').textContent = nf ? String(nf) : '';
     if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
     current = words.filter(w =>
@@ -637,6 +729,109 @@ window.CET6 = {
     // 支持 **重点** 加粗
     return esc(m).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
   }
+  /* =====================================================================
+     词根动画：每个「意思」对应一个会动的小图，按意思匹配（不按拼写），
+     一个词的各部分依次播放，最后弹出词义。
+     ===================================================================== */
+  const A = (name, dur, extra) => `style="animation:${name} ${dur || 1.8}s ease-in-out infinite${extra ? ';' + extra : ''}"`;
+  const ARROW = d => `<path d="M14 32h30m-9-9 9 9-9 9" ${d}/>`;
+  const ANIM = {
+    back:    `<g ${A('kBack', 2)}>${ARROW('')}</g>`,
+    again:   `<g ${A('kSpin', 2.2, 'animation-timing-function:linear')}><path d="M32 14a18 18 0 1 1-16 10"/><path d="M12 16l4 8 8-3"/></g>`,
+    look:    `<g ${A('kBlink', 2.4)}><path d="M10 32q22-20 44 0q-22 20-44 0z"/><g ${A('kLook', 2.4)}><circle cx="32" cy="32" r="6" fill="currentColor"/></g></g>`,
+    grab:    `<circle cx="40" cy="34" r="6" fill="currentColor"/><g ${A('kPull', 1.6)}><path d="M12 22q12 0 16 10q-4 10-16 10"/></g>`,
+    throw:   `<path d="M10 52h44" opacity=".3"/><g ${A('kThrow', 1.6, 'animation-timing-function:ease-out')}><circle cx="32" cy="32" r="6" fill="currentColor"/></g>`,
+    send:    `<g ${A('kRight', 1.8)}><rect x="20" y="24" width="24" height="16" rx="2"/><path d="M20 24l12 9 12-9"/></g>`,
+    carry:   `<path d="M8 46h48" opacity=".3"/><g ${A('kRight', 2)}><rect x="22" y="28" width="20" height="16" rx="2"/><path d="M22 34h20"/></g>`,
+    pull:    `<path d="M10 32h20" stroke-dasharray="3 3"/><g ${A('kPull', 1.6)}><rect x="30" y="24" width="18" height="16" rx="2" fill="currentColor" opacity=".85"/></g>`,
+    walk:    `<g ${A('kRight', 2.2)}><circle cx="32" cy="18" r="4" fill="currentColor"/><path d="M32 22v14m0 0-6 12m6-12 6 12m-6-20-7 7m7-7 7 7"/></g>`,
+    come:    `<g ${A('kLeft', 2)}><circle cx="32" cy="18" r="4" fill="currentColor"/><path d="M32 22v14m0 0-6 12m6-12 6 12"/></g><path d="M10 50h12" opacity=".4"/>`,
+    speak:   `<path d="M14 18h36v20H30l-8 8v-8h-8z"/><circle cx="24" cy="28" r="2.5" fill="currentColor" ${A('kDot', 1.2)}/><circle cx="32" cy="28" r="2.5" fill="currentColor" ${A('kDot', 1.2, 'animation-delay:.2s')}/><circle cx="40" cy="28" r="2.5" fill="currentColor" ${A('kDot', 1.2, 'animation-delay:.4s')}/>`,
+    write:   `<path d="M12 44c6-10 10 6 16-4s10 6 16-4 6 2 8 0" stroke-dasharray="120" ${A('kDraw', 2.2)}/><path d="M44 14l6 6-16 16-7 1 1-7z" opacity=".6"/>`,
+    put:     `<path d="M10 48h44" opacity=".3"/><g ${A('kDrop', 1.6)}><rect x="24" y="30" width="16" height="16" rx="2" fill="currentColor" opacity=".85"/></g>`,
+    turn:    `<g ${A('kTurn', 2)}><rect x="20" y="20" width="24" height="24" rx="3"/><path d="M32 20v8"/></g>`,
+    press:   `<path d="M10 48h44" opacity=".3"/><path d="M32 8v10m-6-4 6 6 6-6"/><g ${A('kPress', 1.4)}><rect x="20" y="28" width="24" height="18" rx="2" fill="currentColor" opacity=".8"/></g>`,
+    break:   `<g ${A('kBreakL', 1.6)}><path d="M12 32h18"/></g><g ${A('kBreakR', 1.6)}><path d="M34 32h18"/></g><path d="M32 22l-2 6 4 2-2 6" opacity=".6"/>`,
+    bend:    `<path d="M32 52V34"/><g ${A('kBend', 1.8, 'transform-origin:32px 34px;transform-box:view-box')}><path d="M32 34V12"/></g>`,
+    lead:    `<path d="M10 44q22-28 44-8" opacity=".25"/><g ${A('kRight', 2)}><circle cx="32" cy="30" r="5" fill="currentColor"/><circle cx="22" cy="34" r="3"/><circle cx="14" cy="38" r="2"/></g>`,
+    build:   `<path d="M10 52h44" opacity=".3"/><rect x="22" y="40" width="20" height="10" rx="1" fill="currentColor" ${A('kStack1', 2.4)}/><rect x="22" y="28" width="20" height="10" rx="1" fill="currentColor" opacity=".75" ${A('kStack2', 2.4)}/><rect x="22" y="16" width="20" height="10" rx="1" fill="currentColor" opacity=".5" ${A('kStack3', 2.4)}/>`,
+    stand:   `<path d="M10 52h44" opacity=".3"/><g ${A('kRise', 1.8, 'transform-origin:32px 52px;transform-box:view-box')}><circle cx="32" cy="16" r="5" fill="currentColor"/><path d="M32 21v18m0 0-7 13m7-13 7 13m-7-24-8 6m8-6 8 6"/></g>`,
+    sit:     `<path d="M18 52V36h20v16M18 36h20" opacity=".4"/><g ${A('kDrop', 1.8)}><circle cx="28" cy="18" r="4" fill="currentColor"/><path d="M28 22v12h10v10"/></g>`,
+    flow:    `<g ${A('kFlow', 1.4, 'animation-direction:alternate')}><path d="M8 26q6-6 12 0t12 0 12 0 12 0"/><path d="M8 38q6-6 12 0t12 0 12 0 12 0" opacity=".6"/></g>`,
+    run:     `<g ${A('kRight', 1.2)}><circle cx="34" cy="16" r="4" fill="currentColor"/><path d="M33 20l-3 14m0 0-8 10m8-10 9 6v8m-6-24-9 4m9-4 8 6"/></g>`,
+    grow:    `<path d="M10 52h44" opacity=".3"/><g ${A('kGrow', 2, 'transform-origin:32px 52px;transform-box:view-box')}><path d="M32 52V24"/><path d="M32 34q-12-2-14-14q12 2 14 14zm0-6q12-2 14-14q-12 2-14 14z" fill="currentColor" opacity=".7"/></g>`,
+    die:     `<path d="M10 52h44" opacity=".3"/><path d="M32 52V36"/><g ${A('kDroop', 2.2, 'transform-origin:32px 36px;transform-box:view-box')}><path d="M32 36V22"/><circle cx="32" cy="18" r="6" fill="currentColor" opacity=".7"/></g>`,
+    light:   `<circle cx="32" cy="32" r="8" fill="currentColor"/><g ${A('kGlow', 1.6)}><path d="M32 10v8M32 46v8M10 32h8M46 32h8M16 16l6 6M42 42l6 6M48 16l-6 6M22 42l-6 6"/></g>`,
+    heart:   `<g ${A('kBeat', 1.2)}><path d="M32 48S14 36 14 24a9 9 0 0 1 18-2 9 9 0 0 1 18 2c0 12-18 24-18 24z" fill="currentColor" opacity=".85"/></g>`,
+    hand:    `<g ${A('kWave', 1.4, 'transform-origin:32px 50px;transform-box:view-box')}><path d="M24 50V30m0 0v-12m0 12h16V22m0 10V18m-8 12V14m-8 16-6-6"/></g>`,
+    head:    `<g ${A('kTurn', 2.2)}><circle cx="32" cy="28" r="12"/><circle cx="28" cy="26" r="1.8" fill="currentColor"/><circle cx="36" cy="26" r="1.8" fill="currentColor"/></g><path d="M24 46h16" opacity=".5"/>`,
+    no:      `<circle cx="32" cy="32" r="18"/><path d="M19 45L45 19" stroke-dasharray="120" ${A('kDraw', 1.6, 'animation-iteration-count:1;animation-fill-mode:both')}/>`,
+    out:     `<path d="M12 18h22v28H12z" opacity=".55"/><g ${A('kOut', 1.8)}><circle cx="24" cy="32" r="6" fill="currentColor"/></g>`,
+    in:      `<path d="M30 18h22v28H30z" opacity=".55"/><g ${A('kIn', 1.8)}><circle cx="40" cy="32" r="6" fill="currentColor"/></g>`,
+    down:    `<g ${A('kDown', 1.6)}><path d="M32 14v34m-10-10 10 10 10-10"/></g>`,
+    up:      `<g ${A('kUp', 1.6)}><path d="M32 50V16m-10 10 10-10 10 10"/></g>`,
+    between: `<circle cx="14" cy="32" r="5"/><circle cx="50" cy="32" r="5"/><g ${A('kFlow', 1.2, 'animation-direction:alternate')}><circle cx="32" cy="32" r="4" fill="currentColor"/></g>`,
+    through: `<path d="M32 12v40" stroke-width="4" opacity=".35"/><g ${A('kThrough', 1.6, 'animation-timing-function:linear')}>${ARROW('')}</g>`,
+    together:`<g ${A('kInL', 1.8, 'animation-direction:alternate')}><circle cx="24" cy="32" r="9" fill="currentColor" opacity=".55"/></g><g ${A('kInR', 1.8, 'animation-direction:alternate')}><circle cx="40" cy="32" r="9" fill="currentColor" opacity=".55"/></g>`,
+    apart:   `<g ${A('kApartL', 1.6, 'animation-direction:alternate')}><path d="M30 16v32H16q-4-16 14-32z" fill="currentColor" opacity=".6"/></g><g ${A('kApartR', 1.6, 'animation-direction:alternate')}><path d="M34 16v32h14q4-16-14-32z" fill="currentColor" opacity=".6"/></g>`,
+    forward: `<g ${A('kRight', 1.4)}><path d="M18 22l10 10-10 10M30 22l10 10-10 10"/></g>`,
+    backward:`<g ${A('kLeft', 1.4)}><path d="M46 22 36 32l10 10M34 22 24 32l10 10"/></g>`,
+    against: `<g ${A('kClashL', 1.2)}><path d="M10 32h16m-6-6 6 6-6 6"/></g><g ${A('kClashR', 1.2)}><path d="M54 32H38m6-6-6 6 6 6"/></g>`,
+    boost:   `<g ${A('kBeat', 1)}><path d="M32 10l5 15h16l-13 9 5 16-13-10-13 10 5-16-13-9h16z" fill="currentColor" opacity=".8"/></g>`,
+    many:    [0,1,2,3,4].map(i => `<circle cx="${14 + i*9}" cy="${i%2 ? 26 : 38}" r="4" fill="currentColor" ${A('kPop', 1.8, 'animation-delay:' + i*0.15 + 's')}/>`).join(''),
+    one:     `<text x="32" y="44" text-anchor="middle" font-size="32" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>1</text>`,
+    two:     `<text x="32" y="44" text-anchor="middle" font-size="32" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>2</text>`,
+    three:   `<text x="32" y="44" text-anchor="middle" font-size="32" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>3</text>`,
+    ten:     `<text x="32" y="44" text-anchor="middle" font-size="28" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>10</text>`,
+    hundred: `<text x="32" y="42" text-anchor="middle" font-size="22" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>100</text>`,
+    self:    `<circle cx="32" cy="20" r="5" fill="currentColor"/><path d="M32 25v14m0 0-6 10m6-10 6 10"/><g ${A('kSpin', 2.4, 'animation-timing-function:linear;transform-origin:32px 32px;transform-box:view-box')}><path d="M48 32a16 16 0 0 1-4 10" /><path d="M44 46l0-5 5 1"/></g>`,
+    small:   `<g ${A('kShrink', 1.8, 'animation-direction:alternate')}><circle cx="32" cy="32" r="16" fill="currentColor" opacity=".7"/></g>`,
+    big:     `<g ${A('kGrow', 1.8, 'animation-direction:alternate')}><circle cx="32" cy="32" r="18" fill="currentColor" opacity=".7"/></g>`,
+    time:    `<circle cx="32" cy="32" r="18"/><g ${A('kSpin', 3, 'animation-timing-function:linear;transform-origin:32px 32px;transform-box:view-box')}><path d="M32 32V18"/></g><path d="M32 32h8"/>`,
+    earth:   `<circle cx="32" cy="32" r="18"/><g ${A('kFlow', 2, 'animation-direction:alternate')}><path d="M20 26h24M18 34h28M24 42h16"/></g>`,
+    water:   `<g ${A('kFlow', 1.2, 'animation-direction:alternate')}><path d="M8 30q6-6 12 0t12 0 12 0 12 0"/><path d="M8 40q6-6 12 0t12 0 12 0 12 0"/></g><path d="M32 12q-6 8-6 12a6 6 0 0 0 12 0q0-4-6-12z" fill="currentColor" opacity=".5"/>`,
+    fire:    `<g ${A('kFlicker', .8, 'transform-origin:32px 50px;transform-box:view-box')}><path d="M32 50c-10 0-14-8-10-16 2 4 4 4 6 2-2-8 2-14 8-18 0 8 10 12 10 22 0 6-6 10-14 10z" fill="currentColor" opacity=".8"/></g>`,
+    person:  `<g ${A('kDrop', 1.8)}><circle cx="32" cy="18" r="6" fill="currentColor"/><path d="M32 24v16m0 0-8 12m8-12 8 12m-8-22-10 6m10-6 10 6"/></g>`,
+    tagN:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">名词</text>`,
+    tagA:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">…的</text>`,
+    tagV:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">动词</text>`,
+    tagAdv:  `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">…地</text>`,
+    able:    `<circle cx="32" cy="32" r="16"/><path d="M24 32l6 6 11-12" stroke-dasharray="120" ${A('kDraw', 1.8)}/>`,
+  };
+  // 意思 → 动作（顺序有讲究：先匹配更具体的）
+  const ANIM_RULES = [
+    [/名词|状态|性质|行为|过程|学科|学$/, 'tagN'], [/^…?的$|…的|似…的|有…的/, 'tagA'], [/副词|…地/, 'tagAdv'], [/^动词$|^使$|使…/, 'tagV'],
+    [/能…|可…|能够|可以|能力/, 'able'], [/人|者|家$|员$/, 'person'],
+    [/不|无|非|未|否|没有/, 'no'], [/反|抗|对抗|逆|相反/, 'against'], [/之间|相互|互/, 'between'], [/穿过|跨|越过|转移|贯穿/, 'through'],
+    [/一起|共同|合|同$|全部/, 'together'], [/离开|分开|分离|去掉|除去|脱离|偏离/, 'apart'], [/出|外/, 'out'], [/进入|在内|向内|内|里|进/, 'in'],
+    [/向下|下|低|降/, 'down'], [/上|超|过度|高|越/, 'up'], [/向后|后/, 'backward'], [/向前|前|预先|先/, 'forward'],
+    [/回|返/, 'back'], [/再|重新|反复|又/, 'again'], [/加强|强|彻底|完全/, 'boost'],
+    [/看|视|观|见|眼/, 'look'], [/拿|取|抓|握|捕/, 'grab'], [/扔|投|掷|抛/, 'throw'], [/送|派|寄|发送|遣/, 'send'], [/运|搬|携|带/, 'carry'],
+    [/拉|拖|引/, 'pull'], [/引导|领|导/, 'lead'], [/跑|奔/, 'run'], [/流|水/, 'water'], [/走|行|步|去$/, 'walk'], [/来|到/, 'come'],
+    [/说|讲|言|声|喊|叫|语|召唤/, 'speak'], [/写|书|记|刻/, 'write'], [/放|置|摆/, 'put'], [/转|旋|翻/, 'turn'], [/压|按|挤/, 'press'],
+    [/断|破|裂|碎/, 'break'], [/弯|曲|倾/, 'bend'], [/建|造|构|筑|立$/, 'build'], [/站|立/, 'stand'], [/坐/, 'sit'],
+    [/生|长|产|育/, 'grow'], [/死|亡|灭/, 'die'], [/光|亮|明|照/, 'light'], [/心|情|感|意/, 'heart'], [/手/, 'hand'], [/头|首/, 'head'],
+    [/自|己/, 'self'], [/小|微/, 'small'], [/大|巨/, 'big'], [/多|众/, 'many'], [/单|一/, 'one'], [/二|双|两/, 'two'], [/三/, 'three'],
+    [/十/, 'ten'], [/百/, 'hundred'], [/时|年|日|月|期/, 'time'], [/地|土|陆/, 'earth'], [/火|热|燃/, 'fire'],
+  ];
+  function animFor(meaning){
+    const m = String(meaning || '');
+    for (const [re, k] of ANIM_RULES) if (re.test(m)) return ANIM[k];
+    return null;
+  }
+  function animTile(seg, meaning, r, delay){
+    const art = animFor(meaning);
+    const svg = art
+      ? `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${art}</svg>`
+      : `<svg viewBox="0 0 64 64"><text x="32" y="40" text-anchor="middle" font-size="18" font-family="Georgia" font-weight="700" fill="currentColor">${esc(seg)}</text></svg>`;
+    return `<div class="anim-tile ${r}" style="--d:${delay}ms">${svg}<b>${esc(seg)}</b><em>${esc(meaning)}</em></div>`;
+  }
+  function animStripHtml(w){
+    if (!w.parts) return '';
+    const n = w.parts.length, step = 700;
+    const tiles = w.parts.map(([seg, m], i) => (i ? `<span class="anim-op" style="--d:${i * step - 200}ms">+</span>` : '') + animTile(seg, m, role(seg, i, n), i * step)).join('');
+    return `<div class="anim-strip">${tiles}<span class="anim-op" style="--d:${n * step - 200}ms">=</span><span class="anim-res" style="--d:${n * step}ms">${esc(shortMean(w))}</span><button class="anim-replay" data-replay="1" title="重新播放">↻ 重播</button></div>`;
+  }
   const ROLE_ZH = {pre:'前缀', root:'词根', suf:'后缀'};
   function shortMean(w){ const t = (w.zh[0] || ['',''])[1]; return t.split(/[；;，,]/)[0]; }
   function partsHtml(w, opt){
@@ -647,7 +842,8 @@ window.CET6 = {
       return `${i ? `<span class="plus" style="--d:${i * step - 60}ms">+</span>` : ''}<span class="blk ${r}" style="--d:${i * step}ms" data-seg="${esc(seg.toLowerCase())}" data-role="${r}" title="点我看同${ROLE_ZH[r]}的词"><i>${ROLE_ZH[r]}</i><b>${esc(seg)}</b><em>${esc(m)}</em></span>`;
     }).join('');
     const res = opt && opt.noResult ? '' : `<span class="eq" style="--d:${n * step}ms">=</span><span class="res" style="--d:${n * step + 80}ms">${esc(shortMean(w))}</span>`;
-    return `<div class="parts-d" aria-label="词根拆解">${blocks}${res}</div>`;
+    const btn = opt && opt.noResult ? '' : `<button class="anim-btn" data-anim="1" title="用动画演示这个词是怎么拼出来的">▶ 动画</button>`;
+    return `<div class="parts-d" aria-label="词根拆解">${blocks}${res}${btn}</div>`;
   }
   // 易混词：词表里有的英文词变成可点击链接，方便来回对比
   function vsHtml(w){
@@ -783,6 +979,15 @@ window.CET6 = {
     if (mw) { const ent = affIdx.get(mw.dataset.root); mw.parentElement.innerHTML = ent.ws.map(w => `<a data-go="${esc(w.w)}">${esc(w.w)}<small>${esc(shortMean(w))}</small></a>`).join(''); return; }
     const blk = e.target.closest('.blk[data-seg]');
     if (blk) { openRoot(blk.dataset.seg); return; }
+    const ab = e.target.closest('[data-anim]');
+    if (ab) {
+      const card = ab.closest('.card'), w = byWord.get(card.dataset.w), old = card.querySelector('.anim-strip');
+      if (old) old.remove(); else card.querySelector('.parts-d').insertAdjacentHTML('afterend', animStripHtml(w));
+      ab.textContent = old ? '▶ 动画' : '■ 收起';
+      return;
+    }
+    const rp = e.target.closest('[data-replay]');
+    if (rp) { const strip = rp.closest('.anim-strip'), w = byWord.get(rp.closest('.card').dataset.w); strip.outerHTML = animStripHtml(w); return; }
     const c = e.target.closest('.card'); if (!c) return;
     const w = c.dataset.w;
     if (e.target.closest('.ok')) {
@@ -877,7 +1082,7 @@ window.CET6 = {
   function speak(w){ try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){} }
   const meanHtml = w => `<ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`;
   function backHtml(w){
-    return `<div class="fc-back in">${meanHtml(w)}${partsHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
+    return `<div class="fc-back in">${meanHtml(w)}${w.parts ? animStripHtml(w).replace(/<button class="anim-replay"[^>]*>.*?<\/button>/, '') : ''}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
   }
   function pool(){ // 当前筛选范围（不含已掌握）
     const base = current.length ? current : words;
