@@ -932,7 +932,10 @@ window.CET6 = {
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const firstMean = w => w.zh.map(([p,t]) => (p ? p + ' ' : '') + t).join('；');
   // 易混词：从 vs 字段里取出词表中真实存在的形近词
-  const rivalsOf = w => [...new Set((w.vs.match(/\b[a-z][a-z-]+\b/g) || []).filter(x => x !== w.w && byWord.has(x)))].map(x => byWord.get(x));
+  // 意思相同的拼写变体（fiber / fibre）不能当选择题
+  const sameMeaning = (a, b) => firstMean(a).split(/[；;]/)[0] === firstMean(b).split(/[；;]/)[0];
+  const rivalsOf = w => [...new Set((w.vs.match(/\b[a-z][a-z-]+\b/g) || []).filter(x => x !== w.w && byWord.has(x)))]
+    .map(x => byWord.get(x)).filter(x => !sameMeaning(w, x));
   function startQuiz(mode){
     let p = pool();
     if (mode === 'vs') { p = p.filter(w => w.vs && rivalsOf(w).length); if (p.length < 4) p = words.filter(w => w.vs && rivalsOf(w).length); }
