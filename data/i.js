@@ -157,7 +157,7 @@ CET6.add("i", [
 ["industrialisation",[["n.","工业化"]],"英式拼写，同 industrialization：industrial+isation → **工业化**","ext",6,4,[2,2,0,2,0,0],[0,6,0,0,0],2,2640,[["industrial","工业的"],["isation","…化"]],"","",0,0],
 ["industrialize",[["v.","（使）工业化"]],"industrial+ize(使…化) → **工业化**；industrialized countries 工业化国家；英式拼法 industrialise","cet4",4,1,[0,0,0,4,0,0],[0,4,0,0,0],1,3542,[["industrial","工业的"],["ize","…化"]],"","",0,0],
 ["industrious",[["adj.","勤劳的；勤奋的"]],"industry 有「勤劳」义，+ous → **勤劳的**；industrial 才是工业的；industrious people 勤劳的人民","cet6",1,1,[0,0,0,1,0,0],[1,0,0,0,0],1,6102,[["industri","勤劳"],["ous","…的"]],"","industrial 工业的",1,0],
-["industry",[["n.","工业；行业；勤劳"]],"熟词僻义：除了工业、行业，还指**勤劳**：Industry is the parent of success.","cet4",69,12,[21,9,15,5,15,4],[30,33,0,6,0],4,340,0,"","",1,1],
+["industry",[["n.","工业；行业；勤劳"]],"熟词僻义：除了工业、行业，还指**勤劳**：Industry is the parent of success.；拉丁语本义就是「勤奋」：勤奋才有工业","cet4",69,12,[21,9,15,5,15,4],[30,33,0,6,0],4,340,0,"","",1,1],
 ["ineffective",[["adj.","无效的；不起作用的"]],"in(不)+effective(有效的) → **无效的**","ext",6,4,[1,0,4,1,0,0],[1,5,0,0,0],2,2634,[["in","不"],["effective","有效的"]],"","",0,0],
 ["inefficient",[["adj.","效率低的；无能的"]],"in(不)+efficient(高效的) → **效率低的**；effective 看有没有用，efficient 看快不快","cet4",2,1,[0,0,0,0,2,0],[2,0,0,0,0],1,4916,[["in","不"],["efficient","高效的"]],"","ineffective 无效的",0,0],
 ["inequality",[["n.","不平等；不均"]],"in(不)+equal(平等)+ity → **不平等**；income inequality 收入不均","ext",20,6,[0,1,7,4,8,0],[4,16,0,0,0],3,1133,[["in","不"],["equal","平等"],["ity","名词"]],"","",1,0],
