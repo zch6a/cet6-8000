@@ -116,7 +116,8 @@ h1 em{font-style:normal;color:var(--accent)}
 .opt.right{border-color:var(--known);background:color-mix(in srgb,var(--known) 14%,var(--paper))}
 .opt.wrong{border-color:#d0574a;background:color-mix(in srgb,#d0574a 12%,var(--paper))}
 .spell{display:flex;gap:8px;margin-top:20px}
-.spell input{flex:1;height:50px;border-radius:12px;border:1px solid var(--line);background:var(--paper);padding:0 16px;font:600 22px Georgia,serif;outline:none;text-align:center}
+.spell button{flex:none;height:50px}
+.spell input{flex:1 1 auto;min-width:0;height:50px;border-radius:12px;border:1px solid var(--line);background:var(--paper);padding:0 16px;font:600 22px Georgia,serif;outline:none;text-align:center}
 .spell input.right{border-color:var(--known)}.spell input.wrong{border-color:#d0574a}
 .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:20px}
 .mode{border:1px solid var(--line);background:var(--paper);border-radius:14px;padding:16px;cursor:pointer;text-align:left}
