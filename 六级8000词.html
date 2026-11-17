@@ -210,6 +210,17 @@ main{padding:18px 0 60px}
 .vs u.df{text-decoration:none;color:#fff;background:var(--accent);border-radius:3px;padding:0 1px;margin:0 .5px;font-weight:700}
 .vs .vsw{font-weight:600;color:var(--ink)}
 .flow-back{min-height:150px;width:100%}
+.story{margin-top:6px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:6px 10px 7px;background:var(--paper);font-size:13px;line-height:1.6}
+.story .st-h{display:flex;flex-wrap:wrap;align-items:center;gap:2px 5px;font:600 14px/1.4 Georgia,serif}
+.story .st-h span{font:600 11px/1.6 system-ui,sans-serif;background:var(--accent);color:#fff;border-radius:4px;padding:0 6px;margin-right:4px}
+.story .st-h i{color:var(--ink3);font-style:normal;font-weight:400}
+.story .st-me{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
+.story .st-w{font-weight:600;color:var(--ink2)}
+.story u.df{text-decoration:none;color:#fff;background:var(--accent);border-radius:3px;padding:0 1px;margin:0 .5px}
+.story .st-k{color:var(--ink3);font-size:12.5px}
+.story .st-t{color:var(--ink2)}
+.story .st-t b{color:var(--ink)}
+@media print{.story u.df{color:inherit;background:none;text-decoration:underline}.story .st-h span{color:inherit;background:none;border:1px solid}}
 .flow-acts button#fPlay{min-width:130px}
 @media print{.vs u.df{color:inherit;background:none;text-decoration:underline;text-decoration-thickness:2px}}
 .vs span{font-size:11px;background:var(--gray-soft);color:var(--ink2);border-radius:4px;padding:1px 6px;margin-right:6px;font-weight:600}
@@ -474,7 +485,8 @@ main{padding:18px 0 60px}
 window.CET6 = {
   rows: [], info: null,
   add(letter, rows){ for (const r of rows) this.rows.push(r); },
-  meta(m){ this.info = m; }
+  meta(m){ this.info = m; },
+  stories(list){ this.storyList = list; }
 };
 </script>
 <script src="data/meta.js"></script>
@@ -484,7 +496,7 @@ window.CET6 = {
 <script src="data/m.js"></script><script src="data/n.js"></script><script src="data/o.js"></script><script src="data/p.js"></script>
 <script src="data/q.js"></script><script src="data/r.js"></script><script src="data/s.js"></script><script src="data/t.js"></script>
 <script src="data/u.js"></script><script src="data/v.js"></script><script src="data/w.js"></script><script src="data/x.js"></script>
-<script src="data/y.js"></script><script src="data/z.js"></script>
+<script src="data/y.js"></script><script src="data/z.js"></script><script src="data/stories.js"></script>
 <script>
 (function(){
   'use strict';
@@ -958,6 +970,17 @@ window.CET6 = {
     if (!w.vs) return '';
     return `<div class="vs"><span>易混</span>${vsBody(w, true)}</div>`;
   }
+  // 形近词串记：一组长得像的词 + 区分口诀 + 一个把它们串起来的小段子
+  const STORY_OF = new Map();
+  for (const s of (window.CET6.storyList || [])) for (const x of s.ws) if (!STORY_OF.has(x)) STORY_OF.set(x, s);
+  function storyHtml(w, link){
+    const s = STORY_OF.get(w.w); if (!s) return '';
+    const chips = s.ws.map(x => {
+      const shown = x === w.w ? x : (markDiff(x, w.w) || x);
+      return x === w.w ? `<b class="st-me">${x}</b>` : link && byWord.has(x) ? `<a class="go st-w" data-go="${x}">${shown}</a>` : `<b class="st-w">${shown}</b>`;
+    }).join('<i>/</i>');
+    return `<div class="story"><div class="st-h"><span>串记</span>${chips}</div><div class="st-k">${memHtml(s.key)}</div><div class="st-t">${memHtml(s.t)}</div></div>`;
+  }
   /* 近义词：会写词之间，某个义项完全相同 → 写作时可以互相替换 */
   // 词性归类：vt./vi./v. 都算动词；n./v. 这种合并行拆开
   const posKey = p => p.split('/').map(x => /^v/.test(x) ? 'v' : x.replace('.', '')).filter(Boolean);
@@ -1025,7 +1048,7 @@ window.CET6 = {
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${partsHtml(w)}
         ${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}
-        ${vsHtml(w)}</div>
+        ${vsHtml(w)}${storyHtml(w, true)}</div>
       <div class="freq" title="近六年真题出现 ${w.n} 次（${YEARS[0]}–${YEARS[YEARS.length-1]} 逐年）"><div class="spark">${spark}</div><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span><small>次</small></div></div>
       <div class="detail">${w.n ? `<div class="parts"><span>出现在 <b>${w.s}</b> / ${nS} 次考试</span>
         <span>听力 <b>${pt[0]||0}</b></span><span>阅读 <b>${pt[1]||0}</b></span><span>写作 <b>${pt[2]||0}</b></span><span>翻译 <b>${pt[3]||0}</b></span>${pt[4] ? `<span>未分题型 <b>${pt[4]}</b></span>` : ''}
@@ -1189,7 +1212,7 @@ window.CET6 = {
   function speak(w){ try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){} }
   const meanHtml = w => `<ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`;
   function backHtml(w){
-    return `<div class="fc-back in">${meanHtml(w)}${w.parts ? animStripHtml(w).replace(/<button class="anim-replay"[^>]*>.*?<\/button>/, '') : ''}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
+    return `<div class="fc-back in">${meanHtml(w)}${w.parts ? animStripHtml(w).replace(/<button class="anim-replay"[^>]*>.*?<\/button>/, '') : ''}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}${storyHtml(w, false)}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
   }
   function pool(){ // 当前筛选范围（不含已掌握）
     const base = current.length ? current : words;
@@ -1299,7 +1322,7 @@ window.CET6 = {
     const showBack = () => {
       const b = $('#flowBack'); if (!b || b.dataset.on) return;
       b.dataset.on = '1';
-      b.innerHTML = `<div class="fc-back in">${meanHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}</div>`;
+      b.innerHTML = `<div class="fc-back in">${meanHtml(w)}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}${storyHtml(w, false)}</div>`;
     };
     if (s.paused) { showBack(); return; }
     s.timer = setTimeout(() => {
@@ -1526,7 +1549,7 @@ window.CET6 = {
       const pt = partsText(w);
       html += `<div class="p-e"><div class="p-l"><b>${esc(w.w)}</b><span class="p-lv">${LVS[w.lv]}</span>${w.n ? `<span class="p-n">${w.n}</span>` : ''}${w.b >= 3 ? '<span class="p-s">★</span>' : ''}${w.wr ? '<span class="p-s">✎</span>' : ''}${w.rs ? '<span class="p-s">僻</span>' : ''}</div>
         <div class="p-z">${w.zh.map(([p,t]) => `${p ? `<i>${esc(p)}</i> ` : ''}${esc(t)}`).join('　')}</div>
-        ${pt ? `<div class="p-p">${esc(pt)}</div>` : ''}${w.mem ? `<div class="p-m">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="p-m">易混：${esc(w.vs)}</div>` : ''}</div>`;
+        ${pt ? `<div class="p-p">${esc(pt)}</div>` : ''}${w.mem ? `<div class="p-m">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="p-m">易混：${esc(w.vs)}</div>` : ''}${STORY_OF.has(w.w) ? `<div class="p-m">串记：${memHtml(STORY_OF.get(w.w).t)}</div>` : ''}</div>`;
     }
     pa.innerHTML = html + '</div>';
   }
