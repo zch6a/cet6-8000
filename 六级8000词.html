@@ -768,7 +768,7 @@ window.CET6 = {
     $('#legend').innerHTML = `
       <h3>怎么用</h3>
       <p><b>1. 先选范围</b>：上方切换「字母 / 真题频率 / 会写词汇 / 词根」，再用级别、频率、字母筛选。时间紧就选「真题频率」+「必考 / 高频」先背最常考的。</p>
-      <p><b>2. 每天点「背诵」</b>：填上考试日期会自动算出每天背多少；看英文先想意思，再按空格看答案，按 1–4 评「忘了 / 模糊 / 记得 / 太简单」。忘了的词这一轮会再出现，之后按间隔自动安排复习（1 天、3 天、一周…），到期的数量显示在「背诵」按钮上。</p>
+      <p><b>2. 每天点「背诵」</b>：填上考试日期会自动算出每天背多少；看英文先想意思，再按空格看答案，按 1–4 评「忘了 / 模糊 / 记得 / 太简单」。忘了的词这一轮会再出现，之后按间隔自动安排复习（1 天、3 天、一周…），到期的数量显示在「背诵」按钮上。忘过 2 次以上的词会出现「专攻易忘词」按钮，集中再过一遍。</p>
       <p><b>3. 用「自测」巩固</b>：看词选义、看义拼词（练写作拼写）、听音辨义（练听力）、易混辨析（affect / effect 这类）。答错的词自动加入复习。</p>
       <p><b>4. 用「词根」成串记</b>：点卡片里任意一块彩色积木，就能看到同一个词根的所有词；学一个词根能顺带认出一串词。</p>
       <p><b>5. 写作换词</b>：点开会写词的卡片，详情里有「近义（写作可替换）」，同词性、同意思，如 important → significant、vital、crucial；也可以直接用中文搜（如「重要的」「减少」）反查一串近义词。</p>
@@ -808,6 +808,7 @@ window.CET6 = {
     while (daylog[dayKey(t)]) { n++; t -= DAY; }
     return n;
   }
+  const sk2 = () => { const n = streak(); return n ? `🔥 已连续打卡 ${n} 天。` : ''; };
   function weekHtml(){
     const days = [...Array(7)].map((_, i) => { const t = Date.now() - (6 - i) * DAY; return {k: dayKey(t), n: daylog[dayKey(t)] || 0, d: '日一二三四五六'[new Date(t).getDay()]}; });
     const max = Math.max(10, ...days.map(d => d.n));
@@ -931,7 +932,13 @@ window.CET6 = {
   function showCard(){
     const s = session; if (!s) return;
     if (s.idx >= s.q.length) {
-      fc.innerHTML = `<div class="done-big">本轮完成 🎉</div><p class="fc-sub">共 ${s.total} 个词。明天再来，到期的词会自动出现。</p><div class="fc-acts"><button class="primary" id="again2">再来一轮</button></div>`;
+      const t = s.tally || [0, 0, 0, 0];
+      const hardN = hardWords().length;
+      fc.innerHTML = `<div class="done-big">本轮完成 🎉</div>
+        <p class="fc-sub">共 ${s.total} 个词：记得 <b>${t[2]}</b> · 太简单 <b>${t[3]}</b> · 模糊 <b>${t[1]}</b> · 忘了 <b>${t[0]}</b>（忘了的已在本轮补考）</p>
+        <p class="fc-sub">${sk2()} 明天再来，到期的词会自动出现。</p>
+        <div class="fc-acts"><button class="primary" id="again2">再来一轮</button>${hardN ? `<button id="hard2">专攻易忘词（${hardN}）</button>` : ''}</div>`;
+      const h2 = $('#hard2'); if (h2) h2.onclick = startHard;
       $('#again2').onclick = startStudy; $('#ovBar').style.width = '100%'; return;
     }
     const it = s.q[s.idx], w = it.w;
@@ -961,6 +968,7 @@ window.CET6 = {
     const it = s.q[s.idx];
     if (it.isNew && !srs[it.w.w]) bumpNew();
     grade(it.w.w, g);
+    s.tally = s.tally || [0, 0, 0, 0]; s.tally[g]++;
     if (g === 0) s.q.splice(Math.min(s.q.length, s.idx + 5), 0, {w: it.w, isNew: false}); // 5 个词后再考一次
     s.idx++; showCard();
   }
