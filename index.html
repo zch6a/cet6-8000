@@ -288,6 +288,9 @@ button:active,.chip:active,.opt:active,.mode:active,.ib:active,.cta:active,.fbtn
 .fc[data-dir="R"]::before{content:"记得";left:6px;background:var(--known)}
 .fc[data-dir="next"]::before{content:"下一个 →";right:6px;background:var(--ink2)}
 .fc[data-dir="prev"]::before{content:"← 上一个";left:6px;background:var(--ink2)}
+#nx.auto{position:relative;overflow:hidden}
+#nx.auto::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--accent);animation:autoBar var(--auto,1.2s) linear forwards}
+@keyframes autoBar{to{width:100%}}
 .swipe-help{display:none;text-align:center;color:var(--ink3);font-size:12px;margin-top:10px}
 @media (hover:none) and (pointer:coarse){.swipe-help{display:block}}
 @media (prefers-reduced-motion: reduce){
@@ -1662,6 +1665,7 @@ window.CET6 = {
         s.hinted = false;
         $('#spRes').innerHTML = `${ok ? '' : `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>`}${isAlt ? `<div class="fc-sub">也对：${esc(typed)} 是另一种拼法，本词表以 <b>${esc(w.w)}</b> 为准</div>` : ''}${backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题<span class="kh">（Enter）</span></button></div>`;
         $('#nx').onclick = next; speak(w.w);
+        if (ok) autoNext(1800);
       }
       return;
     }
@@ -1691,13 +1695,22 @@ window.CET6 = {
       const vsExplain = isVs ? `<div class="fc-back">${opts.map(o => `<div style="margin:3px 0"><b style="font-family:Georgia,serif">${esc(o.w)}</b>　${esc(firstMean(o))}</div>`).join('')}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${storyHtml(w, false)}</div>` : '';
       $('#qRes').innerHTML = `${isListen ? `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>` : ''}${isVs ? vsExplain : (ok ? '' : backHtml(w))}<div class="fc-acts"><button class="primary" id="nx">下一题<span class="kh">（Enter）</span></button></div>`;
       $('#nx').onclick = next; if (!isListen) speak(w.w);
+      if (ok) autoNext(isVs ? 2600 : 1200);
     }
   }
   function mark(w, ok){
     const s = session;
     if (ok) { s.right++; logReview(); } else { s.wrongs.push(w); grade(w.w, 0); }
   }
-  function next(){ session.idx++; quizCard(); }
+  function next(){ clearTimeout(session.autoT); session.idx++; quizCard(); }
+  // 答对了自动进下一题（按钮下方走一条进度条）；点卡片任意处就停住，方便细看解析
+  function autoNext(ms){
+    const s = session; clearTimeout(s.autoT);
+    const b = $('#nx'); if (b) { b.classList.add('auto'); b.style.setProperty('--auto', ms + 'ms'); }
+    const cancel = e => { if (e.target.closest && e.target.closest('#nx')) return; clearTimeout(s.autoT); if (b) b.classList.remove('auto'); fc.removeEventListener('pointerdown', cancel); };
+    fc.addEventListener('pointerdown', cancel);
+    s.autoT = setTimeout(() => { fc.removeEventListener('pointerdown', cancel); if (session === s && s.answered) next(); }, ms);
+  }
 
   addEventListener('keydown', e => {
     if (!ov.classList.contains('show')) return;
