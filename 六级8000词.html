@@ -544,12 +544,14 @@ window.CET6 = {
     return 'root';
   }
   /* 同根词索引：同一个词根（非词缀、≥3 字母、含义相同）出现在多个词里 */
+  // 同根词索引：同一个拼写可能是不同的词根（vision 的 vis「看」≠ division 的 vis「分」），所以按「拼写 + 意思首字」分开
   const rootIdx = new Map();
+  const rootKey = (seg, m) => seg.toLowerCase() + '|' + String(m || '').replace(/^[…\s（(]+/, '').charAt(0);
   for (const w of words) {
     if (!w.parts) continue;
     w.parts.forEach(([seg, m], i) => {
       if (role(seg, i, w.parts.length) !== 'root' || seg.length < 3 || seg.toLowerCase() === w.w) return;
-      const k = seg.toLowerCase();
+      const k = rootKey(seg, m);
       if (!rootIdx.has(k)) rootIdx.set(k, {m, ws: []});
       rootIdx.get(k).ws.push(w.w);
     });
@@ -1099,8 +1101,8 @@ window.CET6 = {
   function familyHtml(w){
     if (!w.parts) return '';
     const out = [];
-    w.parts.forEach(([seg], i) => {
-      const k = seg.toLowerCase(), f = rootIdx.get(k);
+    w.parts.forEach(([seg, m], i) => {
+      const k = seg.toLowerCase(), f = rootIdx.get(rootKey(seg, m));
       if (!f || role(seg, i, w.parts.length) !== 'root') return;
       const others = f.ws.filter(x => x !== w.w).slice(0, 12);
       if (others.length) out.push(`<div class="fam">同根 <b>${esc(k)}</b>（${esc(f.m)}）：${others.map(x => `<a href="#" data-go="${esc(x)}">${esc(x)}</a>`).join('、')}</div>`);
