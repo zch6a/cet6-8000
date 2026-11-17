@@ -1039,8 +1039,12 @@ window.CET6 = {
       return;
     }
     const isVs = s.quiz === 'vs';
-    const others = isVs ? rivalsOf(w).slice(0, 3)
-      : shuffle(words.filter(x => x !== w && x.lv === w.lv && firstMean(x) !== firstMean(w))).slice(0, 3);
+    // 干扰项优先同词性、同级别，不能只看词性就猜出答案
+    const pos0 = x => (x.zh[0] && x.zh[0][0] || '').split('/')[0].replace(/^v[ti]\.$/, 'v.');
+    const pool3 = (cond) => shuffle(words.filter(x => x !== w && firstMean(x) !== firstMean(w) && cond(x)));
+    let others = isVs ? rivalsOf(w).slice(0, 3) : pool3(x => pos0(x) === pos0(w) && x.lv === w.lv).slice(0, 3);
+    if (!isVs && others.length < 3) others = others.concat(pool3(x => pos0(x) === pos0(w) && !others.includes(x))).slice(0, 3);
+    if (!isVs && others.length < 3) others = others.concat(pool3(x => !others.includes(x))).slice(0, 3);
     const opts = shuffle([w, ...others]);
     const isListen = s.quiz === 'listen';
     const head = isListen ? `<div class="fc-word" style="font-size:60px;cursor:pointer" id="lsn" title="再听一遍">🔊</div><div class="fc-sub">点喇叭或按 S 再听一遍</div>`
