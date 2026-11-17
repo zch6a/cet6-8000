@@ -229,6 +229,39 @@ main{padding:18px 0 60px}
 .top{position:fixed;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--paper);
   box-shadow:var(--shadow);cursor:pointer;display:none;place-items:center;z-index:30}
 .top.show{display:grid}
+/* ===== 紧凑双栏卡片 ===== */
+.wrap{max-width:1240px}
+.list{gap:10px}
+@media (min-width:900px){ .list{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"head freq" "body body" "detail detail";
+  gap:4px 12px;padding:11px 14px 10px;border-radius:12px;align-content:start}
+.card .head{grid-area:head;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
+.card .w{font-size:21px;line-height:1.2}
+.card .badges{margin-top:0;gap:4px}
+.card .lv,.card .hot{font-size:10.5px;padding:3px 6px}
+.card .tools{position:static;display:flex;gap:4px;margin-left:2px}
+.card .ib{width:26px;height:26px;border-radius:7px}
+.card .ib svg{width:14px;height:14px}
+.card .freq{grid-area:freq;display:flex;align-items:flex-end;gap:8px;padding:0;text-align:right}
+.card .freq .num{font-size:17px}
+.card .freq small{font-size:11px;color:var(--ink3);margin-left:2px}
+.card .spark{height:20px;margin:0;gap:2px}
+.card .spark i{width:7px}
+.card .body{grid-area:body}
+.card .detail{grid-area:detail}
+.card .mean li{font-size:14.5px;line-height:1.55;margin:0}
+.card .pos{min-width:30px;font-size:12px}
+.card .parts-d{margin:6px 0 2px;gap:4px}
+.card .blk{padding:4px 9px 4px;min-width:40px;border-radius:9px}
+.card .blk b{font-size:16px}
+.card .blk i{font-size:9px;margin-bottom:1px}
+.card .blk em{font-size:11px;margin-top:1px}
+.card .res{font-size:13px;padding:6px 10px;border-radius:9px}
+.card .plus,.card .eq{font-size:13px}
+.card .mem{margin-top:6px;padding:5px 9px 5px 30px;font-size:13.5px;line-height:1.55}
+.card .mem::before{left:7px;top:6px;width:17px;height:17px;line-height:17px;font-size:11px}
+.card .vs{margin-top:4px;font-size:12.5px}
+.group{margin:18px 2px 8px;font-size:26px}
 @media (max-width:760px){
   h1{font-size:30px}
   header.hero{padding:28px 0 18px}
@@ -684,15 +717,13 @@ window.CET6 = {
     const isK = known.has(w.w);
     return `<article class="card${isK ? ' known' : ''}" data-w="${esc(w.w)}">
       <div class="head"><div class="w">${rank}${esc(w.w)}</div>
-        <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div></div>
+        <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div>
+        <div class="tools"><button class="ib spk" title="朗读" aria-label="朗读">${ICON_SPK}</button><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${partsHtml(w)}
         ${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}
         ${vsHtml(w)}</div>
-      <div class="freq"><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span> 次</div>
-        <div class="spark">${spark}</div><div class="yrs">${yrs}</div></div>
-      <div class="tools"><button class="ib spk" title="朗读" aria-label="朗读">${ICON_SPK}</button>
-        <button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div>
+      <div class="freq" title="近六年真题出现 ${w.n} 次（${YEARS[0]}–${YEARS[YEARS.length-1]} 逐年）"><div class="spark">${spark}</div><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span><small>次</small></div></div>
       <div class="detail">${w.n ? `<div class="parts"><span>出现在 <b>${w.s}</b> / ${nS} 次考试</span>
         <span>听力 <b>${pt[0]||0}</b></span><span>阅读 <b>${pt[1]||0}</b></span><span>写作 <b>${pt[2]||0}</b></span><span>翻译 <b>${pt[3]||0}</b></span>${pt[4] ? `<span>未分题型 <b>${pt[4]}</b></span>` : ''}
         <span>频率排名 <b>#${w.r}</b></span></div>
