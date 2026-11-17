@@ -803,27 +803,101 @@ window.CET6 = {
     tagV:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">动词</text>`,
     tagAdv:  `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">…地</text>`,
     able:    `<circle cx="32" cy="32" r="16"/><path d="M24 32l6 6 11-12" stroke-dasharray="120" ${A('kDraw', 1.8)}/>`,
+    toward:  `<circle cx="48" cy="32" r="9"/><circle cx="48" cy="32" r="3" fill="currentColor"/><g ${A('kRight', 1.6)}><path d="M8 32h20m-7-7 7 7-7 7"/></g>`,
+    thing:   `<g ${A('kPop', 2)}><path d="M32 12l18 10v20L32 52 14 42V22z"/><path d="M14 22l18 10 18-10M32 32v20"/></g>`,
+    do:      `<path d="M10 52h22" opacity=".4"/><g ${A('kBend', 1, 'transform-origin:42px 50px;transform-box:view-box')}><path d="M42 50V22"/><rect x="30" y="12" width="24" height="10" rx="2" fill="currentColor"/></g>`,
+    road:    `<path d="M20 54 28 10M44 54 36 10"/><path d="M32 52V12" stroke-dasharray="6 6" ${A('kFlow', .8, 'animation-direction:alternate')}/>`,
+    know:    `<path d="M25 42c-6-4-9-9-9-15a16 16 0 0 1 32 0c0 6-3 11-9 15z" fill="currentColor" opacity=".25"/><path d="M25 42c-6-4-9-9-9-15a16 16 0 0 1 32 0c0 6-3 11-9 15zM26 48h12M28 54h8"/><g ${A('kGlow', 1.6)}><path d="M32 2v4M6 27h4M54 27h4M12 8l3 3M52 8l-3 3"/></g>`,
+    seek:    `<g ${A('kLook', 2.2)}><circle cx="28" cy="28" r="12"/><path d="M37 37l12 12" stroke-width="4"/></g>`,
+    part:    `<circle cx="32" cy="32" r="18" opacity=".35"/><g ${A('kApartR', 1.4, 'animation-direction:alternate')}><path d="M32 32V14a18 18 0 0 1 18 18z" fill="currentColor"/></g>`,
+    work:    `<g ${A('kSpin', 3, 'animation-timing-function:linear')}><circle cx="32" cy="32" r="12"/><circle cx="32" cy="32" r="4"/><path d="M32 12v6M32 46v6M12 32h6M46 32h6M18 18l4 4M42 42l4 4M46 18l-4 4M22 42l-4 4"/></g>`,
+    rule:    `<g ${A('kPop', 2)}><path d="M14 44l-2-24 12 10 8-16 8 16 12-10-2 24z" fill="currentColor" opacity=".8"/><path d="M14 50h36"/></g>`,
+    cut:     `<path d="M8 46h48"/><g ${A('kPress', 1.2)}><path d="M28 10h8v22l-4 6-4-6z" fill="currentColor"/></g>`,
+    place:   `<g ${A('kPop', 2)}><path d="M12 30 32 13l20 17v20H12z"/><path d="M27 50V38h10v12"/></g>`,
+    power:   `<g ${A('kBeat', 1)}><path d="M36 8 18 36h12l-4 20 20-30H34z" fill="currentColor" opacity=".85"/></g>`,
+    straight:`<path d="M20 54h24" opacity=".4"/><path d="M32 54V10" stroke-dasharray="120" ${A('kDraw', 1.6)}/>`,
+    new:     `<g ${A('kPop', 1.6)}><path d="M32 10l4 18 18 4-18 4-4 18-4-18-18-4 18-4z" fill="currentColor" opacity=".85"/></g>`,
+    value:   `<g ${A('kTurn', 2.4)}><circle cx="32" cy="32" r="17"/><text x="32" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="currentColor" stroke="none">¥</text></g>`,
+    line:    `<path d="M8 32h48" stroke-dasharray="120" ${A('kDraw', 1.6)}/><circle cx="8" cy="32" r="3" fill="currentColor"/>`,
+    around:  `<circle cx="32" cy="32" r="16" stroke-dasharray="4 5"/><circle cx="32" cy="32" r="4" fill="currentColor" opacity=".5"/><g ${A('kSpin', 2.4, 'animation-timing-function:linear;transform-origin:32px 32px;transform-box:view-box')}><circle cx="32" cy="16" r="4.5" fill="currentColor"/></g>`,
+    ball:    `<circle cx="32" cy="32" r="17"/><ellipse cx="32" cy="32" rx="17" ry="6"/><g ${A('kTurn', 2.4)}><ellipse cx="32" cy="32" rx="6" ry="17"/></g>`,
+    measure: `<rect x="8" y="34" width="48" height="13" rx="2"/><path d="M16 34v5M24 34v3M32 34v5M40 34v3M48 34v5"/><g ${A('kRise', 1.8, 'transform-origin:32px 22px;transform-box:view-box;animation-name:kGrow')}><path d="M10 22h44M10 22l5-5m-5 5 5 5M54 22l-5-5m5 5-5 5"/></g>`,
+    prick:   `<path d="M10 46h44" opacity=".4"/><g ${A('kPress', 1)}><path d="M32 8v32" stroke-width="2"/><circle cx="32" cy="10" r="2.5"/></g>`,
+    choose:  `<rect x="8" y="24" width="12" height="14" rx="2" opacity=".5"/><rect x="44" y="24" width="12" height="14" rx="2" opacity=".5"/><g ${A('kPop', 1.6)}><rect x="24" y="20" width="16" height="20" rx="2" fill="currentColor" opacity=".85"/></g><path d="M26 50l4 4 8-8" opacity=".8"/>`,
+    side:    `<rect x="12" y="14" width="22" height="36" rx="2" opacity=".5"/><g ${A('kBeat', 1.4)}><circle cx="45" cy="32" r="6" fill="currentColor"/></g>`,
+    equal:   `<g ${A('kPop', 1.6)}><path d="M16 26h32M16 38h32" stroke-width="4"/></g>`,
+    good:    `<circle cx="32" cy="32" r="18"/><circle cx="25" cy="27" r="2" fill="currentColor"/><circle cx="39" cy="27" r="2" fill="currentColor"/><path d="M23 37q9 9 18 0" ${A('kBeat', 1.4)}/>`,
+    bad:     `<circle cx="32" cy="32" r="18"/><circle cx="25" cy="27" r="2" fill="currentColor"/><circle cx="39" cy="27" r="2" fill="currentColor"/><path d="M23 43q9-9 18 0" ${A('kBeat', 1.4)}/>`,
+    wrong:   `<path d="M18 18l28 28M46 18 18 46" stroke-width="4" stroke-dasharray="120" ${A('kDraw', 1.6)}/>`,
+    far:     `<path d="M8 32h30" stroke-dasharray="3 5"/><g ${A('kShrink', 1.8, 'animation-direction:alternate;transform-origin:48px 32px;transform-box:view-box')}><circle cx="48" cy="32" r="7" fill="currentColor"/></g>`,
+    hang:    `<path d="M12 10h40"/><g ${A('kTurn', 2.4, 'transform-origin:32px 10px;transform-box:view-box;animation-name:kLook')}><path d="M32 10v24"/><rect x="24" y="34" width="16" height="12" rx="2" fill="currentColor" opacity=".8"/></g>`,
+    full:    `<path d="M18 14h28l-4 36H22z"/><g ${A('kRise', 2, 'transform-origin:32px 48px;transform-box:view-box')}><path d="M21 24h22l-3 24H24z" fill="currentColor" opacity=".7"/></g>`,
+    hear:    `<path d="M24 46c0-6 12-8 12-18a10 10 0 0 0-20 0"/><path d="M24 30a4 4 0 0 1 6-4"/><g ${A('kGlow', 1.4)}><path d="M44 22q4 6 0 12M50 17q7 11 0 22"/></g>`,
+    push:    `<path d="M10 32h14m-5-5 5 5-5 5"/><g ${A('kFlow', 1.2, 'animation-direction:alternate')}><rect x="30" y="22" width="20" height="20" rx="2" fill="currentColor" opacity=".8"/></g>`,
+    close:   `<g ${A('kInL', 1.6, 'animation-direction:alternate')}><rect x="12" y="14" width="19" height="36" rx="1"/></g><g ${A('kInR', 1.6, 'animation-direction:alternate')}><rect x="33" y="14" width="19" height="36" rx="1"/></g>`,
+    boat:    `<g ${A('kFlow', 1.6, 'animation-direction:alternate')}><path d="M12 38h40l-6 10H18z" fill="currentColor" opacity=".8"/><path d="M32 38V12l12 20H32"/></g><path d="M6 54q6-4 12 0t12 0 12 0 12 0" opacity=".5"/>`,
+    empty:   `<rect x="16" y="16" width="32" height="32" rx="3" stroke-dasharray="5 5" ${A('kGlow', 1.8)}/>`,
+    breathe: `<g ${A('kFlow', 1.6, 'animation-direction:alternate')}><path d="M10 24h28a6 6 0 1 0-6-6M10 34h36a6 6 0 1 1-6 6M10 44h18"/></g>`,
+    give:    `<path d="M8 48h16l8-6" opacity=".6"/><g ${A('kRight', 1.8)}><rect x="20" y="22" width="18" height="16" rx="2" fill="currentColor" opacity=".85"/><path d="M29 22v16M20 28h18" stroke="var(--paper)"/></g>`,
+    shape:   `<g ${A('kPop', 1.8)}><path d="M10 46 21 26l11 20z"/></g><g ${A('kPop', 1.8, 'animation-delay:.3s')}><circle cx="44" cy="36" r="9"/></g><g ${A('kPop', 1.8, 'animation-delay:.6s')}><rect x="26" y="10" width="12" height="12" rx="1"/></g>`,
+    bound:   `<path d="M12 20v30M24 20v30M36 20v30M48 20v30M6 28h50M6 42h50"/><g ${A('kClashL', 1.2)}><circle cx="30" cy="12" r="3.5" fill="currentColor"/></g>`,
+    law:     `<path d="M32 12v38M20 50h24M12 20h40"/><g ${A('kTurn', 2.4, 'transform-origin:32px 20px;transform-box:view-box;animation-name:kLook')}><path d="M12 20l-6 14h12zM52 20l-6 14h12z"/></g>`,
   };
-  // 意思 → 动作（顺序有讲究：先匹配更具体的）
+  // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
+  const ANIM_WORDS = {
+    tagN:'名词 学 学科 …学 状态 性质 行为 主义 …性 …者的状态', tagA:'…的 令人…的 值得…的 充满…的 多…的 易…的 要…的 有…的 似…的 形容词', tagAdv:'副词 …地',
+    tagV:'动词 使 使… 使…化 …化 使成为', able:'能…的 可…的 能力 能够 可…性 确定 一定 可以',
+    person:'人 者 家 人民 个人 人/物 统治者 女人 男人 人类 证人 主人 运动员 作者 制定者 居住者 诗人 演员 成年人 艺术家 航行者 客人 敌人 被…者 分解者 女性 …的人 做…的人',
+    no:'不 无 没有 未 非 否认 不足 否', against:'反 相反 反对 相反的 抗 反向 抵抗 相对 对抗 逆',
+    between:'之间 相互 互相 中间 交流 在…之间', through:'穿过 越过 转移 通过 贯穿 跨 跨越',
+    together:'一起 共同 全部 相同 合作 混合 联合 集合 伙伴 合 同 一同', apart:'分开 离开 去掉 偏离 分离 脱离 分开的 除去 松开 去除 远离',
+    out:'出 外 向外 出现 超出 伸出 出去 在外 提出 播出 外面', in:'进入 在内 向内 里 内 在…里 进来 里面 进 向里',
+    down:'下 向下 落下 在下 下面 低 往下', up:'在上 向上 上 超 超过 过度 高 过高 在…上 上面 加上 往上 在…之上',
+    backward:'后 向后 之后 在后', forward:'向前 预先 在前 前 之前 提前 先于 前面 优先 以前的 祖先 先', back:'回 返回 撤回 回应 找回 返 向回',
+    again:'再 重新 反复 又 再次', boost:'加强 完全 彻底 强烈 强 加强语气',
+    look:'看 观察 观点 视觉 眼睛 看护 视 见 观看 看见 眼', grab:'拿 握住 抓 拿住 抓取 取 握 捕捉 抓住', throw:'扔 投 投掷 抛 掷',
+    send:'送 运送 派遣 邮寄 发送 派 寄', carry:'带 运 携带 带来 搬运 搬', pull:'拉 拉紧 引诱 吸引 拉伸 拖 拉动',
+    lead:'引导 教导 带领 领导 跟随 领 引', walk:'走 步 行走 去 旅行 行 步行 走路', come:'来 到 到达 来到', run:'跑 奔跑 奔',
+    speak:'说 声音 喊 说话 讲 语言 哭喊 大声 断言 名声 传说 讲述 声称 叫 言 呼喊 声 话 召唤', write:'写 标记 书 记号 画 描绘 刻 书写 字母 文字',
+    put:'放 放置 位置 摆 安放', turn:'转 翻 翻转 旋转 转动 转向', press:'压 压紧 压力 挤 按压 挤压',
+    break:'断裂 打破 断 破 打碎 破碎 碎 裂 破裂', bend:'弯 倾斜 弯曲 倾向 倾', build:'建造 创造 建立 塑造 创立 结构 设立 机构 建 构造 筑',
+    stand:'站 站立 立', sit:'坐', grow:'生命 产生 生长 长 成长 生育 生产 长大 生活 生态 生 出生 诞生 育',
+    die:'死 熄灭 死亡 灭', light:'光 发光 明亮 光荣 证明 明确的 照亮 亮 照 光明 明',
+    heart:'心 感觉 感情 感谢 心智 心理 心理的 意愿 意志 热情 用心 满意 注意 留心 小心 担心 乐意的 感受 雄心 专心的 情感 感 情 心灵 精神 爱',
+    hand:'手 拍手 手术 扶手', head:'头 首要 头脑 首 首领', self:'自己 自己的 自 自身',
+    small:'小 微小 最小 小石子 小山 小屋 微 细小', big:'大 大的 最大 巨大 巨', many:'多 更多 众多 许多 很多',
+    one:'一 单独 单一 第一 一致 同一 单 独', two:'二 两 第二 双折 双', three:'三', ten:'十 十几 几十', hundred:'百 一百',
+    time:'时间 日 年 时期 日子 月 时候 任何时候 年老 日期 每年的 时 天 期间 时代', earth:'土地 地 地面 陆地 田地 殖民地 土 大地 陆',
+    water:'水 流 流动 河流 水流 海 流水', fire:'火 热 燃烧 加热 燃',
+    toward:'朝向 向 朝 向着', thing:'物 物体 东西 物品', do:'做 打 作 打击 击 敲', road:'路 道路 途径', know:'知道 记忆 知识 认识 了解 认知 懂 知',
+    seek:'寻求 寻找 找 寻 探求', part:'部分 一半 分 份', work:'工作 劳动 干活', rule:'统治 管理 支配', cut:'切 割 砍 切割 剪',
+    place:'场所 地方 房间 处所 场地 室', power:'力量 力 能量', straight:'直 正 笔直', new:'新 新的', value:'价值 价格 钱 价',
+    line:'线 线条', around:'周围 圆 环绕 围绕 绕 圈 环', ball:'球', measure:'测量 量 尺度 度量', prick:'刺 戳 扎 点',
+    choose:'选择 选', side:'边 旁边 侧 在旁', equal:'相等 等 平等 平', good:'好 善 好的', bad:'坏 恶 不好 坏的', wrong:'错 错误 误',
+    far:'远 遥远', hang:'悬挂 挂 悬', full:'满 填满 装满 充满', hear:'听 听见', push:'推 驱使 驱 驱赶', close:'关闭 关 封闭 闭',
+    boat:'船 航海 航行', empty:'空 空的 空虚', breathe:'呼吸 气 吸气', give:'给予 给 赠 授予', shape:'形状 形 形式 样子',
+    bound:'界限 边界 界 限', law:'法律 规则 法 规定 公正 正义',
+  };
+  const ANIM_MAP = new Map();
+  for (const [k, list] of Object.entries(ANIM_WORDS)) for (const m of list.split(' ')) if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k);
+  // 借用已有画面的意思（意思:画面）
+  ('行动:do 尝试:do 方向:toward 移动:run 迁移:walk 脚:walk 爬:up 空中:up 伸:pull 能:able 器具:thing 石头:thing 连接:together 同伴:together ' +
+   '编织:together 折叠:bend 太阳:light 射线:light 神圣:light 盖:close 命令:speak 名字:write 相信:heart 信任:heart 希望:heart 开始:new ' +
+   '孩子:small 短:small 用:hand 技艺:hand 活:grow 耕种:grow 植物:grow 判断:law 竞争:against 依靠:hang 解开:apart 波浪:water ' +
+   '值得:value 变化:turn 存在:stand 始终:through 数:measure 数字:measure 使用:hand 利用:hand')
+    .split(' ').forEach(p => { const [m, k] = p.split(':'); if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k); });
+  // 只给明显的后缀格式留兜底规则
   const ANIM_RULES = [
-    [/名词|状态|性质|行为|过程|学科|学$/, 'tagN'], [/^…?的$|…的|似…的|有…的/, 'tagA'], [/副词|…地/, 'tagAdv'], [/^动词$|^使$|使…/, 'tagV'],
-    [/能…|可…|能够|可以|能力/, 'able'], [/人|者|家$|员$/, 'person'],
-    [/不|无|非|未|否|没有/, 'no'], [/反|抗|对抗|逆|相反/, 'against'], [/之间|相互|互/, 'between'], [/穿过|跨|越过|转移|贯穿/, 'through'],
-    [/一起|共同|合|同$|全部/, 'together'], [/离开|分开|分离|去掉|除去|脱离|偏离/, 'apart'], [/出|外/, 'out'], [/进入|在内|向内|内|里|进/, 'in'],
-    [/向下|下|低|降/, 'down'], [/上|超|过度|高|越/, 'up'], [/向后|后/, 'backward'], [/向前|前|预先|先/, 'forward'],
-    [/回|返/, 'back'], [/再|重新|反复|又/, 'again'], [/加强|强|彻底|完全/, 'boost'],
-    [/看|视|观|见|眼/, 'look'], [/拿|取|抓|握|捕/, 'grab'], [/扔|投|掷|抛/, 'throw'], [/送|派|寄|发送|遣/, 'send'], [/运|搬|携|带/, 'carry'],
-    [/拉|拖|引/, 'pull'], [/引导|领|导/, 'lead'], [/跑|奔/, 'run'], [/流|水/, 'water'], [/走|行|步|去$/, 'walk'], [/来|到/, 'come'],
-    [/说|讲|言|声|喊|叫|语|召唤/, 'speak'], [/写|书|记|刻/, 'write'], [/放|置|摆/, 'put'], [/转|旋|翻/, 'turn'], [/压|按|挤/, 'press'],
-    [/断|破|裂|碎/, 'break'], [/弯|曲|倾/, 'bend'], [/建|造|构|筑|立$/, 'build'], [/站|立/, 'stand'], [/坐/, 'sit'],
-    [/生|长|产|育/, 'grow'], [/死|亡|灭/, 'die'], [/光|亮|明|照/, 'light'], [/心|情|感|意/, 'heart'], [/手/, 'hand'], [/头|首/, 'head'],
-    [/自|己/, 'self'], [/小|微/, 'small'], [/大|巨/, 'big'], [/多|众/, 'many'], [/单|一/, 'one'], [/二|双|两/, 'two'], [/三/, 'three'],
-    [/十/, 'ten'], [/百/, 'hundred'], [/时|年|日|月|期/, 'time'], [/地|土|陆/, 'earth'], [/火|热|燃/, 'fire'],
+    [/^.*…的$/, 'tagA'], [/^.*…地$/, 'tagAdv'], [/^使.{1,3}$/, 'tagV'], [/(者|[^国大]人|员|师|[^国]家)$/, 'person'],
   ];
   function animFor(meaning){
-    const m = String(meaning || '');
-    for (const [re, k] of ANIM_RULES) if (re.test(m)) return ANIM[k];
-    return null;
+    let m = String(meaning || '').trim();
+    if (!m) return null;
+    let k = ANIM_MAP.get(m);
+    // 「…的 / …地」结尾的词根意思：去掉尾巴再查一次（如「明确的」→「明确」）
+    if (!k && /[的地]$/.test(m) && m.length > 2) k = ANIM_MAP.get(m.slice(0, -1));
+    if (!k) for (const [re, key] of ANIM_RULES) if (re.test(m)) { k = key; break; }
+    return k ? ANIM[k] : null;
   }
   function animTile(seg, meaning, r, delay){
     const art = animFor(meaning);
