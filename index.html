@@ -1023,6 +1023,17 @@ window.CET6 = {
     stable:  `<path d="M8 52h48"/><g ${A('kStack1', 2)}><rect x="14" y="40" width="36" height="12" rx="1" fill="currentColor" opacity=".8"/></g><g ${A('kStack2', 2)}><rect x="20" y="28" width="24" height="12" rx="1"/></g><g ${A('kStack3', 2)}><rect x="26" y="16" width="12" height="12" rx="1"/></g>`,
     pure:    `<path d="M32 10q16 20 16 30a16 16 0 0 1-32 0q0-10 16-30z"/><g ${A('kGlow', 1.6)}><path d="M48 14l2-5 2 5 5 2-5 2-2 5-2-5-5-2z" fill="currentColor"/></g>`,
     slide:   `<path d="M6 20l52 30" opacity=".6"/><g ${A('kRight', 1.8)}><circle cx="16" cy="20" r="5" fill="currentColor"/></g>`,
+    snow:    `<g ${A('kDrop', 2.2)}><path d="M20 10v12M14 13l12 6M26 13l-12 6"/></g><g ${A('kDrop', 2.2, 'animation-delay:.7s')}><path d="M42 18v12M36 21l12 6M48 21l-12 6"/></g><path d="M8 54h48" opacity=".4"/>`,
+    wind:    `<g ${A('kFlow', 1.4, 'animation-direction:alternate')}><path d="M8 24h30a6 6 0 1 0-6-6M8 34h40a6 6 0 1 1-6 6M8 44h22"/></g>`,
+    bird:    `<g ${A('kUp', 2.2, 'animation-direction:alternate')}><path d="M10 32q11-12 22 0q11-12 22 0" stroke-width="3.5"/></g>`,
+    jump:    `<path d="M10 54h44" opacity=".4"/><g ${A('kUp', .9, 'animation-direction:alternate;animation-timing-function:ease-out')}><circle cx="32" cy="40" r="7" fill="currentColor"/></g>`,
+    sing:    `<g ${A('kBeat', 1.2)}><path d="M26 44V16l16-4v28" /><circle cx="22" cy="44" r="5" fill="currentColor"/><circle cx="38" cy="40" r="5" fill="currentColor"/></g>`,
+    bed:     `<path d="M8 46V22M8 38h48v8M56 46V34"/><g ${A('kBeat', 2.4)}><rect x="12" y="30" width="12" height="8" rx="3" fill="currentColor" opacity=".7"/></g>`,
+    board:   `<g ${A('kPop', 1.8)}><rect x="8" y="26" width="48" height="12" rx="2" fill="currentColor" opacity=".25"/><rect x="8" y="26" width="48" height="12" rx="2"/><path d="M20 26v12M32 26v12M44 26v12" opacity=".5"/></g>`,
+    speed:   `<g ${A('kRight', .9)}><circle cx="40" cy="32" r="7" fill="currentColor"/><path d="M8 26h18M12 32h14M8 38h18" opacity=".7"/></g>`,
+    pile:    `<path d="M8 54h48" opacity=".4"/><g ${A('kStack1', 2)}><rect x="16" y="42" width="32" height="10" rx="2" fill="currentColor" opacity=".8"/></g><g ${A('kStack2', 2)}><rect x="19" y="31" width="26" height="10" rx="2" fill="currentColor" opacity=".6"/></g><g ${A('kStack3', 2)}><rect x="23" y="20" width="18" height="10" rx="2" fill="currentColor" opacity=".45"/></g>`,
+    stick:   `<rect x="12" y="38" width="40" height="8" rx="2" opacity=".6"/><g ${A('kPress', 1.4)}><rect x="22" y="22" width="20" height="14" rx="3" fill="currentColor" opacity=".8"/></g><path d="M24 38v4M32 38v5M40 38v4" stroke-width="2"/>`,
+    center:  `<circle cx="32" cy="32" r="20" opacity=".4"/><circle cx="32" cy="32" r="12" opacity=".7"/><g ${A('kBeat', 1.2)}><circle cx="32" cy="32" r="5" fill="currentColor"/></g>`,
   };
   // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
   const ANIM_WORDS = {
@@ -1060,6 +1071,8 @@ window.CET6 = {
     bound:'界限 边界 界 限', law:'法律 规则 法 规定 公正 正义',
     twist:'扭 扭曲 拧 绞', hard:'硬 坚硬 坚固', soft:'软 柔软 温和', angle:'角 角度', surface:'面 表面 平面',
     feather:'轻 轻的 减轻', stable:'稳定 稳固 牢固', pure:'纯 纯粹 纯净 干净', slide:'滑 滑动 滑落 溜',
+    snow:'雪', wind:'风', bird:'鸟', jump:'跳 跳跃', sing:'唱 歌 歌唱', bed:'床', board:'板 木板', speed:'快速 速度 快',
+    pile:'堆 堆积 积累', stick:'粘 黏 粘住', center:'中心 中间的 核心',
   };
   const ANIM_MAP = new Map();
   for (const [k, list] of Object.entries(ANIM_WORDS)) for (const m of list.split(' ')) if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k);
@@ -1078,7 +1091,9 @@ window.CET6 = {
    '渴望:heart 幻想:heart 征服:rule 限制:bound 保持:grab 退让:backward 建议:speak 经济:value 隔代:person 承诺:speak 忍受:press ' +
    '真实:able 方式:road 主要的:head 装饰:new 有效的:able ' +
    '宽广:big 印:write 支付:value 学校:place 店:place 箱子:thing 等级:measure 轮:around 插入:in 接近:come 论证:speak 负担得起:value ' +
-   '种植:grow 草:grow 伤害:bad 检查:look 教育:lead 显现:light 母亲:person')
+   '种植:grow 草:grow 伤害:bad 检查:look 教育:lead 显现:light 母亲:person ' +
+   '玩:ball 社会:person 社会的:person 最好:good 包:thing 带子:line 停留:stand 底部:down 战斗:against 银行:value ' +
+   '米:measure 增加:up 完成:full 接受:grab 应用:hand 照料:hand 太空:light 空间:empty 年轻:small 醒:look 洗澡:water 评估:measure')
     .split(' ').forEach(p => { const [m, k] = p.split(':'); if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k); });
   // 只给明显的后缀格式留兜底规则
   const ANIM_RULES = [
