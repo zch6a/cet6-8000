@@ -1547,7 +1547,9 @@ window.CET6 = {
   // 意思相同的拼写变体（fiber / fibre）不能当选择题
   const sameMeaning = (a, b) => firstMean(a).split(/[；;]/)[0] === firstMean(b).split(/[；;]/)[0];
   // 易混词 = 卡片「易混」里的词 + 同一组串记里的词
-  const rivalsOf = w => [...new Set([...((w.vs || '').match(/\b[a-z][a-z-]+\b/g) || []), ...((STORY_OF.get(w.w) || {}).ws || [])]
+  // 干扰项只取易混说明里每一段开头的词头（advise v. 建议 → advise），不取例句里顺带的词（read aloud 的 read、every day 的 day）
+  const vsHeads = vs => vs.split(/[；;/、]/).map(s => (s.match(/^\s*([a-z][a-z-]+)(?=\s*(?:[^a-z\s]|(?:n|v|vt|vi|adj|adv|prep|conj)\.|$))/) || [])[1]).filter(Boolean);
+  const rivalsOf = w => [...new Set([...vsHeads(w.vs || ''), ...((STORY_OF.get(w.w) || {}).ws || [])]
     .filter(x => x !== w.w && byWord.has(x)))].map(x => byWord.get(x)).filter(x => !sameMeaning(w, x));
   function startQuiz(mode){
     let p = pool();
