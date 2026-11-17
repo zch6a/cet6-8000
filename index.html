@@ -631,7 +631,13 @@ window.CET6 = {
   const senseIdx = new Map();   // pos -> [{s, w}]
   for (const w of words) if (w.wr) for (const {pos, s} of sensesOf(w)) { if (!senseIdx.has(pos)) senseIdx.set(pos, []); senseIdx.get(pos).push({s, w}); }
   // 意思相同，或只多一两个修饰字（重要的 ~ 至关重要的）
-  const near = (a, b) => a === b || (Math.abs(a.length - b.length) <= 2 && Math.min(a.length, b.length) >= 3 && (a.endsWith(b) || b.endsWith(a)));
+  // 多出来的字不能是否定词：必要的 ≠ 不必要的，可能的 ≠ 不太可能的
+  const near = (a, b) => {
+    if (a === b) return true;
+    if (Math.abs(a.length - b.length) > 2 || Math.min(a.length, b.length) < 3) return false;
+    const [s, l] = a.length < b.length ? [a, b] : [b, a];
+    return l.endsWith(s) && !/[不无非未没反]/.test(l.slice(0, l.length - s.length));
+  };
   function synonymsOf(w){
     if (!w.wr) return [];
     const seen = new Map();
