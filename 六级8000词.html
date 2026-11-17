@@ -1040,6 +1040,9 @@ window.CET6 = {
     pile:    `<path d="M8 54h48" opacity=".4"/><g ${A('kStack1', 2)}><rect x="16" y="42" width="32" height="10" rx="2" fill="currentColor" opacity=".8"/></g><g ${A('kStack2', 2)}><rect x="19" y="31" width="26" height="10" rx="2" fill="currentColor" opacity=".6"/></g><g ${A('kStack3', 2)}><rect x="23" y="20" width="18" height="10" rx="2" fill="currentColor" opacity=".45"/></g>`,
     stick:   `<rect x="12" y="38" width="40" height="8" rx="2" opacity=".6"/><g ${A('kPress', 1.4)}><rect x="22" y="22" width="20" height="14" rx="3" fill="currentColor" opacity=".8"/></g><path d="M24 38v4M32 38v5M40 38v4" stroke-width="2"/>`,
     center:  `<circle cx="32" cy="32" r="20" opacity=".4"/><circle cx="32" cy="32" r="12" opacity=".7"/><g ${A('kBeat', 1.2)}><circle cx="32" cy="32" r="5" fill="currentColor"/></g>`,
+    flask:   `<path d="M26 10h12M28 10v14L16 48a4 4 0 0 0 4 6h24a4 4 0 0 0 4-6L36 24V10"/><g ${A('kRise', 2)}><path d="M20 44h24l2 4a3 3 0 0 1-3 4H21a3 3 0 0 1-3-4z" fill="currentColor" opacity=".6"/></g><g ${A('kGlow', 1.2)}><circle cx="30" cy="38" r="2" fill="currentColor"/><circle cx="35" cy="33" r="1.5" fill="currentColor"/></g>`,
+    free:    `<path d="M14 54V26a12 12 0 0 1 24 0v28M14 54h24M20 26v28M26 22v32M32 26v28" opacity=".5"/><g ${A('kUp', 1.8, 'animation-direction:alternate')}><path d="M36 22q6-7 12 0q6-7 12 0" stroke-width="3"/></g>`,
+    table:   `<g ${A('kPop', 1.8)}><rect x="10" y="14" width="44" height="36" rx="2"/><path d="M10 26h44M10 38h44M25 14v36M40 14v36"/></g><g ${A('kBlink', 1.6)}><rect x="26" y="27" width="13" height="10" fill="currentColor" opacity=".5" stroke="none"/></g>`,
   };
   // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
   const ANIM_WORDS = {
@@ -1079,6 +1082,7 @@ window.CET6 = {
     feather:'轻 轻的 减轻', stable:'稳定 稳固 牢固', pure:'纯 纯粹 纯净 干净', slide:'滑 滑动 滑落 溜',
     snow:'雪', wind:'风', bird:'鸟', jump:'跳 跳跃', sing:'唱 歌 歌唱', bed:'床', board:'板 木板', speed:'快速 速度 快',
     pile:'堆 堆积 积累', stick:'粘 黏 粘住', center:'中心 中间的 核心',
+    flask:'化学 化学的', free:'自由 解放', table:'表 表格',
   };
   const ANIM_MAP = new Map();
   for (const [k, list] of Object.entries(ANIM_WORDS)) for (const m of list.split(' ')) if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k);
@@ -1099,7 +1103,12 @@ window.CET6 = {
    '宽广:big 印:write 支付:value 学校:place 店:place 箱子:thing 等级:measure 轮:around 插入:in 接近:come 论证:speak 负担得起:value ' +
    '种植:grow 草:grow 伤害:bad 检查:look 教育:lead 显现:light 母亲:person ' +
    '玩:ball 社会:person 社会的:person 最好:good 包:thing 带子:line 停留:stand 底部:down 战斗:against 银行:value ' +
-   '米:measure 增加:up 完成:full 接受:grab 应用:hand 照料:hand 太空:light 空间:empty 年轻:small 醒:look 洗澡:water 评估:measure')
+   '米:measure 增加:up 完成:full 接受:grab 应用:hand 照料:hand 太空:light 空间:empty 年轻:small 醒:look 洗澡:water 评估:measure ' +
+   '习惯:again 同意:equal 公平:equal 比较:equal 粒子:around 宇宙:around 自然:grow 滋养:grow 神经:power 电子:power ' +
+   '驱动:push 努力:push 挣扎:against 勒紧:press 宣布:speak 约定:speak 要求:speak 评论:speak 咨询:speak 批评:speak 发誓:speak ' +
+   '赞成:good 工匠:hand 雇用:hand 排列:line 顺序:line 公民:person 儿子:person 朋友:together 常见:many 财富:value 花费:value ' +
+   '考虑:know 污染:bad 继续:forward 通信:send 勇气:heart 白天:light 神:light 决定:choose 区分:apart 不同:apart 教:lead ' +
+   '楼梯:up 系统:work 结束:close 种类:shape 准备:forward 准备好:forward')
     .split(' ').forEach(p => { const [m, k] = p.split(':'); if (!ANIM_MAP.has(m)) ANIM_MAP.set(m, k); });
   // 只给明显的后缀格式留兜底规则
   const ANIM_RULES = [
