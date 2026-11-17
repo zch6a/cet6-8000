@@ -241,6 +241,8 @@ main{padding:18px 0 60px}
 @media print{.vs u.df{color:inherit;background:none;text-decoration:underline;text-decoration-thickness:2px}}
 .vs span{font-size:11px;background:var(--gray-soft);color:var(--ink2);border-radius:4px;padding:1px 6px;margin-right:6px;font-weight:600}
 .fam{margin-top:6px}
+/* 触屏手机没有键盘：按钮上的快捷键提示（Esc / 空格 / Enter …）不显示 */
+@media (hover:none) and (pointer:coarse){.kh{display:none}}
 .fam a,.go{color:var(--accent);text-decoration:none;border-bottom:1px dotted currentColor;cursor:pointer}
 .cover .body .parts-d,.cover .body .vs{filter:blur(6px);cursor:pointer}
 .cover .card.reveal .body .parts-d,.cover .card.reveal .body .vs{filter:none}
@@ -501,7 +503,7 @@ body.simple .pbox:not(.open) > .pbody{display:none}
 <div id="printArea" aria-hidden="true"></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
   <div class="ov-top"><span class="ttl" id="ovTitle">背诵</span><span class="meta" id="ovMeta"></span>
-    <button class="ov-close" id="ovClose">退出（Esc）</button></div>
+    <button class="ov-close" id="ovClose">退出<span class="kh">（Esc）</span></button></div>
   <div class="ov-bar"><i id="ovBar"></i></div>
   <div class="ov-main"><div class="fc" id="fc"></div></div>
 </div>
@@ -1354,7 +1356,7 @@ window.CET6 = {
       <div class="setrow" style="justify-content:center">每天新词 <input id="pDaily" type="number" min="5" max="500" value="${plan.daily}" style="width:80px">
         考试日期 <input id="pExam" type="date" value="${esc(plan.exam)}"></div>
       <p class="fc-sub">${dl ? `距考试 ${dl} 天，还没掌握 ${left.toLocaleString()} 词；留一周冲刺的话，建议每天新词 ≈ <a class="go" id="useSug">${suggest}</a>` : '填上考试日期，会自动算每天该背多少'}</p>
-      <div class="fc-acts"><button class="primary" id="goStudy">开始（Enter）</button><button id="goFlow" title="自动播放当前列表：看词 → 听音 → 出意思和助记，不打分">快速过词（自动播放）</button>${hardWords().length ? `<button id="goHard" title="忘过 2 次以上的词，集中再过一遍">专攻易忘词（${hardWords().length}）</button>` : ''}</div>
+      <div class="fc-acts"><button class="primary" id="goStudy">开始<span class="kh">（Enter）</span></button><button id="goFlow" title="自动播放当前列表：看词 → 听音 → 出意思和助记，不打分">快速过词（自动播放）</button>${hardWords().length ? `<button id="goHard" title="忘过 2 次以上的词，集中再过一遍">专攻易忘词（${hardWords().length}）</button>` : ''}</div>
       <div class="fc-keys">背的时候：空格 = 看答案，1 忘了 · 2 模糊 · 3 记得 · 4 太简单。忘了的词这一轮会再出现，直到记住。</div>
       <div class="fc-acts" style="margin-top:18px"><button id="expP" title="把进度存成文件，换设备时导入">导出进度</button><button id="impP">导入进度</button><input type="file" id="impF" accept=".json,application/json" hidden></div>
       <p class="fc-sub" id="pMsg">进度只保存在这个浏览器里；换手机、换电脑或清缓存前，先导出备份。</p>`;
@@ -1427,7 +1429,7 @@ window.CET6 = {
     $('#ovMeta').textContent = `第 ${(s.idx + 1).toLocaleString()} / ${s.q.length.toLocaleString()} 个 · ${LV[w.lv]} · 真题 ${w.n} 次`;
     $('#ovBar').style.width = (s.idx / s.q.length * 100) + '%';
     fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div><div id="flowBack" class="flow-back"></div>
-      <div class="fc-acts flow-acts"><button id="fPrev" title="上一个（←）">←</button><button class="primary" id="fPlay">${s.paused ? '▶ 继续' : '❚❚ 暂停'}（空格）</button><button id="fNext" title="下一个（→）">→</button>
+      <div class="fc-acts flow-acts"><button id="fPrev" title="上一个（←）">←</button><button class="primary" id="fPlay">${s.paused ? '▶ 继续' : '❚❚ 暂停'}<span class="kh">（空格）</span></button><button id="fNext" title="下一个（→）">→</button>
         <button id="fSpeed" title="切换速度">速度：${FLOW_ZH[s.speed]}</button><button id="fKnow" title="已经会了，以后不再出现（K）">会了 ✓（K）</button></div>
       <div class="fc-keys">自动播放：先看词、听发音，自己想一下，意思和助记随后出现。← → 前后翻，K 标为已掌握。</div>`;
     $('#fPrev').onclick = () => flowGo(-1);
@@ -1495,7 +1497,7 @@ window.CET6 = {
     fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div>
       <div class="fc-sub">先在心里说出意思，再看答案</div>
       <div class="fc-pic" id="fcHint"></div>
-      <div class="fc-acts"><button id="hintB">提示（H）</button><button id="spkB">朗读（S）</button><button class="primary" id="showB">看答案（空格）</button></div>`;
+      <div class="fc-acts"><button id="hintB">提示<span class="kh">（H）</span></button><button id="spkB">朗读<span class="kh">（S）</span></button><button class="primary" id="showB">看答案<span class="kh">（空格）</span></button></div>`;
     $('#hintB').onclick = () => { $('#fcHint').innerHTML = w.parts ? `<div class="in" style="display:flex;justify-content:center">${partsHtml(w, {noResult: true})}</div>` : '<div class="fc-sub">这个词没有词根拆解，看看首字母和长度：' + esc(w.w[0]) + ' · ' + w.w.length + ' 个字母</div>'; };
     $('#spkB').onclick = () => speak(w.w);
     $('#showB').onclick = reveal;
@@ -1587,7 +1589,7 @@ window.CET6 = {
         // 靠提示才拼出来的算「模糊」：计入复习，但不算完全记住
         if (ok && s.hinted) { s.right++; grade(w.w, 1); } else mark(w, ok);
         s.hinted = false;
-        $('#spRes').innerHTML = `${ok ? '' : `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>`}${backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题（Enter）</button></div>`;
+        $('#spRes').innerHTML = `${ok ? '' : `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>`}${backHtml(w)}<div class="fc-acts"><button class="primary" id="nx">下一题<span class="kh">（Enter）</span></button></div>`;
         $('#nx').onclick = next; speak(w.w);
       }
       return;
@@ -1615,7 +1617,7 @@ window.CET6 = {
       fc.querySelectorAll('.opt').forEach((b, k) => { if (opts[k] === w) b.classList.add('right'); else if (k === i) b.classList.add('wrong'); });
       mark(w, ok);
       const vsExplain = isVs ? `<div class="fc-back">${opts.map(o => `<div style="margin:3px 0"><b style="font-family:Georgia,serif">${esc(o.w)}</b>　${esc(firstMean(o))}</div>`).join('')}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${storyHtml(w, false)}</div>` : '';
-      $('#qRes').innerHTML = `${isListen ? `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>` : ''}${isVs ? vsExplain : (ok ? '' : backHtml(w))}<div class="fc-acts"><button class="primary" id="nx">下一题（Enter）</button></div>`;
+      $('#qRes').innerHTML = `${isListen ? `<div class="fc-word" style="font-size:34px">${esc(w.w)}</div>` : ''}${isVs ? vsExplain : (ok ? '' : backHtml(w))}<div class="fc-acts"><button class="primary" id="nx">下一题<span class="kh">（Enter）</span></button></div>`;
       $('#nx').onclick = next; if (!isListen) speak(w.w);
     }
   }
