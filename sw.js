@@ -1,9 +1,9 @@
 // 六级 8000 词 · 离线缓存：第二次打开直接从本机读；装好之后断网（地铁、飞机）也能打开、背诵、自测
 // 词表数据（data/core.js / extra.js?v=版本号）版本一变就是新文件，所以可以放心长期缓存；
 // 页面本身先走网络拿最新版，断网时才用缓存。
-const CACHE = 'cet6-58b1fd824e8a5fff';
+const CACHE = 'cet6-a96856eb4e8a5fff';
 const PAGE = './';
-const DATA = ['data/core.js?v=58b1fd82', 'data/extra.js?v=4e8a5fff'];
+const DATA = ['data/core.js?v=a96856eb', 'data/extra.js?v=4e8a5fff', 'data/scenes.js?v=d318d268'];
 // 安装时就把页面和两份词表数据一次存好：哪怕第一次打开没等 extra.js 下载完就关掉，之后断网也是完整的
 self.addEventListener('install', e => {
   self.skipWaiting();
@@ -19,7 +19,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
   // 词表数据：先查缓存，没有再下载并存起来
-  if (/\/data\/(core|extra)\.js$/.test(url.pathname) && url.searchParams.has('v')) {
+  if (/\/data\/(core|extra|scenes)\.js$/.test(url.pathname) && url.searchParams.has('v')) {
     e.respondWith(caches.open(CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(res => { if (res.ok) c.put(req, res.clone()); return res; }))));
     return;
   }
