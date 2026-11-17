@@ -1109,7 +1109,7 @@ window.CET6 = {
   };
   const senseIdx = new Map();   // pos -> [{s, w}]
   // 含义太宽、会把不同的词凑到一起的义项不用来配近义词（movement 社会运动 ≠ sport 体育运动）
-  const SYN_STOP = new Set(['运动', '东西', '事情', '方面', '部分', '质量', '身份', '兑现', '移民']);   // 质量：mass ≠ quality；身份：identity ≠ capacity；移民：immigrant(人) ≠ migration(迁移这件事)
+  const SYN_STOP = new Set(['运动', '东西', '事情', '方面', '部分', '质量', '身份', '兑现', '移民', '受欢迎的']);   // 质量：mass ≠ quality；身份：identity ≠ capacity；移民：immigrant(人) ≠ migration(迁移这件事)；受欢迎的：a welcome change ≠ a popular change
   for (const w of words) if (w.wr) for (const {pos, s} of sensesOf(w)) { if (SYN_STOP.has(s)) continue; if (!senseIdx.has(pos)) senseIdx.set(pos, []); senseIdx.get(pos).push({s, w}); }
   // 意思相同，或只多一两个修饰字（重要的 ~ 至关重要的）
   // 多出来的字不能是否定词：必要的 ≠ 不必要的，可能的 ≠ 不太可能的
