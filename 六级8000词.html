@@ -207,6 +207,9 @@ main{padding:18px 0 60px}
 .rcard .rw a small{color:var(--ink3);margin-left:3px;font-size:11px}
 .rcard .more-w{color:var(--accent);cursor:pointer;font-size:12px;border:0;background:none;padding:0}
 .vs{margin-top:6px;font-size:13px;color:var(--ink2)}
+.vs u.df{text-decoration:none;color:#fff;background:var(--accent);border-radius:3px;padding:0 1px;margin:0 .5px;font-weight:700}
+.vs .vsw{font-weight:600;color:var(--ink)}
+@media print{.vs u.df{color:inherit;background:none;text-decoration:underline;text-decoration-thickness:2px}}
 .vs span{font-size:11px;background:var(--gray-soft);color:var(--ink2);border-radius:4px;padding:1px 6px;margin-right:6px;font-weight:600}
 .fam{margin-top:6px}
 .fam a,.go{color:var(--accent);text-decoration:none;border-bottom:1px dotted currentColor;cursor:pointer}
@@ -926,10 +929,32 @@ window.CET6 = {
     return `<div class="parts-d" aria-label="词根拆解">${blocks}${res}${btn}</div>`;
   }
   // 易混词：词表里有的英文词变成可点击链接，方便来回对比
+  // 形近词：把和当前词不一样的字母标红（按最长公共子序列对齐），一眼看出差在哪
+  function markDiff(a, base){
+    if (a === base || Math.abs(a.length - base.length) > 3) return null;
+    const n = a.length, m = base.length, L = Array.from({length: n + 1}, () => new Uint8Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+      L[i][j] = a[i] === base[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    if (L[0][0] < Math.max(n, m) - 3 || L[0][0] < Math.min(n, m) * 0.6) return null; // 长得不像就不标
+    let i = 0, j = 0, out = '';
+    while (i < n) {
+      if (j < m && a[i] === base[j]) { out += a[i]; i++; j++; }
+      else if (j < m && L[i][j + 1] >= L[i + 1][j]) j++;
+      else { out += `<u class="df">${a[i]}</u>`; i++; }
+    }
+    return out;
+  }
+  function vsBody(w, link){
+    return esc(w.vs).replace(/\b([a-z][a-z-]{1,})\b/g, (m) => {
+      if (m === w.w) return m;
+      const diff = markDiff(m, w.w), shown = diff || m;
+      if (link && byWord.has(m)) return `<a class="go" data-go="${m}">${shown}</a>`;
+      return diff || byWord.has(m) ? `<b class="vsw">${shown}</b>` : m;
+    });
+  }
   function vsHtml(w){
     if (!w.vs) return '';
-    const body = esc(w.vs).replace(/\b([a-z][a-z-]{1,})\b/g, (m) => byWord.has(m) && m !== w.w ? `<a class="go" data-go="${m}">${m}</a>` : m);
-    return `<div class="vs"><span>易混</span>${body}</div>`;
+    return `<div class="vs"><span>易混</span>${vsBody(w, true)}</div>`;
   }
   /* 近义词：会写词之间，某个义项完全相同 → 写作时可以互相替换 */
   // 词性归类：vt./vi./v. 都算动词；n./v. 这种合并行拆开
@@ -1162,7 +1187,7 @@ window.CET6 = {
   function speak(w){ try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .85; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(e){} }
   const meanHtml = w => `<ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>`;
   function backHtml(w){
-    return `<div class="fc-back in">${meanHtml(w)}${w.parts ? animStripHtml(w).replace(/<button class="anim-replay"[^>]*>.*?<\/button>/, '') : ''}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${esc(w.vs)}</div>` : ''}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
+    return `<div class="fc-back in">${meanHtml(w)}${w.parts ? animStripHtml(w).replace(/<button class="anim-replay"[^>]*>.*?<\/button>/, '') : ''}${w.mem ? `<div class="mem">${memHtml(w.mem)}</div>` : ''}${w.vs ? `<div class="vs"><span>易混</span>${vsBody(w, false)}</div>` : ''}${(synHtml(w) + familyHtml(w)).replace(/<a href="#" data-go="[^"]*"[^>]*>([^<]*)<\/a>/g, '$1')}</div>`;
   }
   function pool(){ // 当前筛选范围（不含已掌握）
     const base = current.length ? current : words;
