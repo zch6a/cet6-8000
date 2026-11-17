@@ -1,7 +1,7 @@
 // 六级 8000 词 · 离线缓存：第二次打开直接从本机读，不用再等下载
 // 词表数据（data/all.js?v=版本号）版本一变就是新文件，所以可以放心长期缓存；
 // 页面本身先走网络拿最新版，断网时才用缓存。
-const CACHE = 'cet6-3e8608414b9d89c3';
+const CACHE = 'cet6-693493f40a916b17';
 self.addEventListener('install', e => { self.skipWaiting(); });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('cet6-') && k !== CACHE).map(k => caches.delete(k))))
