@@ -237,6 +237,9 @@ body.simple .pbox.open > .pbody{animation:fcUp .22s ease-out}
 @media (min-width:900px){.sv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .sv-card{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;background:var(--paper);padding:10px 14px;font-size:13.5px;line-height:1.6}
 .sv-ws{display:grid;gap:2px;margin-bottom:6px}
+.sv-card{position:relative}
+.sv-card.topic{border-left-color:var(--teal)}
+.sv-tag{position:absolute;top:8px;right:10px;font-size:11px;font-weight:600;color:var(--teal);background:var(--teal-soft);border-radius:5px;padding:1px 7px}
 .sv-w{display:flex;gap:10px;align-items:baseline;min-width:0}
 .sv-w a{font:700 17px/1.3 Georgia,serif;flex:none;min-width:96px}
 .sv-w span{color:var(--ink2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -816,17 +819,22 @@ window.CET6 = {
     const sum = s => s.ws.reduce((t, x) => t + ((byWord.get(x) || {}).n || 0), 0);
     if (st.letter !== 'all' && !q) list = list.filter(s => s.ws.some(x => x[0] === st.letter));
     if (q) list = list.filter(s => s.ws.some(x => x.startsWith(q)) || (/[^\x00-\x7f]/.test(q) && (s.t + s.key).includes(q)));
+    // 翻译话题串记（含翻译话题词的一组，如二至二分、四大发明）和形近词串记分开标注；勾「只看翻译话题词」时只留前者
+    const isTopic = s => s.ws.some(x => TOPICS.has(x));
+    if (st.topicOnly) list = list.filter(isTopic);
     list = [...list].sort((a, b) => sum(b) - sum(a));
     // 背诵 / 自测 / 快速过词用的就是这一页上的词
     current = [...new Set(list.flatMap(s => s.ws))].map(x => byWord.get(x)).filter(Boolean);
     const html = list.map(s => {
       const rows = s.ws.map(x => { const w = byWord.get(x);
         return `<div class="sv-w"><a class="go" data-go="${x}">${x}</a><span>${w ? esc(firstMeanShort(w)) : ''}</span>${w && w.n ? `<small>${w.n} 次</small>` : ''}</div>`; }).join('');
-      return `<div class="sv-card"><div class="sv-ws">${rows}</div><div class="st-k">${memHtml(s.key)}</div><div class="st-t">${memHtml(s.t)}</div></div>`;
+      return `<div class="sv-card${isTopic(s) ? ' topic' : ''}">${isTopic(s) ? '<span class="sv-tag">翻译话题</span>' : ''}<div class="sv-ws">${rows}</div><div class="st-k">${memHtml(s.key)}</div><div class="st-t">${memHtml(s.t)}</div></div>`;
     }).join('');
     $('#list').innerHTML = html ? `<div class="sv-grid">${html}</div>` : '<div class="empty">没有找到相关的串记</div>';
     $('#more').hidden = true;
-    $('#resinfo').textContent = `串记 ${list.length} 组 · 形近词放在一起，用一个小段子区分` + (q ? ` · 搜索「${q}」` : ' · 按真题出现次数排');
+    const nt = list.filter(isTopic).length;
+    $('#resinfo').textContent = (st.topicOnly ? `翻译话题串记 ${list.length} 组 · 一个话题的词放在一起，用一句翻译式例句串起来`
+      : `串记 ${list.length} 组（形近词 ${list.length - nt} · 翻译话题 ${nt}）· 形近词用小段子区分，话题词用一句例句串起来`) + (q ? ` · 搜索「${q}」` : ' · 按真题出现次数排');
   }
 
   // 中文反查：搜「重要的」时不要匹配「不重要的」
