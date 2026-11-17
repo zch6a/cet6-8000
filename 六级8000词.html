@@ -1048,6 +1048,7 @@ window.CET6 = {
     for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
       L[i][j] = a[i] === base[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
     if (L[0][0] < Math.max(n, m) - 3 || L[0][0] < Math.min(n, m) * 0.6) return null; // 长得不像就不标
+    if ((n - L[0][0]) + (m - L[0][0]) > 3) return null; // 同根词家族（nurse / nourish）差得多，标一两个字母反而误导
     let i = 0, j = 0, out = '';
     while (i < n) {
       if (j < m && a[i] === base[j]) { out += a[i]; i++; j++; }
