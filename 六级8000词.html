@@ -679,6 +679,8 @@ window.CET6 = {
     list.sort((a,b) => (q && (b.seg === q) - (a.seg === q)) || score(b) - score(a));
     const sec = {root: [], pre: [], suf: []};
     for (const e of list) sec[e.r].push(e);
+    // 背诵 / 自测用这一页词根卡里的词（先词根、再前缀后缀，按卡片顺序去重）
+    current = [...new Set(['root', 'pre', 'suf'].flatMap(r => sec[r].slice(0, q ? 60 : 240)).flatMap(e => e.ws))];
     const titles = {root: ['词根', '一个词根记住一串词'], pre: ['前缀', '放在词首，决定方向、否定、程度'], suf: ['后缀', '放在词尾，决定词性']};
     const cardH = e => {
       const shown = e.ws.slice(0, 14);
@@ -703,6 +705,8 @@ window.CET6 = {
     if (st.letter !== 'all') list = list.filter(s => s.ws.some(x => x[0] === st.letter));
     if (q) list = list.filter(s => s.ws.some(x => x.startsWith(q)) || (/[^\x00-\x7f]/.test(q) && (s.t + s.key).includes(q)));
     list = [...list].sort((a, b) => sum(b) - sum(a));
+    // 背诵 / 自测 / 快速过词用的就是这一页上的词
+    current = [...new Set(list.flatMap(s => s.ws))].map(x => byWord.get(x)).filter(Boolean);
     const html = list.map(s => {
       const rows = s.ws.map(x => { const w = byWord.get(x);
         return `<div class="sv-w"><a class="go" data-go="${x}">${x}</a><span>${w ? esc(firstMeanShort(w)) : ''}</span>${w && w.n ? `<small>${w.n} 次</small>` : ''}</div>`; }).join('');
@@ -1439,7 +1443,7 @@ window.CET6 = {
     openOv('自测'); $('#ovMeta').textContent = ''; $('#ovBar').style.width = '0';
     const n = pool().length;
     fc.innerHTML = `<div class="done-big">选一种自测方式</div>
-      <p class="fc-sub">题目从当前列表抽 20 个（${esc($('#resinfo').textContent)}，不含已掌握）。答错的词会自动加入背诵复习。</p>
+      <p class="fc-sub">题目从当前列表抽 20 个（${esc($('#resinfo').textContent)}，不含已掌握${st.lv === 'all' ? '，跳过中学基础词' : ''}）。答错的词会自动加入背诵复习。</p>
       <div class="modes">
         <button class="mode" data-m="pick"><b>看词选义</b><span>看英文，四选一中文</span></button>
         <button class="mode" data-m="spell"><b>看义拼词</b><span>看中文和词根提示，拼出单词</span></button>
@@ -1457,6 +1461,8 @@ window.CET6 = {
     .map(x => byWord.get(x)).filter(x => !sameMeaning(w, x));
   function startQuiz(mode){
     let p = pool();
+    // 同背诵：级别选「全部」时不考中学基础词（print、lock 这类太简单）
+    if (st.lv === 'all') { const q = p.filter(w => w.lv !== 'basic'); if (q.length >= 4) p = q; }
     if (mode === 'vs') { p = p.filter(w => w.vs && rivalsOf(w).length); if (p.length < 4) p = words.filter(w => w.vs && rivalsOf(w).length); }
     if (p.length < 4) return;
     session = {quiz: mode, q: shuffle(p.slice()).slice(0, 20), idx: 0, right: 0, wrongs: []};
