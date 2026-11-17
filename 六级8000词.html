@@ -217,6 +217,17 @@ main{padding:18px 0 60px}
 .story .st-me{color:var(--ink);text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
 .story .st-w{font-weight:600;color:var(--ink2)}
 .story u.df{text-decoration:none;color:#fff;background:var(--accent);border-radius:3px;padding:0 1px;margin:0 .5px}
+.sv-grid{display:grid;gap:10px}
+@media (min-width:900px){.sv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sv-card{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;background:var(--paper);padding:10px 14px;font-size:13.5px;line-height:1.6}
+.sv-ws{display:grid;gap:2px;margin-bottom:6px}
+.sv-w{display:flex;gap:10px;align-items:baseline;min-width:0}
+.sv-w a{font:700 17px/1.3 Georgia,serif;flex:none;min-width:96px}
+.sv-w span{color:var(--ink2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sv-w small{color:var(--ink3);font-size:11px;flex:none}
+.sv-card .st-k{color:var(--ink3);font-size:12.5px}
+.sv-card .st-t{color:var(--ink2)}
+.sv-card .st-t b{color:var(--ink)}
 .story .st-k{color:var(--ink3);font-size:12.5px}
 .story .st-t{color:var(--ink2)}
 .story .st-t b{color:var(--ink)}
@@ -447,6 +458,7 @@ main{padding:18px 0 60px}
         <button data-sort="freq" aria-pressed="false">真题频率</button>
         <button data-sort="write" aria-pressed="false" title="四级常用词 + 重要六级词：写作、翻译要会拼会用">会写词汇</button>
         <button data-sort="roots" aria-pressed="false" title="按词根词缀成串记忆">词根</button>
+        <button data-sort="stories" aria-pressed="false" title="长得像的词放在一起，用一个小段子区分">串记</button>
       </div>
     </div>
     <div class="row2">
@@ -683,6 +695,23 @@ window.CET6 = {
     $('#resinfo').textContent = `词根 ${sec.root.length} · 前缀 ${sec.pre.length} · 后缀 ${sec.suf.length}` + (q ? ` · 搜索「${q}」` : ' · 按覆盖的高频词多少排序');
   }
   const firstMeanShort = w => w.zh.map(([p,t]) => (p ? p + ' ' : '') + t).join('；');
+  /* 串记视图：所有形近词段子一页看完，按真题出现次数排 */
+  function renderStories(){
+    const q = st.q;
+    let list = window.CET6.storyList || [];
+    const sum = s => s.ws.reduce((t, x) => t + ((byWord.get(x) || {}).n || 0), 0);
+    if (st.letter !== 'all') list = list.filter(s => s.ws.some(x => x[0] === st.letter));
+    if (q) list = list.filter(s => s.ws.some(x => x.startsWith(q)) || (/[^\x00-\x7f]/.test(q) && (s.t + s.key).includes(q)));
+    list = [...list].sort((a, b) => sum(b) - sum(a));
+    const html = list.map(s => {
+      const rows = s.ws.map(x => { const w = byWord.get(x);
+        return `<div class="sv-w"><a class="go" data-go="${x}">${x}</a><span>${w ? esc(firstMeanShort(w)) : ''}</span>${w && w.n ? `<small>${w.n} 次</small>` : ''}</div>`; }).join('');
+      return `<div class="sv-card"><div class="sv-ws">${rows}</div><div class="st-k">${memHtml(s.key)}</div><div class="st-t">${memHtml(s.t)}</div></div>`;
+    }).join('');
+    $('#list').innerHTML = html ? `<div class="sv-grid">${html}</div>` : '<div class="empty">没有找到相关的串记</div>';
+    $('#more').hidden = true;
+    $('#resinfo').textContent = `串记 ${list.length} 组 · 形近词放在一起，用一个小段子区分` + (q ? ` · 搜索「${q}」` : ' · 按真题出现次数排');
+  }
 
   // 中文反查：搜「重要的」时不要匹配「不重要的」
   const NEG = /[不无非未没](太|令人|令|使人|使|很|够|大)?$/;
@@ -704,9 +733,10 @@ window.CET6 = {
   function apply(scrollUp){
     save();
     $('#wfreqWrap').hidden = st.sort !== 'write';
-    $('#viewName').textContent = {alpha:'字母', freq:'频率', write:'会写', roots:'词根'}[st.sort] || '筛选';
+    $('#viewName').textContent = {alpha:'字母', freq:'频率', write:'会写', roots:'词根', stories:'串记'}[st.sort] || '筛选';
     const nf = [st.lv !== 'all', st.band !== 'all', st.letter !== 'all', st.cover, st.hideKnown, st.rareOnly].filter(Boolean).length;
     $('#fCount').textContent = nf ? String(nf) : '';
+    if (st.sort === 'stories') { renderStories(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
     current = words.filter(w =>
@@ -1097,7 +1127,7 @@ window.CET6 = {
     $('#q').value = seg; st.q = seg; apply(true);
   }
   function goWord(x){
-    if (st.sort === 'roots') { st.sort = 'alpha'; document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === 'alpha'))); }
+    if (st.sort === 'roots' || st.sort === 'stories') { st.sort = 'alpha'; document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.sort === 'alpha'))); }
     st.letter = 'all'; st.lv = 'all'; st.band = 'all'; markLetters();
     document.querySelectorAll('#lvChips .chip,#bandChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === 'all')));
     $('#q').value = x; st.q = x; apply(true);
