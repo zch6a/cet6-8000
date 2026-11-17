@@ -195,20 +195,35 @@ body.simple .pgroup .pbody.open{animation:fcUp .22s ease-out}
 .mem b{color:var(--ink);font-weight:600}
 .pic{font-size:28px;line-height:1.2;margin-top:8px;letter-spacing:2px}
 /* ---------- 词根算式卡：[前缀] + [词根] + [后缀] = 意思 ---------- */
-.parts-d{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;margin:10px 0 2px}
-.blk{position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border-radius:11px;
-  padding:7px 12px 6px;min-width:54px;border:1.5px solid transparent;opacity:0;transform:translateY(-14px) rotate(-3deg) scale(.85);
-  cursor:pointer;transition:transform .15s,box-shadow .15s}
-.blk:hover{transform:translateY(-2px)!important;box-shadow:0 4px 12px rgba(0,0,0,.12)}
-.in .blk{animation:drop .5s cubic-bezier(.2,.9,.3,1.35) forwards;animation-delay:var(--d)}
+.parts-d{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 2px}
+/* 词块像积木一样拼在一起：前一块的颜色在接缝处凸出一个圆榫，嵌进后一块 */
+.wbar{display:inline-flex;align-items:stretch;flex-wrap:wrap;row-gap:4px}
+.blk{--br:12px;position:relative;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--br);
+  padding:7px 14px 6px;min-width:54px;opacity:0;transform:translate(var(--sx,0px),var(--sy,-12px)) scale(.9);
+  box-shadow:inset 0 -2.5px 0 color-mix(in srgb,currentColor 22%,transparent);cursor:pointer;transition:transform .15s,box-shadow .15s}
+.wbar>.blk{border-radius:4px}
+.wbar>.blk:first-child{border-radius:var(--br) 4px 4px var(--br)}
+.wbar>.blk:last-child{border-radius:4px var(--br) var(--br) 4px}
+.wbar>.blk:only-child{border-radius:var(--br)}
+.wbar>.blk+.blk{margin-left:3px}
+.wbar>.blk+.blk::before{content:"";position:absolute;left:-8px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;transform:scale(0)}
+.wbar>.blk.pre+.blk::before{background:var(--teal-soft)}
+.wbar>.blk.root+.blk::before{background:var(--accent-soft)}
+.wbar>.blk.suf+.blk::before{background:var(--violet-soft)}
+.blk:hover{transform:translateY(-2px)!important;box-shadow:inset 0 -2.5px 0 color-mix(in srgb,currentColor 22%,transparent),0 4px 12px rgba(0,0,0,.12)}
+.in .blk{animation:snap .5s cubic-bezier(.25,1.35,.5,1) forwards;animation-delay:var(--d)}
+@keyframes snap{to{opacity:1;transform:none}}
+.in .wbar{animation:snapBump .35s ease-out both;animation-delay:var(--t)}
+@keyframes snapBump{0%,100%{transform:none}40%{transform:scale(1.045)}}
+.in .wbar>.blk+.blk::before{animation:tabIn .3s cubic-bezier(.3,1.6,.5,1) forwards;animation-delay:var(--t)}
+@keyframes tabIn{to{transform:scale(1)}}
 @keyframes drop{to{opacity:1;transform:none}}
 .blk i{font-style:normal;font-size:10px;letter-spacing:.12em;opacity:.75;line-height:1;margin-bottom:3px}
 .blk b{font:700 19px/1.2 Georgia,"Times New Roman",serif;letter-spacing:.03em}
 .blk em{font-style:normal;font-size:12px;line-height:1.35;margin-top:2px;font-weight:600}
-.blk.pre{background:var(--teal-soft);color:var(--teal);border-color:color-mix(in srgb,var(--teal) 40%,transparent)}
-.blk.root{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,transparent)}
-.blk.suf{background:var(--violet-soft);color:var(--violet);border-color:color-mix(in srgb,var(--violet) 40%,transparent);border-style:dashed}
-.blk.pre::after{content:"";position:absolute;right:-5px;top:50%;width:8px;height:8px;margin-top:-4px;background:inherit;border:inherit;border-left:0;border-bottom:0;transform:rotate(45deg)}
+.blk.pre{background:var(--teal-soft);color:var(--teal)}
+.blk.root{background:var(--accent-soft);color:var(--accent)}
+.blk.suf{background:var(--violet-soft);color:var(--violet)}
 .plus,.eq{align-self:center;color:var(--ink3);font:600 15px/1 Georgia,serif;opacity:0}
 .in .plus,.in .eq{animation:fade .3s forwards;animation-delay:var(--d)}
 @keyframes fade{to{opacity:1}}
@@ -216,7 +231,7 @@ body.simple .pgroup .pbody.open{animation:fcUp .22s ease-out}
   font-weight:700;font-size:15px;opacity:0;transform:scale(.6)}
 .in .res{animation:pop .45s cubic-bezier(.2,.9,.3,1.5) forwards;animation-delay:var(--d)}
 @keyframes pop{to{opacity:1;transform:none}}
-@media (prefers-reduced-motion: reduce){.blk,.plus,.eq,.res{opacity:1;transform:none}.in .blk,.in .plus,.in .eq,.in .res{animation:none}}
+@media (prefers-reduced-motion: reduce){.blk,.plus,.eq,.res{opacity:1;transform:none}.in .blk,.in .plus,.in .eq,.in .res,.in .wbar{animation:none}.wbar>.blk+.blk::before{transform:none}}
 .legend-role{display:inline-flex;gap:6px;align-items:center;margin-left:6px}
 .legend-role span{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600}
 /* ---------- 词根视图 ---------- */
@@ -370,60 +385,99 @@ body.simple .pgroup .pbody:not(.open){display:none}
 .fc-back .ptabs{justify-content:center}
 .anim-btn{border:1px dashed var(--line);background:none;color:var(--ink3);border-radius:8px;font-size:12px;padding:3px 9px;cursor:pointer;align-self:center;margin-left:4px}
 .anim-btn:hover{color:var(--accent);border-color:var(--accent)}
-.anim-strip{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 2px;padding:10px;border-radius:12px;background:var(--line2)}
-.anim-tile{display:flex;flex-direction:column;align-items:center;gap:2px;opacity:0;transform:scale(.6);animation:tileIn .45s cubic-bezier(.2,.9,.3,1.4) forwards;animation-delay:var(--d)}
+.anim-strip{display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px 6px;margin:8px 0 2px;padding:12px;border-radius:14px;background:var(--line2)}
+.anim-tile{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0;transform:translateY(10px) scale(.6);animation:tileIn .5s cubic-bezier(.2,.9,.3,1.4) forwards;animation-delay:var(--d)}
 @keyframes tileIn{to{opacity:1;transform:none}}
-.anim-tile svg{width:64px;height:64px;border-radius:12px;background:var(--paper);border:1.5px solid currentColor}
-.anim-tile b{font:700 15px/1.1 Georgia,serif}
-.anim-tile em{font-style:normal;font-size:11px;font-weight:600}
+.anim-tile svg{width:68px;height:68px;border-radius:18px;background:var(--paper);overflow:hidden;
+  box-shadow:0 0 0 1.5px color-mix(in srgb,currentColor 30%,transparent),0 4px 12px -6px color-mix(in srgb,currentColor 60%,transparent)}
+.anim-tile b{font:700 15px/1.1 Georgia,serif;margin-top:4px}
+.anim-tile em{font-style:normal;font-size:11px;font-weight:600;line-height:1.35;padding:1px 7px;border-radius:6px;max-width:92px;text-align:center}
 .anim-tile.pre{color:var(--teal)} .anim-tile.root{color:var(--accent)} .anim-tile.suf{color:var(--violet)}
-.anim-op{color:var(--ink3);font:600 16px Georgia,serif;opacity:0;animation:fade .3s forwards;animation-delay:var(--d)}
-.anim-res{opacity:0;transform:scale(.5);animation:pop .5s cubic-bezier(.2,.9,.3,1.6) forwards;animation-delay:var(--d);
-  background:var(--ink);color:var(--paper);font-weight:700;border-radius:12px;padding:10px 14px;font-size:16px}
-.anim-replay{margin-left:auto;border:0;background:none;color:var(--ink3);cursor:pointer;font-size:12px}
-/* 各个动作：transform-box 让旋转缩放以图形自身为中心 */
+.anim-tile.pre em{background:var(--teal-soft)} .anim-tile.root em{background:var(--accent-soft)} .anim-tile.suf em{background:var(--violet-soft)}
+.anim-op{color:var(--ink3);font:600 17px Georgia,serif;opacity:0;animation:fade .3s forwards;animation-delay:var(--d);margin-top:24px}
+.anim-eqres{display:flex;align-items:flex-start;gap:6px}
+.anim-res{display:flex;flex-direction:column;align-items:center;margin-top:5px;opacity:0;transform:scale(.5);
+  animation:resIn .6s cubic-bezier(.2,.9,.3,1.5) forwards,resGlow 1s ease-out forwards;animation-delay:var(--d),calc(var(--d) + .35s);
+  background:var(--paper);color:var(--ink);border:2px solid var(--ink);font-weight:700;border-radius:14px;padding:5px 14px 7px;font-size:17px;line-height:1.3}
+.anim-res small{font:700 13px/1.2 Georgia,serif;letter-spacing:.02em}
+.anim-res small i{font-style:normal}
+.anim-res .r-pre{color:var(--teal)} .anim-res .r-root{color:var(--accent)} .anim-res .r-suf{color:var(--violet)}
+@keyframes resIn{0%{opacity:0;transform:scale(.5)}60%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:none}}
+@keyframes resGlow{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+.anim-replay{margin-left:auto;align-self:flex-end;border:0;background:none;color:var(--ink3);cursor:pointer;font-size:12px}
+@media (max-width:420px){.anim-tile svg{width:58px;height:58px;border-radius:15px}.anim-op{margin-top:19px}.anim-res{font-size:15px}}
+/* 画面里的配色：ff 实心主色、sf 浅色填充、pf 纸色（眼睛高光）、mu / mf 灰色参照物 */
 .anim-tile svg *{transform-box:fill-box;transform-origin:center}
-.a-loop{animation-iteration-count:infinite!important;animation-duration:1.8s!important;animation-timing-function:ease-in-out!important}
-@keyframes kBack{0%{transform:translateX(-14px)}40%{transform:translateX(14px)}50%{transform:translateX(14px) scaleX(-1)}90%,100%{transform:translateX(-14px) scaleX(-1)}}
-@keyframes kSpin{to{transform:rotate(360deg)}}
-@keyframes kBlink{0%,40%,60%,100%{transform:scaleY(1)}50%{transform:scaleY(.1)}}
-@keyframes kLook{0%,100%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
-@keyframes kThrow{0%{transform:translate(-18px,16px) scale(.8)}60%{transform:translate(10px,-14px)}100%{transform:translate(20px,-4px);opacity:0}}
-@keyframes kRight{0%{transform:translateX(-18px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(18px);opacity:0}}
-@keyframes kLeft{0%{transform:translateX(18px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(-18px);opacity:0}}
-@keyframes kUp{0%{transform:translateY(16px);opacity:0}25%{opacity:1}100%{transform:translateY(-14px);opacity:0}}
-@keyframes kDown{0%{transform:translateY(-16px);opacity:0}25%{opacity:1}100%{transform:translateY(14px);opacity:0}}
-@keyframes kDrop{0%{transform:translateY(-22px)}60%{transform:translateY(0)}75%{transform:translateY(-4px)}100%{transform:translateY(0)}}
-@keyframes kPress{0%,100%{transform:translateY(-6px) scaleY(1)}50%{transform:translateY(2px) scaleY(.6)}}
-@keyframes kTurn{0%,100%{transform:rotate(-45deg)}50%{transform:rotate(45deg)}}
-@keyframes kBreakL{0%,30%{transform:none}100%{transform:translate(-6px,4px) rotate(-25deg)}}
-@keyframes kBreakR{0%,30%{transform:none}100%{transform:translate(6px,4px) rotate(25deg)}}
-@keyframes kBend{0%,100%{transform:rotate(0)}50%{transform:rotate(-40deg)}}
-@keyframes kDraw{from{stroke-dashoffset:120}to{stroke-dashoffset:0}}
-@keyframes kDot{0%,100%{opacity:.2}50%{opacity:1}}
-@keyframes kGrow{0%{transform:scale(.2);opacity:.3}100%{transform:scale(1);opacity:1}}
-@keyframes kShrink{0%{transform:scale(1)}100%{transform:scale(.35)}}
-@keyframes kBeat{0%,100%{transform:scale(1)}30%{transform:scale(1.25)}50%{transform:scale(.95)}}
-@keyframes kGlow{0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}}
-@keyframes kInL{0%{transform:translateX(-14px)}100%{transform:translateX(0)}}
-@keyframes kInR{0%{transform:translateX(14px)}100%{transform:translateX(0)}}
-@keyframes kApartL{0%{transform:translateX(0)}100%{transform:translateX(-10px)}}
-@keyframes kApartR{0%{transform:translateX(0)}100%{transform:translateX(10px)}}
-@keyframes kIn{0%{transform:translate(-22px,0);opacity:1}70%{transform:translate(2px,0);opacity:1}100%{transform:translate(2px,0);opacity:0}}
-@keyframes kOut{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(24px,0);opacity:0}}
-@keyframes kThrough{0%{transform:translateX(-22px)}100%{transform:translateX(22px)}}
-@keyframes kStack1{0%,10%{transform:translateY(-30px);opacity:0}30%,100%{transform:none;opacity:1}}
-@keyframes kStack2{0%,35%{transform:translateY(-30px);opacity:0}55%,100%{transform:none;opacity:1}}
-@keyframes kStack3{0%,60%{transform:translateY(-30px);opacity:0}80%,100%{transform:none;opacity:1}}
-@keyframes kRise{0%{transform:scaleY(.15)}60%,100%{transform:scaleY(1)}}
-@keyframes kWave{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(15deg)}}
-@keyframes kFlow{0%{transform:translateX(-8px)}100%{transform:translateX(8px)}}
-@keyframes kFlicker{0%,100%{transform:scale(1,1)}50%{transform:scale(.85,1.15)}}
-@keyframes kPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
-@keyframes kDroop{0%{transform:rotate(0)}100%{transform:rotate(70deg);opacity:.4}}
-@keyframes kClashL{0%,100%{transform:translateX(-8px)}50%{transform:translateX(2px)}}
-@keyframes kClashR{0%,100%{transform:translateX(8px)}50%{transform:translateX(-2px)}}
-@keyframes kPull{0%,100%{transform:translateX(10px)}50%{transform:translateX(-8px)}}
+.anim-tile svg [transform]{transform-box:view-box;transform-origin:0 0}
+.anim-tile svg .ff{fill:currentColor;stroke:none}
+.anim-tile svg .sf{fill:currentColor;fill-opacity:.18}
+.anim-tile svg .pf{fill:var(--paper)}
+.anim-tile svg .mu{stroke:var(--ink3);opacity:.6}
+.anim-tile svg .mf{fill:var(--ink3);opacity:.28;stroke:none}
+.anim-tile svg .mute .ff{fill:var(--ink3)}
+.anim-tile svg text.ff{stroke:none}
+/* 通用动作：起点 (x0,y0,r0,s0) → 终点 (x1,y1,r1,s1)，在 16%→58% 之间走完，停到 86% 再淡出 */
+@keyframes qGo{0%{opacity:0;transform:translate(var(--x0,0px),var(--y0,0px)) rotate(var(--r0,0deg)) scale(var(--s0,1))}
+  8%,16%{opacity:1;transform:translate(var(--x0,0px),var(--y0,0px)) rotate(var(--r0,0deg)) scale(var(--s0,1))}
+  58%,86%{opacity:1;transform:translate(var(--x1,0px),var(--y1,0px)) rotate(var(--r1,0deg)) scale(var(--s1,1))}
+  100%{opacity:0;transform:translate(var(--x1,0px),var(--y1,0px)) rotate(var(--r1,0deg)) scale(var(--s1,1))}}
+/* 去了再回来：46%→64% 停在终点 */
+@keyframes qPing{0%,14%{transform:translate(var(--x0,0px),var(--y0,0px)) rotate(var(--r0,0deg)) scale(var(--s0,1))}
+  46%,64%{transform:translate(var(--x1,0px),var(--y1,0px)) rotate(var(--r1,0deg)) scale(var(--s1,1))}
+  96%,100%{transform:translate(var(--x0,0px),var(--y0,0px)) rotate(var(--r0,0deg)) scale(var(--s0,1))}}
+@keyframes qLate{0%,45%{opacity:0;transform:scale(.3)}55%{opacity:1;transform:scale(1.15)}62%,86%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+@keyframes qMid{0%,40%{opacity:0;transform:scale(.3)}48%{opacity:1;transform:scale(1.2)}54%,64%{opacity:1;transform:scale(1)}74%,100%{opacity:0;transform:scale(1)}}
+@keyframes qPopHold{0%{opacity:0;transform:scale(0)}8%{opacity:1;transform:scale(1.2)}14%,80%{opacity:1;transform:scale(1)}92%,100%{opacity:0;transform:scale(1)}}
+@keyframes qDraw{0%,16%{stroke-dashoffset:100;opacity:1}58%,86%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes qDrop{0%{opacity:0;transform:translateY(var(--y0,-26px))}8%{opacity:1;transform:translateY(var(--y0,-26px));animation-timing-function:cubic-bezier(.5,0,1,1)}
+  40%{transform:translateY(0) scale(1,1);animation-timing-function:ease-out}46%{transform:translateY(0) scale(1.16,.84)}54%{transform:translateY(0) scale(.96,1.04)}60%,86%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+@keyframes qFall{0%{opacity:0;transform:translateY(var(--y0,-20px))}10%{opacity:1;transform:translateY(var(--y0,-20px));animation-timing-function:cubic-bezier(.5,0,1,1)}48%{opacity:1;transform:translateY(0)}54%,100%{opacity:0;transform:translateY(3px)}}
+@keyframes qGrowY{0%,10%{opacity:0;transform:scaleY(0)}16%{opacity:1;transform:scaleY(0)}50%,86%{opacity:1;transform:scaleY(1)}100%{opacity:0;transform:scaleY(1)}}
+@keyframes qBeat{0%,60%,100%{transform:scale(1)}14%{transform:scale(var(--s1,1.16))}28%{transform:scale(.97)}42%{transform:scale(1.05)}}
+@keyframes qRing{0%{opacity:0;transform:scale(.7)}14%{opacity:.7}60%,100%{opacity:0;transform:scale(1.5)}}
+@keyframes qSway{0%,100%{transform:rotate(var(--r0,-8deg))}50%{transform:rotate(var(--r1,8deg))}}
+@keyframes qSpin{from{transform:rotate(0)}to{transform:rotate(var(--r1,360deg))}}
+@keyframes qSpin2{0%,10%{transform:rotate(0)}70%,100%{transform:rotate(720deg)}}
+@keyframes qTurn{0%,10%{transform:rotate(0)}55%,100%{transform:rotate(360deg)}}
+@keyframes qBob{0%,100%{transform:translateY(0)}50%{transform:translateY(var(--y1,-3px))}}
+@keyframes qFade{0%,100%{opacity:var(--o0,.3)}50%{opacity:1}}
+@keyframes qOn{0%,35%{opacity:0}45%,86%{opacity:1}100%{opacity:0}}
+@keyframes qNo{0%,62%,82%,100%{transform:none}66%{transform:translateX(-3px)}70%{transform:translateX(3px)}74%{transform:translateX(-2px)}78%{transform:translateX(2px)}}
+@keyframes qU{0%{opacity:0;transform:translate(0,0)}6%{opacity:1;transform:translate(0,0)}36%{transform:translate(28px,0)}44%{transform:translate(34.5px,3px)}50%{transform:translate(36px,8px)}
+  56%{transform:translate(34.5px,13px)}64%{transform:translate(28px,16px)}88%{opacity:1;transform:translate(0,16px)}100%{opacity:0;transform:translate(0,16px)}}
+@keyframes qDot{0%,60%,100%{transform:translateY(0);opacity:.35}25%{transform:translateY(-4px);opacity:1}}
+@keyframes qClaw{0%,8%{transform:translateY(-10px)}32%,46%{transform:translateY(9px)}76%,88%{transform:translateY(-9px)}100%{transform:translateY(-10px)}}
+@keyframes qLift{0%{opacity:0;transform:translateY(0)}8%,46%{opacity:1;transform:translateY(0)}76%,88%{opacity:1;transform:translateY(-18px)}100%{opacity:0;transform:translateY(-18px)}}
+@keyframes qHit{0%,20%{transform:translateY(var(--y0,-10px))}42%{transform:translateY(calc(var(--y0,-10px) - 4px));animation-timing-function:cubic-bezier(.6,0,1,1)}
+  50%{transform:translateY(var(--y1,8px))}54%,66%{transform:translateY(calc(var(--y1,8px) + 5px))}90%,100%{transform:translateY(var(--y0,-10px))}}
+@keyframes qNail{0%,48%{transform:translateY(0)}54%,92%{transform:translateY(5px)}100%{transform:translateY(0)}}
+@keyframes qFlash{0%,48%{opacity:0;transform:scale(.6)}54%{opacity:1;transform:scale(1.1)}68%,100%{opacity:0;transform:scale(1.2)}}
+@keyframes qSquash{0%,48%{transform:scaleY(1)}54%,66%{transform:scaleY(.72)}90%,100%{transform:scaleY(1)}}
+@keyframes qSplit{0%,52%{transform:translate(0,0) rotate(0)}62%,88%{transform:translate(var(--x1,0px),0) rotate(var(--r1,0deg))}100%{transform:translate(0,0) rotate(0)}}
+@keyframes qBlink{0%,88%,100%{transform:scaleY(1)}93%{transform:scaleY(.08)}}
+@keyframes qFlip{0%,30%{transform:scaleX(1)}40%{transform:scaleX(.06)}50%{transform:scaleX(1)}60%{transform:scaleX(.06)}70%,100%{transform:scaleX(1)}}
+@keyframes qSettle{0%,8%{transform:rotate(-16deg)}34%{transform:rotate(7deg)}48%{transform:rotate(-3deg)}60%,88%{transform:rotate(0)}100%{transform:rotate(-16deg)}}
+@keyframes qWide{0%,14%{transform:scaleX(.2)}50%,86%{transform:scaleX(1)}100%{transform:scaleX(.2)}}
+@keyframes qStep{0%{opacity:0;transform:scale(.5)}6%,55%{opacity:1;transform:scale(1)}75%,100%{opacity:0;transform:scale(1)}}
+@keyframes qSlide{from{transform:translateX(var(--x0,0px))}to{transform:translateX(var(--x1,-16px))}}
+@keyframes qArc{0%{opacity:0;transform:translate(0,0)}8%,10%{opacity:1;transform:translate(0,0)}25%{transform:translate(10px,-17px)}40%{transform:translate(21px,-24px)}
+  55%{transform:translate(32px,-21px)}70%,86%{opacity:1;transform:translate(44px,-8px)}100%{opacity:0;transform:translate(44px,-8px)}}
+@keyframes qFold{0%,14%{transform:scaleX(1)}50%,80%{transform:scaleX(-1)}100%{transform:scaleX(1)}}
+@keyframes qChomp{0%,100%{transform:rotate(var(--r0,0deg))}50%{transform:rotate(0)}}
+@keyframes qFlicker{0%,100%{transform:scale(1,1)}25%{transform:scale(.94,1.06)}50%{transform:scale(1.04,.96)}75%{transform:scale(.97,1.04)}}
+@keyframes qOut{0%{opacity:0;transform:scale(0)}10%,40%{opacity:1;transform:scale(1)}55%,100%{opacity:0;transform:scale(0)}}
+@keyframes qSmoke{0%,50%{opacity:0;transform:translateY(4px)}60%{opacity:.8}90%,100%{opacity:0;transform:translateY(-8px)}}
+@keyframes qSquish{0%,20%{transform:scale(1,1)}45%,70%{transform:scale(1.12,.78)}100%{transform:scale(1,1)}}
+@keyframes qBounce{0%,100%{transform:translateY(-24px);animation-timing-function:cubic-bezier(.5,0,1,1)}45%{transform:translateY(0) scale(1,1)}
+  50%{transform:translateY(0) scale(1.14,.86)}55%{transform:translateY(0) scale(1,1);animation-timing-function:cubic-bezier(0,0,.5,1)}}
+@keyframes qShadow{0%,100%{transform:scale(.5);opacity:.4}50%{transform:scale(1);opacity:1}}
+@keyframes qFlap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(-.5)}}
+@keyframes qBump{0%,10%{transform:translateX(0)}40%{transform:translateX(16px)}46%{transform:translateX(10px)}52%{transform:translateX(13px)}60%,85%{transform:translateX(10px)}100%{transform:translateX(0)}}
+@keyframes qDoor{0%,15%{transform:scaleX(1)}50%,80%{transform:scaleX(.25)}100%{transform:scaleX(1)}}
+@keyframes qJitter{0%,100%{transform:translateX(-1.5px)}50%{transform:translateX(1.5px)}}
+@keyframes qFloat{0%{opacity:0;transform:translate(-8px,-14px) rotate(-15deg)}10%{opacity:1}30%{transform:translate(6px,-6px) rotate(12deg)}
+  55%{transform:translate(-6px,2px) rotate(-10deg)}80%{opacity:1;transform:translate(4px,10px) rotate(6deg)}100%{opacity:0;transform:translate(4px,12px) rotate(0)}}
+@keyframes qDash{from{stroke-dashoffset:0}to{stroke-dashoffset:-12}}
 @media (prefers-reduced-motion: reduce){.anim-tile svg *{animation:none!important}}
 /* ===== 紧凑双栏卡片 ===== */
 .wrap{max-width:1240px}
@@ -448,7 +502,7 @@ body.simple .pgroup .pbody:not(.open){display:none}
 .card .mean li{font-size:14.5px;line-height:1.55;margin:0}
 .card .pos{min-width:30px;font-size:12px}
 .card .parts-d{margin:6px 0 2px;gap:4px}
-.card .blk{padding:4px 9px 4px;min-width:40px;border-radius:9px}
+.card .blk{--br:9px;padding:4px 10px 4px;min-width:40px}
 .card .blk b{font-size:16px}
 .card .blk i{font-size:9px;margin-bottom:1px}
 .card .blk em{font-size:11px;margin-top:1px}
@@ -937,146 +991,182 @@ window.CET6 = {
     return esc(m).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
   }
   /* =====================================================================
-     词根动画：每个「意思」对应一个会动的小图，按意思匹配（不按拼写），
-     一个词的各部分依次播放，最后弹出词义。
+     词根动画：每个「意思」对应一个会动的小画面，按意思匹配（不按拼写）。
+     画法统一：彩色的「小豆子」是主角（带两只眼睛），灰色是参照物（盒子、墙、地面），
+     动作有起势、到位、停顿，一眼看出「往哪动、干了什么」。
+     同一块里的各个部件共用 2.8 秒节拍：qGo / qDraw 在 16%→58% 走完，qLate 在 55% 弹出结果。
      ===================================================================== */
-  const A = (name, dur, extra) => `style="animation:${name} ${dur || 1.8}s ease-in-out infinite${extra ? ';' + extra : ''}"`;
-  const ARROW = d => `<path d="M14 32h30m-9-9 9 9-9 9" ${d}/>`;
-  const ANIM = {
-    back:    `<g ${A('kBack', 2)}>${ARROW('')}</g>`,
-    again:   `<g ${A('kSpin', 2.2, 'animation-timing-function:linear')}><path d="M32 14a18 18 0 1 1-16 10"/><path d="M12 16l4 8 8-3"/></g>`,
-    look:    `<g ${A('kBlink', 2.4)}><path d="M10 32q22-20 44 0q-22 20-44 0z"/><g ${A('kLook', 2.4)}><circle cx="32" cy="32" r="6" fill="currentColor"/></g></g>`,
-    grab:    `<circle cx="40" cy="34" r="6" fill="currentColor"/><g ${A('kPull', 1.6)}><path d="M12 22q12 0 16 10q-4 10-16 10"/></g>`,
-    throw:   `<path d="M10 52h44" opacity=".3"/><g ${A('kThrow', 1.6, 'animation-timing-function:ease-out')}><circle cx="32" cy="32" r="6" fill="currentColor"/></g>`,
-    send:    `<g ${A('kRight', 1.8)}><rect x="20" y="24" width="24" height="16" rx="2"/><path d="M20 24l12 9 12-9"/></g>`,
-    carry:   `<path d="M8 46h48" opacity=".3"/><g ${A('kRight', 2)}><rect x="22" y="28" width="20" height="16" rx="2"/><path d="M22 34h20"/></g>`,
-    pull:    `<path d="M10 32h20" stroke-dasharray="3 3"/><g ${A('kPull', 1.6)}><rect x="30" y="24" width="18" height="16" rx="2" fill="currentColor" opacity=".85"/></g>`,
-    walk:    `<g ${A('kRight', 2.2)}><circle cx="32" cy="18" r="4" fill="currentColor"/><path d="M32 22v14m0 0-6 12m6-12 6 12m-6-20-7 7m7-7 7 7"/></g>`,
-    come:    `<g ${A('kLeft', 2)}><circle cx="32" cy="18" r="4" fill="currentColor"/><path d="M32 22v14m0 0-6 12m6-12 6 12"/></g><path d="M10 50h12" opacity=".4"/>`,
-    speak:   `<path d="M14 18h36v20H30l-8 8v-8h-8z"/><circle cx="24" cy="28" r="2.5" fill="currentColor" ${A('kDot', 1.2)}/><circle cx="32" cy="28" r="2.5" fill="currentColor" ${A('kDot', 1.2, 'animation-delay:.2s')}/><circle cx="40" cy="28" r="2.5" fill="currentColor" ${A('kDot', 1.2, 'animation-delay:.4s')}/>`,
-    write:   `<path d="M12 44c6-10 10 6 16-4s10 6 16-4 6 2 8 0" stroke-dasharray="120" ${A('kDraw', 2.2)}/><path d="M44 14l6 6-16 16-7 1 1-7z" opacity=".6"/>`,
-    put:     `<path d="M10 48h44" opacity=".3"/><g ${A('kDrop', 1.6)}><rect x="24" y="30" width="16" height="16" rx="2" fill="currentColor" opacity=".85"/></g>`,
-    turn:    `<g ${A('kTurn', 2)}><rect x="20" y="20" width="24" height="24" rx="3"/><path d="M32 20v8"/></g>`,
-    press:   `<path d="M10 48h44" opacity=".3"/><path d="M32 8v10m-6-4 6 6 6-6"/><g ${A('kPress', 1.4)}><rect x="20" y="28" width="24" height="18" rx="2" fill="currentColor" opacity=".8"/></g>`,
-    break:   `<g ${A('kBreakL', 1.6)}><path d="M12 32h18"/></g><g ${A('kBreakR', 1.6)}><path d="M34 32h18"/></g><path d="M32 22l-2 6 4 2-2 6" opacity=".6"/>`,
-    bend:    `<path d="M32 52V34"/><g ${A('kBend', 1.8, 'transform-origin:32px 34px;transform-box:view-box')}><path d="M32 34V12"/></g>`,
-    lead:    `<path d="M10 44q22-28 44-8" opacity=".25"/><g ${A('kRight', 2)}><circle cx="32" cy="30" r="5" fill="currentColor"/><circle cx="22" cy="34" r="3"/><circle cx="14" cy="38" r="2"/></g>`,
-    build:   `<path d="M10 52h44" opacity=".3"/><rect x="22" y="40" width="20" height="10" rx="1" fill="currentColor" ${A('kStack1', 2.4)}/><rect x="22" y="28" width="20" height="10" rx="1" fill="currentColor" opacity=".75" ${A('kStack2', 2.4)}/><rect x="22" y="16" width="20" height="10" rx="1" fill="currentColor" opacity=".5" ${A('kStack3', 2.4)}/>`,
-    stand:   `<path d="M10 52h44" opacity=".3"/><g ${A('kRise', 1.8, 'transform-origin:32px 52px;transform-box:view-box')}><circle cx="32" cy="16" r="5" fill="currentColor"/><path d="M32 21v18m0 0-7 13m7-13 7 13m-7-24-8 6m8-6 8 6"/></g>`,
-    sit:     `<path d="M18 52V36h20v16M18 36h20" opacity=".4"/><g ${A('kDrop', 1.8)}><circle cx="28" cy="18" r="4" fill="currentColor"/><path d="M28 22v12h10v10"/></g>`,
-    flow:    `<g ${A('kFlow', 1.4, 'animation-direction:alternate')}><path d="M8 26q6-6 12 0t12 0 12 0 12 0"/><path d="M8 38q6-6 12 0t12 0 12 0 12 0" opacity=".6"/></g>`,
-    run:     `<g ${A('kRight', 1.2)}><circle cx="34" cy="16" r="4" fill="currentColor"/><path d="M33 20l-3 14m0 0-8 10m8-10 9 6v8m-6-24-9 4m9-4 8 6"/></g>`,
-    grow:    `<path d="M10 52h44" opacity=".3"/><g ${A('kGrow', 2, 'transform-origin:32px 52px;transform-box:view-box')}><path d="M32 52V24"/><path d="M32 34q-12-2-14-14q12 2 14 14zm0-6q12-2 14-14q-12 2-14 14z" fill="currentColor" opacity=".7"/></g>`,
-    die:     `<path d="M10 52h44" opacity=".3"/><path d="M32 52V36"/><g ${A('kDroop', 2.2, 'transform-origin:32px 36px;transform-box:view-box')}><path d="M32 36V22"/><circle cx="32" cy="18" r="6" fill="currentColor" opacity=".7"/></g>`,
-    light:   `<circle cx="32" cy="32" r="8" fill="currentColor"/><g ${A('kGlow', 1.6)}><path d="M32 10v8M32 46v8M10 32h8M46 32h8M16 16l6 6M42 42l6 6M48 16l-6 6M22 42l-6 6"/></g>`,
-    heart:   `<g ${A('kBeat', 1.2)}><path d="M32 48S14 36 14 24a9 9 0 0 1 18-2 9 9 0 0 1 18 2c0 12-18 24-18 24z" fill="currentColor" opacity=".85"/></g>`,
-    hand:    `<g ${A('kWave', 1.4, 'transform-origin:32px 50px;transform-box:view-box')}><path d="M24 50V30m0 0v-12m0 12h16V22m0 10V18m-8 12V14m-8 16-6-6"/></g>`,
-    head:    `<g ${A('kTurn', 2.2)}><circle cx="32" cy="28" r="12"/><circle cx="28" cy="26" r="1.8" fill="currentColor"/><circle cx="36" cy="26" r="1.8" fill="currentColor"/></g><path d="M24 46h16" opacity=".5"/>`,
-    no:      `<circle cx="32" cy="32" r="18"/><path d="M19 45L45 19" stroke-dasharray="120" ${A('kDraw', 1.6, 'animation-iteration-count:1;animation-fill-mode:both')}/>`,
-    out:     `<path d="M12 18h22v28H12z" opacity=".55"/><g ${A('kOut', 1.8)}><circle cx="24" cy="32" r="6" fill="currentColor"/></g>`,
-    in:      `<path d="M30 18h22v28H30z" opacity=".55"/><g ${A('kIn', 1.8)}><circle cx="40" cy="32" r="6" fill="currentColor"/></g>`,
-    down:    `<g ${A('kDown', 1.6)}><path d="M32 14v34m-10-10 10 10 10-10"/></g>`,
-    up:      `<g ${A('kUp', 1.6)}><path d="M32 50V16m-10 10 10-10 10 10"/></g>`,
-    between: `<circle cx="14" cy="32" r="5"/><circle cx="50" cy="32" r="5"/><g ${A('kFlow', 1.2, 'animation-direction:alternate')}><circle cx="32" cy="32" r="4" fill="currentColor"/></g>`,
-    through: `<path d="M32 12v40" stroke-width="4" opacity=".35"/><g ${A('kThrough', 1.6, 'animation-timing-function:linear')}>${ARROW('')}</g>`,
-    together:`<g ${A('kInL', 1.8, 'animation-direction:alternate')}><circle cx="24" cy="32" r="9" fill="currentColor" opacity=".55"/></g><g ${A('kInR', 1.8, 'animation-direction:alternate')}><circle cx="40" cy="32" r="9" fill="currentColor" opacity=".55"/></g>`,
-    apart:   `<g ${A('kApartL', 1.6, 'animation-direction:alternate')}><path d="M30 16v32H16q-4-16 14-32z" fill="currentColor" opacity=".6"/></g><g ${A('kApartR', 1.6, 'animation-direction:alternate')}><path d="M34 16v32h14q4-16-14-32z" fill="currentColor" opacity=".6"/></g>`,
-    forward: `<g ${A('kRight', 1.4)}><path d="M18 22l10 10-10 10M30 22l10 10-10 10"/></g>`,
-    backward:`<g ${A('kLeft', 1.4)}><path d="M46 22 36 32l10 10M34 22 24 32l10 10"/></g>`,
-    against: `<g ${A('kClashL', 1.2)}><path d="M10 32h16m-6-6 6 6-6 6"/></g><g ${A('kClashR', 1.2)}><path d="M54 32H38m6-6-6 6 6 6"/></g>`,
-    boost:   `<g ${A('kBeat', 1)}><path d="M32 10l5 15h16l-13 9 5 16-13-10-13 10 5-16-13-9h16z" fill="currentColor" opacity=".8"/></g>`,
-    many:    [0,1,2,3,4].map(i => `<circle cx="${14 + i*9}" cy="${i%2 ? 26 : 38}" r="4" fill="currentColor" ${A('kPop', 1.8, 'animation-delay:' + i*0.15 + 's')}/>`).join(''),
-    one:     `<text x="32" y="44" text-anchor="middle" font-size="32" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>1</text>`,
-    two:     `<text x="32" y="44" text-anchor="middle" font-size="32" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>2</text>`,
-    three:   `<text x="32" y="44" text-anchor="middle" font-size="32" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>3</text>`,
-    ten:     `<text x="32" y="44" text-anchor="middle" font-size="28" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>10</text>`,
-    hundred: `<text x="32" y="42" text-anchor="middle" font-size="22" font-family="Georgia" fill="currentColor" stroke="none" ${A('kPop', 1.6)}>100</text>`,
-    self:    `<circle cx="32" cy="20" r="5" fill="currentColor"/><path d="M32 25v14m0 0-6 10m6-10 6 10"/><g ${A('kSpin', 2.4, 'animation-timing-function:linear;transform-origin:32px 32px;transform-box:view-box')}><path d="M48 32a16 16 0 0 1-4 10" /><path d="M44 46l0-5 5 1"/></g>`,
-    small:   `<g ${A('kShrink', 1.8, 'animation-direction:alternate')}><circle cx="32" cy="32" r="16" fill="currentColor" opacity=".7"/></g>`,
-    big:     `<g ${A('kGrow', 1.8, 'animation-direction:alternate')}><circle cx="32" cy="32" r="18" fill="currentColor" opacity=".7"/></g>`,
-    time:    `<circle cx="32" cy="32" r="18"/><g ${A('kSpin', 3, 'animation-timing-function:linear;transform-origin:32px 32px;transform-box:view-box')}><path d="M32 32V18"/></g><path d="M32 32h8"/>`,
-    earth:   `<circle cx="32" cy="32" r="18"/><g ${A('kFlow', 2, 'animation-direction:alternate')}><path d="M20 26h24M18 34h28M24 42h16"/></g>`,
-    water:   `<g ${A('kFlow', 1.2, 'animation-direction:alternate')}><path d="M8 30q6-6 12 0t12 0 12 0 12 0"/><path d="M8 40q6-6 12 0t12 0 12 0 12 0"/></g><path d="M32 12q-6 8-6 12a6 6 0 0 0 12 0q0-4-6-12z" fill="currentColor" opacity=".5"/>`,
-    fire:    `<g ${A('kFlicker', .8, 'transform-origin:32px 50px;transform-box:view-box')}><path d="M32 50c-10 0-14-8-10-16 2 4 4 4 6 2-2-8 2-14 8-18 0 8 10 12 10 22 0 6-6 10-14 10z" fill="currentColor" opacity=".8"/></g>`,
-    person:  `<g ${A('kDrop', 1.8)}><circle cx="32" cy="18" r="6" fill="currentColor"/><path d="M32 24v16m0 0-8 12m8-12 8 12m-8-22-10 6m10-6 10 6"/></g>`,
-    tagN:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">名词</text>`,
-    tagA:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">…的</text>`,
-    tagV:    `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">动词</text>`,
-    tagAdv:  `<rect x="12" y="20" width="40" height="24" rx="6" ${A('kPop', 2)}/><text x="32" y="38" text-anchor="middle" font-size="15" fill="currentColor" stroke="none">…地</text>`,
-    able:    `<circle cx="32" cy="32" r="16"/><path d="M24 32l6 6 11-12" stroke-dasharray="120" ${A('kDraw', 1.8)}/>`,
-    toward:  `<circle cx="48" cy="32" r="9"/><circle cx="48" cy="32" r="3" fill="currentColor"/><g ${A('kRight', 1.6)}><path d="M8 32h20m-7-7 7 7-7 7"/></g>`,
-    thing:   `<g ${A('kPop', 2)}><path d="M32 12l18 10v20L32 52 14 42V22z"/><path d="M14 22l18 10 18-10M32 32v20"/></g>`,
-    do:      `<path d="M10 52h22" opacity=".4"/><g ${A('kBend', 1, 'transform-origin:42px 50px;transform-box:view-box')}><path d="M42 50V22"/><rect x="30" y="12" width="24" height="10" rx="2" fill="currentColor"/></g>`,
-    road:    `<path d="M20 54 28 10M44 54 36 10"/><path d="M32 52V12" stroke-dasharray="6 6" ${A('kFlow', .8, 'animation-direction:alternate')}/>`,
-    know:    `<path d="M25 42c-6-4-9-9-9-15a16 16 0 0 1 32 0c0 6-3 11-9 15z" fill="currentColor" opacity=".25"/><path d="M25 42c-6-4-9-9-9-15a16 16 0 0 1 32 0c0 6-3 11-9 15zM26 48h12M28 54h8"/><g ${A('kGlow', 1.6)}><path d="M32 2v4M6 27h4M54 27h4M12 8l3 3M52 8l-3 3"/></g>`,
-    seek:    `<g ${A('kLook', 2.2)}><circle cx="28" cy="28" r="12"/><path d="M37 37l12 12" stroke-width="4"/></g>`,
-    part:    `<circle cx="32" cy="32" r="18" opacity=".35"/><g ${A('kApartR', 1.4, 'animation-direction:alternate')}><path d="M32 32V14a18 18 0 0 1 18 18z" fill="currentColor"/></g>`,
-    work:    `<g ${A('kSpin', 3, 'animation-timing-function:linear')}><circle cx="32" cy="32" r="12"/><circle cx="32" cy="32" r="4"/><path d="M32 12v6M32 46v6M12 32h6M46 32h6M18 18l4 4M42 42l4 4M46 18l-4 4M22 42l-4 4"/></g>`,
-    rule:    `<g ${A('kPop', 2)}><path d="M14 44l-2-24 12 10 8-16 8 16 12-10-2 24z" fill="currentColor" opacity=".8"/><path d="M14 50h36"/></g>`,
-    cut:     `<path d="M8 46h48"/><g ${A('kPress', 1.2)}><path d="M28 10h8v22l-4 6-4-6z" fill="currentColor"/></g>`,
-    place:   `<g ${A('kPop', 2)}><path d="M12 30 32 13l20 17v20H12z"/><path d="M27 50V38h10v12"/></g>`,
-    power:   `<g ${A('kBeat', 1)}><path d="M36 8 18 36h12l-4 20 20-30H34z" fill="currentColor" opacity=".85"/></g>`,
-    straight:`<path d="M20 54h24" opacity=".4"/><path d="M32 54V10" stroke-dasharray="120" ${A('kDraw', 1.6)}/>`,
-    new:     `<g ${A('kPop', 1.6)}><path d="M32 10l4 18 18 4-18 4-4 18-4-18-18-4 18-4z" fill="currentColor" opacity=".85"/></g>`,
-    value:   `<g ${A('kTurn', 2.4)}><circle cx="32" cy="32" r="17"/><text x="32" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="currentColor" stroke="none">¥</text></g>`,
-    line:    `<path d="M8 32h48" stroke-dasharray="120" ${A('kDraw', 1.6)}/><circle cx="8" cy="32" r="3" fill="currentColor"/>`,
-    around:  `<circle cx="32" cy="32" r="16" stroke-dasharray="4 5"/><circle cx="32" cy="32" r="4" fill="currentColor" opacity=".5"/><g ${A('kSpin', 2.4, 'animation-timing-function:linear;transform-origin:32px 32px;transform-box:view-box')}><circle cx="32" cy="16" r="4.5" fill="currentColor"/></g>`,
-    ball:    `<circle cx="32" cy="32" r="17"/><ellipse cx="32" cy="32" rx="17" ry="6"/><g ${A('kTurn', 2.4)}><ellipse cx="32" cy="32" rx="6" ry="17"/></g>`,
-    measure: `<rect x="8" y="34" width="48" height="13" rx="2"/><path d="M16 34v5M24 34v3M32 34v5M40 34v3M48 34v5"/><g ${A('kRise', 1.8, 'transform-origin:32px 22px;transform-box:view-box;animation-name:kGrow')}><path d="M10 22h44M10 22l5-5m-5 5 5 5M54 22l-5-5m5 5-5 5"/></g>`,
-    prick:   `<path d="M10 46h44" opacity=".4"/><g ${A('kPress', 1)}><path d="M32 8v32" stroke-width="2"/><circle cx="32" cy="10" r="2.5"/></g>`,
-    choose:  `<rect x="8" y="24" width="12" height="14" rx="2" opacity=".5"/><rect x="44" y="24" width="12" height="14" rx="2" opacity=".5"/><g ${A('kPop', 1.6)}><rect x="24" y="20" width="16" height="20" rx="2" fill="currentColor" opacity=".85"/></g><path d="M26 50l4 4 8-8" opacity=".8"/>`,
-    side:    `<rect x="12" y="14" width="22" height="36" rx="2" opacity=".5"/><g ${A('kBeat', 1.4)}><circle cx="45" cy="32" r="6" fill="currentColor"/></g>`,
-    equal:   `<g ${A('kPop', 1.6)}><path d="M16 26h32M16 38h32" stroke-width="4"/></g>`,
-    good:    `<circle cx="32" cy="32" r="18"/><circle cx="25" cy="27" r="2" fill="currentColor"/><circle cx="39" cy="27" r="2" fill="currentColor"/><path d="M23 37q9 9 18 0" ${A('kBeat', 1.4)}/>`,
-    bad:     `<circle cx="32" cy="32" r="18"/><circle cx="25" cy="27" r="2" fill="currentColor"/><circle cx="39" cy="27" r="2" fill="currentColor"/><path d="M23 43q9-9 18 0" ${A('kBeat', 1.4)}/>`,
-    wrong:   `<path d="M18 18l28 28M46 18 18 46" stroke-width="4" stroke-dasharray="120" ${A('kDraw', 1.6)}/>`,
-    far:     `<path d="M8 32h30" stroke-dasharray="3 5"/><g ${A('kShrink', 1.8, 'animation-direction:alternate;transform-origin:48px 32px;transform-box:view-box')}><circle cx="48" cy="32" r="7" fill="currentColor"/></g>`,
-    hang:    `<path d="M12 10h40"/><g ${A('kTurn', 2.4, 'transform-origin:32px 10px;transform-box:view-box;animation-name:kLook')}><path d="M32 10v24"/><rect x="24" y="34" width="16" height="12" rx="2" fill="currentColor" opacity=".8"/></g>`,
-    full:    `<path d="M18 14h28l-4 36H22z"/><g ${A('kRise', 2, 'transform-origin:32px 48px;transform-box:view-box')}><path d="M21 24h22l-3 24H24z" fill="currentColor" opacity=".7"/></g>`,
-    hear:    `<path d="M24 46c0-6 12-8 12-18a10 10 0 0 0-20 0"/><path d="M24 30a4 4 0 0 1 6-4"/><g ${A('kGlow', 1.4)}><path d="M44 22q4 6 0 12M50 17q7 11 0 22"/></g>`,
-    push:    `<path d="M10 32h14m-5-5 5 5-5 5"/><g ${A('kFlow', 1.2, 'animation-direction:alternate')}><rect x="30" y="22" width="20" height="20" rx="2" fill="currentColor" opacity=".8"/></g>`,
-    close:   `<g ${A('kInL', 1.6, 'animation-direction:alternate')}><rect x="12" y="14" width="19" height="36" rx="1"/></g><g ${A('kInR', 1.6, 'animation-direction:alternate')}><rect x="33" y="14" width="19" height="36" rx="1"/></g>`,
-    boat:    `<g ${A('kFlow', 1.6, 'animation-direction:alternate')}><path d="M12 38h40l-6 10H18z" fill="currentColor" opacity=".8"/><path d="M32 38V12l12 20H32"/></g><path d="M6 54q6-4 12 0t12 0 12 0 12 0" opacity=".5"/>`,
-    empty:   `<rect x="16" y="16" width="32" height="32" rx="3" stroke-dasharray="5 5" ${A('kGlow', 1.8)}/>`,
-    breathe: `<g ${A('kFlow', 1.6, 'animation-direction:alternate')}><path d="M10 24h28a6 6 0 1 0-6-6M10 34h36a6 6 0 1 1-6 6M10 44h18"/></g>`,
-    give:    `<path d="M8 48h16l8-6" opacity=".6"/><g ${A('kRight', 1.8)}><rect x="20" y="22" width="18" height="16" rx="2" fill="currentColor" opacity=".85"/><path d="M29 22v16M20 28h18" stroke="var(--paper)"/></g>`,
-    shape:   `<g ${A('kPop', 1.8)}><path d="M10 46 21 26l11 20z"/></g><g ${A('kPop', 1.8, 'animation-delay:.3s')}><circle cx="44" cy="36" r="9"/></g><g ${A('kPop', 1.8, 'animation-delay:.6s')}><rect x="26" y="10" width="12" height="12" rx="1"/></g>`,
-    bound:   `<path d="M12 20v30M24 20v30M36 20v30M48 20v30M6 28h50M6 42h50"/><g ${A('kClashL', 1.2)}><circle cx="30" cy="12" r="3.5" fill="currentColor"/></g>`,
-    shield:  `<g ${A('kBeat', 1.6)}><path d="M32 10l18 6v14c0 12-8 20-18 24-10-4-18-12-18-24V16z" fill="currentColor" opacity=".25"/><path d="M32 10l18 6v14c0 12-8 20-18 24-10-4-18-12-18-24V16z"/><path d="M25 32l5 5 10-11"/></g>`,
-    sleep:   `<path d="M10 46h44" opacity=".3"/><path d="M14 46v-8h36v8M14 38q0-6 8-6h6v6" /><g ${A('kGlow', 1.8)}><text x="44" y="24" font-size="14" font-weight="700" fill="currentColor" stroke="none">z</text><text x="50" y="14" font-size="10" font-weight="700" fill="currentColor" stroke="none">z</text></g>`,
-    eat:     `<circle cx="32" cy="32" r="18"/><g ${A('kPress', .9, 'transform-origin:32px 32px;transform-box:view-box;animation-name:kBlink')}><path d="M32 32 50 22v20z" fill="var(--paper)" stroke="none"/></g><circle cx="30" cy="22" r="2" fill="currentColor"/>`,
-    compass: `<circle cx="32" cy="32" r="18"/><g ${A('kTurn', 2.4)}><path d="M32 16l5 16-5 16-5-16z" fill="currentColor" opacity=".8"/></g><path d="M32 8v4M32 52v4M8 32h4M52 32h4" opacity=".5"/>`,
-    heal:    `<g ${A('kBeat', 1.2)}><path d="M26 14h12v12h12v12H38v12H26V38H14V26h12z" fill="currentColor" opacity=".8"/></g>`,
-    law:     `<path d="M32 12v38M20 50h24M12 20h40"/><g ${A('kTurn', 2.4, 'transform-origin:32px 20px;transform-box:view-box;animation-name:kLook')}><path d="M12 20l-6 14h12zM52 20l-6 14h12z"/></g>`,
-    twist:   `<path d="M12 32h6M46 32h6" opacity=".5"/><g ${A('kTurn', 1.6)}><path d="M18 22q14 0 14 10t14 10M18 42q14 0 14-10t14-10"/></g>`,
-    hard:    `<rect x="18" y="30" width="28" height="20" rx="2" fill="currentColor" opacity=".8"/><g ${A('kPress', 1)}><path d="M32 8v14"/><rect x="24" y="8" width="16" height="7" rx="1"/></g><g ${A('kGlow', 1)}><path d="M12 26l4 3M52 26l-4 3"/></g>`,
-    soft:    `<path d="M10 50h44" opacity=".3"/><g ${A('kBeat', 1.8, 'transform-origin:32px 50px;transform-box:view-box')}><path d="M14 50q0-22 18-22t18 22z" fill="currentColor" opacity=".35"/><path d="M14 50q0-22 18-22t18 22"/></g>`,
-    angle:   `<path d="M12 50h40M12 50 44 14"/><path d="M30 50a18 18 0 0 0-6-13" stroke-dasharray="40" ${A('kDraw', 1.6)}/>`,
-    surface: `<path d="M8 40 24 28h32L40 40z" opacity=".5"/><g ${A('kGlow', 1.8)}><path d="M8 40 24 28h32L40 40z" fill="currentColor" opacity=".35"/></g>`,
-    feather: `<g ${A('kFlow', 2.2, 'animation-direction:alternate')}><path d="M20 46q4-26 26-32-2 22-26 32zM20 46l14-18"/></g><path d="M10 54h44" opacity=".3"/>`,
-    stable:  `<path d="M8 52h48"/><g ${A('kStack1', 2)}><rect x="14" y="40" width="36" height="12" rx="1" fill="currentColor" opacity=".8"/></g><g ${A('kStack2', 2)}><rect x="20" y="28" width="24" height="12" rx="1"/></g><g ${A('kStack3', 2)}><rect x="26" y="16" width="12" height="12" rx="1"/></g>`,
-    pure:    `<path d="M32 10q16 20 16 30a16 16 0 0 1-32 0q0-10 16-30z"/><g ${A('kGlow', 1.6)}><path d="M48 14l2-5 2 5 5 2-5 2-2 5-2-5-5-2z" fill="currentColor"/></g>`,
-    slide:   `<path d="M6 20l52 30" opacity=".6"/><g ${A('kRight', 1.8)}><circle cx="16" cy="20" r="5" fill="currentColor"/></g>`,
-    snow:    `<g ${A('kDrop', 2.2)}><path d="M20 10v12M14 13l12 6M26 13l-12 6"/></g><g ${A('kDrop', 2.2, 'animation-delay:.7s')}><path d="M42 18v12M36 21l12 6M48 21l-12 6"/></g><path d="M8 54h48" opacity=".4"/>`,
-    wind:    `<g ${A('kFlow', 1.4, 'animation-direction:alternate')}><path d="M8 24h30a6 6 0 1 0-6-6M8 34h40a6 6 0 1 1-6 6M8 44h22"/></g>`,
-    bird:    `<g ${A('kUp', 2.2, 'animation-direction:alternate')}><path d="M10 32q11-12 22 0q11-12 22 0" stroke-width="3.5"/></g>`,
-    jump:    `<path d="M10 54h44" opacity=".4"/><g ${A('kUp', .9, 'animation-direction:alternate;animation-timing-function:ease-out')}><circle cx="32" cy="40" r="7" fill="currentColor"/></g>`,
-    sing:    `<g ${A('kBeat', 1.2)}><path d="M26 44V16l16-4v28" /><circle cx="22" cy="44" r="5" fill="currentColor"/><circle cx="38" cy="40" r="5" fill="currentColor"/></g>`,
-    bed:     `<path d="M8 46V22M8 38h48v8M56 46V34"/><g ${A('kBeat', 2.4)}><rect x="12" y="30" width="12" height="8" rx="3" fill="currentColor" opacity=".7"/></g>`,
-    board:   `<g ${A('kPop', 1.8)}><rect x="8" y="26" width="48" height="12" rx="2" fill="currentColor" opacity=".25"/><rect x="8" y="26" width="48" height="12" rx="2"/><path d="M20 26v12M32 26v12M44 26v12" opacity=".5"/></g>`,
-    speed:   `<g ${A('kRight', .9)}><circle cx="40" cy="32" r="7" fill="currentColor"/><path d="M8 26h18M12 32h14M8 38h18" opacity=".7"/></g>`,
-    pile:    `<path d="M8 54h48" opacity=".4"/><g ${A('kStack1', 2)}><rect x="16" y="42" width="32" height="10" rx="2" fill="currentColor" opacity=".8"/></g><g ${A('kStack2', 2)}><rect x="19" y="31" width="26" height="10" rx="2" fill="currentColor" opacity=".6"/></g><g ${A('kStack3', 2)}><rect x="23" y="20" width="18" height="10" rx="2" fill="currentColor" opacity=".45"/></g>`,
-    stick:   `<rect x="12" y="38" width="40" height="8" rx="2" opacity=".6"/><g ${A('kPress', 1.4)}><rect x="22" y="22" width="20" height="14" rx="3" fill="currentColor" opacity=".8"/></g><path d="M24 38v4M32 38v5M40 38v4" stroke-width="2"/>`,
-    center:  `<circle cx="32" cy="32" r="20" opacity=".4"/><circle cx="32" cy="32" r="12" opacity=".7"/><g ${A('kBeat', 1.2)}><circle cx="32" cy="32" r="5" fill="currentColor"/></g>`,
-    flask:   `<path d="M26 10h12M28 10v14L16 48a4 4 0 0 0 4 6h24a4 4 0 0 0 4-6L36 24V10"/><g ${A('kRise', 2)}><path d="M20 44h24l2 4a3 3 0 0 1-3 4H21a3 3 0 0 1-3-4z" fill="currentColor" opacity=".6"/></g><g ${A('kGlow', 1.2)}><circle cx="30" cy="38" r="2" fill="currentColor"/><circle cx="35" cy="33" r="1.5" fill="currentColor"/></g>`,
-    free:    `<path d="M14 54V26a12 12 0 0 1 24 0v28M14 54h24M20 26v28M26 22v32M32 26v28" opacity=".5"/><g ${A('kUp', 1.8, 'animation-direction:alternate')}><path d="M36 22q6-7 12 0q6-7 12 0" stroke-width="3"/></g>`,
-    table:   `<g ${A('kPop', 1.8)}><rect x="10" y="14" width="44" height="36" rx="2"/><path d="M10 26h44M10 38h44M25 14v36M40 14v36"/></g><g ${A('kBlink', 1.6)}><rect x="26" y="27" width="13" height="10" fill="currentColor" opacity=".5" stroke="none"/></g>`,
-    moon:    `<g ${A('kGlow', 2.2)}><path d="M40 12a20 20 0 1 0 12 30A16 16 0 0 1 40 12z" fill="currentColor" opacity=".8"/></g><g ${A('kGlow', 1.4, 'animation-delay:.5s')}><path d="M16 16l1.5 3 3 1.5-3 1.5-1.5 3-1.5-3-3-1.5 3-1.5z" fill="currentColor"/></g>`,
-    door:    `<rect x="18" y="10" width="28" height="44" rx="1" opacity=".5"/><g ${A('kTurn', 2.2, 'transform-origin:18px 32px;transform-box:view-box;animation-name:kLook')}><rect x="18" y="10" width="28" height="44" rx="1" fill="currentColor" opacity=".35"/><circle cx="40" cy="34" r="2" fill="currentColor"/></g>`,
-    net:     `<g ${A('kBeat', 2)}><path d="M10 14h44M10 26h44M10 38h44M10 50h44M14 10v44M26 10v44M38 10v44M50 10v44" opacity=".75"/></g>`,
-    shake:   `<g ${A('kClashL', .25, 'animation-direction:alternate')}><path d="M24 50V30a8 8 0 0 1 16 0v20M20 50h24"/><circle cx="32" cy="18" r="6"/></g><path d="M12 24l-4 4 4 4M52 24l4 4-4 4" opacity=".6"/>`,
-    stone:   `<path d="M8 52h48" opacity=".4"/><g ${A('kDrop', 1.8)}><path d="M18 46l4-14 12-6 12 6 2 14z" fill="currentColor" opacity=".7"/></g>`,
+  const EASE = 'cubic-bezier(.45,0,.25,1)';
+  // S(关键帧, 时长, 自定义变量, 相对本块出现的延迟, 其他样式)
+  const S = (kf, dur = 2.8, vars = '', delay = 0, more = '') =>
+    `style="${vars ? vars.replace(/;?$/, ';') : ''}animation:${kf} ${dur}s ${EASE} calc(var(--d, 0ms) + ${(delay + .35).toFixed(2)}s) infinite both${more ? ';' + more : ''}"`;
+  const G = (style, inner) => `<g ${style}>${inner}</g>`;
+  const O = (x, y) => `transform-origin:${x}px ${y}px;transform-box:view-box`;
+  const LIN = 'animation-timing-function:linear';
+  const BOT = 'transform-origin:50% 100%';
+  const DRAW = 'pathLength="100" stroke-dasharray="100"';
+  const f1 = v => +v.toFixed(1);
+  // 主角小豆子：cls 可加 mute（灰色）、brow（皱眉）
+  const bean = (x, y, r = 7, cls = '') => {
+    const ex = r * .38, ey = y - r * .15, er = f1(Math.max(1.1, r * .2));
+    const brow = /brow/.test(cls) ? `<path d="M${f1(x - r * .7)} ${f1(y - r * .62)}l${f1(r * .45)} ${f1(r * .22)}M${f1(x + r * .7)} ${f1(y - r * .62)}l${f1(-r * .45)} ${f1(r * .22)}" stroke="var(--paper)" stroke-width="1.6"/>` : '';
+    return `<g class="bean${cls ? ' ' + cls : ''}"><circle cx="${x}" cy="${y}" r="${r}" class="ff"/><circle cx="${f1(x - ex)}" cy="${f1(ey)}" r="${er}" class="pf"/><circle cx="${f1(x + ex)}" cy="${f1(ey)}" r="${er}" class="pf"/>${brow}</g>`;
   };
+  // 小人剪影：脚踩在 (x, y)
+  const man = (x, y, k = 1, cls = 'ff') => `<circle cx="${x}" cy="${f1(y - 30 * k)}" r="${f1(6 * k)}" class="${cls}"/><path class="${cls}" d="M${f1(x - 11 * k)} ${y}v${f1(-9 * k)}a${f1(11 * k)} ${f1(11 * k)} 0 0 1 ${f1(22 * k)} 0v${f1(9 * k)}z"/>`;
+  const star4 = (x, y, r) => `<path class="ff" d="M${x} ${y - r}Q${x} ${y} ${x + r} ${y}Q${x} ${y} ${x} ${y + r}Q${x} ${y} ${x - r} ${y}Q${x} ${y} ${x} ${y - r}z"/>`;
+  const burst = (x, y, r) => `<path stroke-width="2.5" d="${[0, 60, 120, 180, 240, 300].map(a => { const c = Math.cos(a * Math.PI / 180), s = Math.sin(a * Math.PI / 180); return `M${f1(x + c * r * .45)} ${f1(y + s * r * .45)}L${f1(x + c * r)} ${f1(y + s * r)}`; }).join('')}"/>`;
+  const wave = (y, cls = '') => { let d = `M-16 ${y}`; for (let x = -16; x < 80; x += 16) d += 'q4 -4.5 8 0t8 0'; return `<path${cls ? ` class="${cls}"` : ''} d="${d}"/>`; };
+  const slideWave = (y, cls, dur) => G(S('qSlide', dur, '--x1:-16px', 0, LIN), wave(y, cls));
+  const HEART = 'M32 50S13 38 13 25a9.5 9.5 0 0 1 19-3 9.5 9.5 0 0 1 19 3c0 13-19 25-19 25z';
+  const GROUND = '<path class="mu" d="M6 54h52"/>';
+  const rays = (cx, cy, r0, r1, n = 8) => `<path d="${Array.from({length: n}, (_, i) => { const a = i * 2 * Math.PI / n, c = Math.cos(a), s = Math.sin(a); return `M${f1(cx + c * r0)} ${f1(cy + s * r0)}L${f1(cx + c * r1)} ${f1(cy + s * r1)}`; }).join('')}"/>`;
+  const gear = (cx, cy, r, n) => { const dash = f1(Math.PI * r / n); return `<circle cx="${cx}" cy="${cy}" r="${r}" stroke-width="6" stroke-dasharray="${dash} ${dash}" stroke-linecap="butt"/><circle cx="${cx}" cy="${cy}" r="${r - 2}" class="sf" stroke-width="2.5"/><circle cx="${cx}" cy="${cy}" r="${f1(r * .32)}" class="pf" stroke="currentColor" stroke-width="2.5"/>`; };
+  const num = (t, size) => `<circle cx="32" cy="32" r="20" class="sf"/>` + G(S('qBeat', 2.8, '--s1:1.18'), `<text x="32" y="${f1(32 + size * .35)}" text-anchor="middle" font-size="${size}" font-family="Georgia,serif" font-weight="700" class="ff">${t}</text>`);
+  // 小鸟：身子、头、喙、尾巴，翅膀上下扇
+  const birdArt = (x, y, k) => `<path class="ff" d="M${f1(x - 7 * k)} ${y}l${f1(-6 * k)} ${f1(-4 * k)}v${f1(7 * k)}z"/><ellipse cx="${x}" cy="${y}" rx="${f1(8 * k)}" ry="${f1(5.5 * k)}" class="ff"/><circle cx="${f1(x + 7 * k)}" cy="${f1(y - 4 * k)}" r="${f1(4 * k)}" class="ff"/><path class="ff" d="M${f1(x + 10.5 * k)} ${f1(y - 5 * k)}l${f1(4 * k)} ${f1(1.2 * k)}-${f1(4 * k)} ${f1(1.6 * k)}z"/><circle cx="${f1(x + 8 * k)}" cy="${f1(y - 5 * k)}" r="${f1(1.1 * k)}" class="pf"/>` +
+    G(S('qFlap', .5, '', 0, O(x, f1(y - 2 * k))), `<path class="sf" d="M${f1(x - 5 * k)} ${f1(y - 2 * k)}q${f1(2 * k)} ${f1(-12 * k)} ${f1(11 * k)} ${f1(-11 * k)}q${f1(-3 * k)} ${f1(5 * k)} ${f1(-5 * k)} ${f1(11 * k)}z" stroke-width="2"/>`);
+  const flame = (cls = 'ff') => `<path class="${cls}" d="M32 54c-11 0-16-8-12-18 2 4 5 5 7 3-2-9 2-16 9-21 0 9 11 13 11 24 0 7-6 12-15 12z"/>`;
+  const ANIM = {
+    // ---- 方向、位置（前缀里最常见）----
+    out:     `<path class="mf" d="M10 16h24v32H10z"/><path class="mu" d="M34 16H10v32h24"/>` + G(S('qGo', 2.8, '--x1:28px'), bean(21, 32)),
+    in:      `<path class="mf" d="M30 16h24v32H30z"/><path class="mu" d="M30 16h24v32H30"/>` + G(S('qGo', 2.8, '--x1:30px'), bean(12, 32)),
+    down:    GROUND + `<path class="mu" d="M16 12v24" stroke-dasharray="3 4"/><path class="mu" d="M11 31l5 6 5-6"/>` + G(S('qDrop', 2.8, '--y0:-30px', 0, BOT), bean(36, 46, 8)),
+    up:      `<path class="mu" d="M6 32h52" stroke-dasharray="4 4"/><path class="mu" d="M52 46V20M47 25l5-5 5 5"/>` + G(S('qGo', 2.8, '--y1:-30px'), bean(30, 47, 7)),
+    forward: GROUND + `<path class="mu" d="M24 18v36" stroke-dasharray="3 4"/><circle cx="14" cy="45" r="7" class="mu" stroke-dasharray="3 3"/>` + G(S('qGo', 2.8, '--x1:32px'), bean(14, 45)),
+    backward:GROUND + `<path class="mu" d="M40 18v36" stroke-dasharray="3 4"/><circle cx="50" cy="45" r="7" class="mu" stroke-dasharray="3 3"/>` + G(S('qGo', 2.8, '--x1:-32px'), bean(50, 45)),
+    back:    `<path class="mu" d="M14 24h28a8 8 0 0 1 0 16H14" stroke-dasharray="3 4"/><path class="mu" d="M19 35l-5 5 5 5"/>` + G(S('qU'), bean(14, 24, 6)),
+    again:   `<circle cx="32" cy="32" r="15" class="mu" stroke-dasharray="4 4"/><path class="mu" d="M28 13l4 4-4 4"/><text x="32" y="37" text-anchor="middle" font-size="13" font-family="Georgia,serif" font-weight="700" class="ff" opacity=".55">×2</text>` + G(S('qSpin2', 2.8, '', 0, O(32, 32)), bean(32, 17, 5)),
+    together:G(S('qPing', 2.8, '--x0:-12px;--x1:0px'), bean(25, 38)) + G(S('qPing', 2.8, '--x0:12px;--x1:0px'), bean(39, 38)) + G(S('qMid', 2.8, '', 0, O(32, 19)), `<path class="ff" transform="translate(32 19) scale(.32) translate(-32 -32)" d="${HEART}"/>`),
+    apart:   G(S('qPing', 2.8, '--x1:-8px'), `<path class="sf" d="M12 20h20l-3 7 4 5-3 7 3 5H12z"/>`) + G(S('qPing', 2.8, '--x1:8px'), `<path class="sf" d="M32 20h20v24H33l-3-5 3-7-4-5z"/>`),
+    between: GROUND + `<rect x="6" y="22" width="8" height="32" rx="2" class="mf"/><rect x="50" y="22" width="8" height="32" rx="2" class="mf"/>` + G(S('qPing', 2.8, '--x0:-11px;--x1:11px'), bean(32, 47, 6)),
+    through: `<path class="mf" d="M28 4h8v22h-8zM28 38h8v22h-8z"/>` + G(S('qGo', 2.8, '--x1:40px'), bean(12, 32, 5)),
+    toward:  `<circle cx="48" cy="32" r="11" class="mu"/><circle cx="48" cy="32" r="6" class="mu"/><circle cx="48" cy="32" r="2.5" class="ff"/>` + G(S('qGo', 2.8, '--x1:20px'), bean(14, 32, 6)) + G(S('qLate', 2.8, '', 0, O(48, 32)), `<circle cx="48" cy="32" r="15" stroke-width="2"/>`),
+    against: `<path class="mu" d="M6 22h9m-3-3 3 3-3 3M58 22h-9m3-3-3 3 3 3"/>` + G(S('qPing', 2.8, '--x0:-8px;--x1:0px'), bean(25, 40, 7, 'brow')) + G(S('qPing', 2.8, '--x0:8px;--x1:0px'), bean(39, 40, 7, 'brow')) + G(S('qMid', 2.8, '', 0, O(32, 24)), burst(32, 24, 9)),
+    side:    GROUND + `<rect x="10" y="22" width="22" height="32" rx="2" class="mf"/>` + G(S('qGo', 2.8, '--x0:10px;--y0:-22px'), bean(44, 47)),
+    around:  `<circle cx="32" cy="32" r="18" class="mu" stroke-dasharray="3 4"/>` + bean(32, 32, 7, 'mute') + G(S('qSpin', 2.8, '', 0, O(32, 32) + ';' + LIN), `<circle cx="32" cy="14" r="4.5" class="ff"/>`),
+    center:  `<circle cx="32" cy="32" r="21" class="mu"/><circle cx="32" cy="32" r="13" class="mu"/>` + G(S('qDrop', 2.8, '--y0:-26px', 0, BOT), bean(32, 32, 6)) + G(S('qLate', 2.8, '', 0, O(32, 32)), `<circle cx="32" cy="32" r="9" stroke-width="2"/>`),
+    far:     `<path class="mu" d="M6 56L28 20M58 56L36 20"/>` + G(S('qGo', 2.8, '--y1:-22px;--s1:.35'), bean(32, 44, 9)),
+    come:    `<path class="mu" d="M6 56L28 20M58 56L36 20"/>` + G(S('qGo', 2.8, '--y0:-22px;--s0:.35'), bean(32, 44, 9)),
+    // ---- 程度、数量、否定 ----
+    no:      G(S('qNo'), `<circle cx="32" cy="32" r="19" class="sf" stroke-width="4"/>` + bean(32, 32, 8, 'mute') + `<path d="M19 45L45 19" stroke-width="4.5" ${DRAW} ${S('qDraw')}/>`),
+    boost:   [[12, 10], [23, 18], [34, 26], [45, 34]].map(([x, h], i) => `<rect x="${x}" y="${52 - h}" width="8" height="${h}" rx="2" class="mu" stroke-width="1.5"/>` + G(S('qGrowY', 2.8, '', i * .16, BOT), `<rect x="${x}" y="${52 - h}" width="8" height="${h}" rx="2" class="ff"/>`)).join('') + G(S('qLate', 2.8, '', .35, O(54, 12)), star4(54, 12, 6)),
+    able:    `<circle cx="32" cy="32" r="20" class="sf"/><path d="M21 33l7 7 15-16" stroke-width="4.5" ${DRAW} ${S('qDraw')}/>` + G(S('qLate', 2.8, '', .1, O(52, 13)), star4(52, 13, 5)) + G(S('qLate', 2.8, '', .25, O(12, 50)), star4(12, 50, 3.5)),
+    small:   `<path class="mu" d="M9 9l9 9m0-6v6h-6M55 9l-9 9m0-6v6h6M9 55l9-9m0 6v-6h-6M55 55l-9-9m0 6v-6h6"/>` + G(S('qPing', 2.8, '--s0:1.3;--s1:.5'), bean(32, 32, 10)),
+    big:     `<path class="mu" d="M17 17l-8-8m0 6v-6h6M47 17l8-8m0 6v-6h-6M17 47l-8 8m0-6v6h6M47 47l8 8m0-6v6h-6"/>` + G(S('qPing', 2.8, '--s0:.6;--s1:1.5'), bean(32, 32, 9)),
+    many:    [[18, 44, 6], [31, 46, 6], [44, 44, 6], [24, 32, 5.5], [38, 32, 5.5], [31, 20, 5]].map(([x, y, r], i) => G(S('qPopHold', 2.8, '', i * .12, O(x, y)), bean(x, y, r))).join(''),
+    one:     num('1', 30), two: num('2', 30), three: num('3', 30), ten: num('10', 24), hundred: num('100', 18),
+    full:    `<path d="M18 12h28l-4 42H22z"/>` + G(S('qGrowY', 2.8, '', 0, BOT), `<path class="ff" d="M20.5 22h23l-2.8 30H23.3z" opacity=".8"/>`) + G(S('qLate', 2.8, '', 0, O(32, 18)), `<path class="mu" d="M24 16h16" stroke-dasharray="2 3"/>`),
+    empty:   `<path d="M14 26v26h36V26"/><path class="mu" d="M14 26l-6-8M50 26l6-8"/>` + G(S('qFade', 1.8, '--o0:.15'), `<rect x="20" y="32" width="24" height="14" rx="2" class="mu" stroke-dasharray="3 3"/>`) + G(S('qGo', 2.8, '--y1:-14px'), `<circle cx="29" cy="24" r="1.8" class="mf"/><circle cx="36" cy="20" r="1.3" class="mf"/>`),
+    part:    `<path class="sf" d="M32 32h19a19 19 0 1 1-19-19z"/>` + G(S('qPing', 2.8, '--x1:6px;--y1:-6px'), `<path class="ff" d="M32 32V13a19 19 0 0 1 19 19z"/>`),
+    // ---- 人和身体 ----
+    person:  GROUND + G(S('qGo', 2.8, '--y0:12px;--s0:.85'), man(32, 54, 1.05)) + G(S('qLate', 2.8, '', 0, O(50, 20)), star4(50, 20, 5)) + G(S('qLate', 2.8, '', .15, O(14, 26)), star4(14, 26, 3.5)),
+    self:    `<rect x="38" y="10" width="19" height="44" rx="3" class="mf"/><path class="mu" d="M42 17l6-4M42 25l10-7" stroke-width="2"/>` + G(S('qBob', 1.6, '--y1:-4px'), bean(19, 36, 9)) + G(S('qBob', 1.6, '--y1:-4px'), `<g opacity=".5">${bean(47.5, 36, 6)}</g>`),
+    head:    man(32, 60, 1.25) + G(S('qRing', 2.8, '', 0, O(32, 22.5)), `<circle cx="32" cy="22.5" r="11" stroke-width="2"/>`) + G(S('qLate', 2.8, '', .2, O(50, 12)), star4(50, 12, 4.5)),
+    hand:    G(S('qSway', 2.8, '--r0:-14deg;--r1:14deg', 0, O(32, 54)), `<rect x="19" y="13" width="6" height="22" rx="3" class="ff"/><rect x="26" y="9" width="6" height="24" rx="3" class="ff"/><rect x="33" y="10" width="6" height="24" rx="3" class="ff"/><rect x="40" y="15" width="6" height="20" rx="3" class="ff"/><rect x="11" y="28" width="6" height="16" rx="3" class="ff" transform="rotate(-38 14 42)"/><rect x="19" y="28" width="27" height="25" rx="9" class="ff"/>`),
+    heart:   G(S('qRing', 1.4, '', 0, O(32, 33)), `<path d="${HEART}" stroke-width="2"/>`) + G(S('qBeat', 1.4), `<path class="ff" d="${HEART}"/><path d="M22 26a5 5 0 0 1 5-4" stroke="var(--paper)" stroke-width="2.5"/>`),
+    look:    G(S('qBlink', 2.8, '', 0, O(32, 32)), `<path class="sf" d="M7 32q25-23 50 0q-25 23-50 0z"/>` + G(S('qPing', 2.8, '--x0:-6px;--x1:6px'), `<circle cx="32" cy="32" r="8.5" class="ff"/><circle cx="35" cy="29" r="2.5" class="pf"/>`)),
+    hear:    `<path class="sf" d="M18 27a13 13 0 0 1 26 0c0 8-8 10-8 18a6.5 6.5 0 0 1-13 0" stroke-width="3"/><path d="M25 28a6 6 0 0 1 12 0c0 4-4 5-5 8" stroke-width="2.5"/>` + [0, 1].map(i => G(S('qGo', 1.8, '--x0:8px;--x1:-2px', i * .45), `<path d="M52 22q5 9 0 18" stroke-width="2.5"/>`)).join(''),
+    speak:   `<path class="sf" d="M14 13h36a5 5 0 0 1 5 5v17a5 5 0 0 1-5 5H32l-10 9v-9h-8a5 5 0 0 1-5-5V18a5 5 0 0 1 5-5z"/>` + [22, 32, 42].map((x, i) => G(S('qDot', 1.4, '', i * .18), `<circle cx="${x}" cy="27" r="3.4" class="ff"/>`)).join(''),
+    breathe: G(S('qPing', 2.8, '--x0:-5px;--x1:5px'), `<path d="M8 23h28a6 6 0 1 0-6-6M8 33h38a6 6 0 1 1-6 6M8 43h20"/>`),
+    eat:     G(S('qSlide', .8, '--x1:-12px', 0, LIN), `<circle cx="48" cy="32" r="3" class="mf"/><circle cx="60" cy="32" r="3" class="mf"/><circle cx="72" cy="32" r="3" class="mf"/>`) + G(S('qChomp', .4, '--r0:-30deg', 0, O(26, 32)), `<path class="ff" d="M8 32a18 18 0 0 1 36 0z"/><circle cx="27" cy="22" r="2.4" class="pf"/>`) + G(S('qChomp', .4, '--r0:30deg', 0, O(26, 32)), `<path class="ff" d="M8 32a18 18 0 0 0 36 0z"/>`),
+    sleep:   `<path class="mu" d="M8 50h48M10 50V36M54 50v-8"/><path class="sf" d="M14 42h40v8H14z"/>` + bean(20, 37, 6) + [0, 1, 2].map(i => G(S('qGo', 2.8, '--y1:-12px;--x1:6px', i * .55), `<text x="${34 + i * 6}" y="${32 - i * 6}" font-size="${11 + i * 2}" font-weight="700" font-family="Georgia,serif" class="ff">z</text>`)).join(''),
+    sit:     `<path class="mu" d="M44 22v32M20 42h24M22 42v12" stroke-width="3.5"/>` + G(S('qDrop', 2.8, '--y0:-22px', 0, BOT), bean(31, 34, 8)),
+    stand:   GROUND + G(S('qPing', 2.8, '--r0:-75deg;--r1:0deg', 0, O(32, 54)), man(32, 54, 1)),
+    shake:   `<path class="mu" d="M12 22l-4 4 4 4M12 36l-4 4 4 4M52 22l4 4-4 4M52 36l4 4-4 4"/>` + G(S('qJitter', .2, '', 0, LIN), man(32, 54, 1)),
+    // ---- 手上的动作 ----
+    grab:    GROUND + G(S('qClaw'), `<path class="mu" d="M32-30V18"/><path d="M25 18h14" stroke-width="3.5"/><path d="M27 18q-8 6-4 15M37 18q8 6 4 15"/>`) + G(S('qLift'), bean(32, 47, 6)),
+    do:      `<rect x="8" y="50" width="48" height="6" rx="1" class="mf"/>` + G(S('qNail'), `<path d="M40 50V40M35 40h10" stroke-width="3"/>`) + G(S('qHit', 2.8, '--y0:-12px;--y1:3px'), `<path d="M40-10V24" stroke-width="4"/><rect x="29" y="23" width="22" height="10" rx="2" class="ff"/>`) + G(S('qFlash', 2.8, '', 0, O(40, 40)), `<path d="M30 38l-5-3M50 38l5-3M31 44l-6 1M49 44l6 1" stroke-width="2.5"/>`),
+    put:     GROUND + `<ellipse cx="32" cy="52" rx="13" ry="3" class="mu" stroke-dasharray="3 3"/>` + G(S('qGo', 2.8, '--y0:-22px'), `<rect x="22" y="33" width="20" height="18" rx="2" class="sf"/><path d="M22 40h20" stroke-width="2"/>`) + G(S('qLate', 2.8, '', 0, O(32, 52)), `<ellipse cx="32" cy="52" rx="17" ry="4" stroke-width="2"/>`),
+    throw:   `<path class="mu" d="M10 48Q30 4 54 40" stroke-dasharray="3 4"/>` + G(S('qArc'), `<circle cx="10" cy="48" r="5.5" class="ff"/>`),
+    send:    `<path class="mu" d="M6 54q14-2 22-14" stroke-dasharray="3 4"/>` + G(S('qGo', 2.8, '--x0:-14px;--y0:14px;--x1:8px;--y1:-8px'), `<path class="sf" d="M10 34l42-17-12 33-8-11z"/><path d="M32 39l20-22" stroke-width="2"/>`),
+    carry:   `<path class="mu" d="M4 53h56"/>` + G(S('qGo', 2.8, '--x0:-14px;--x1:12px'), `<rect x="17" y="27" width="20" height="15" rx="2" class="sf"/><path d="M12 42h34l4-10" stroke-width="3"/>` + [18, 40].map(x => G(S('qSpin', .8, '', 0, LIN), `<circle cx="${x}" cy="47" r="5" class="pf" stroke="currentColor"/><path d="M${x} 43v8" stroke-width="2"/>`)).join('')),
+    pull:    `<path class="mu" d="M4 47h56"/>` + G(S('qPing', 2.8, '--x1:-9px'), `<path d="M22 37h13" stroke-width="2.5"/><rect x="35" y="27" width="20" height="20" rx="3" class="sf"/>`) + G(S('qPing', 2.8, '--r1:-16deg', 0, O(14, 47)), bean(14, 40, 7)),
+    push:    `<path class="mu" d="M4 53h56"/>` + G(S('qPing', 2.8, '--x1:12px'), `<path class="mu" d="M3 41h4M2 47h5"/>` + bean(14, 46, 7) + `<rect x="21" y="33" width="20" height="20" rx="2" class="sf"/>`),
+    press:   `<path class="mu" d="M8 12v10m-3-3 3 3 3-3M56 12v10m-3-3 3 3 3-3"/>` + G(S('qHit', 2.8, '--y0:-6px;--y1:11px'), `<path d="M32-12V12" stroke-width="4"/><rect x="14" y="12" width="36" height="8" rx="2" class="ff"/>`) + G(S('qSquash', 2.8, '', 0, BOT), `<rect x="20" y="30" width="24" height="22" rx="3" class="sf"/>`) + GROUND,
+    cut:     `<path class="mu" d="M4 53h56"/>` + G(S('qSplit', 2.8, '--x1:-4px;--r1:-6deg'), `<rect x="12" y="34" width="20" height="18" rx="2" class="sf"/>`) + G(S('qSplit', 2.8, '--x1:4px;--r1:6deg'), `<rect x="32" y="34" width="20" height="18" rx="2" class="sf"/>`) + G(S('qHit', 2.8, '--y0:-14px;--y1:16px'), `<path class="ff" d="M28 2h8v20l-4 6-4-6z"/>`),
+    break:   G(S('qSplit', 2.8, '--x1:-3px;--r1:-24deg', 0, O(31, 32)), `<path d="M8 32h23" stroke-width="5"/>`) + G(S('qSplit', 2.8, '--x1:3px;--r1:24deg', 0, O(33, 32)), `<path d="M33 32h23" stroke-width="5"/>`) + G(S('qFlash', 2.8, '', 0, O(32, 32)), burst(32, 32, 11)),
+    bend:    `<rect x="10" y="16" width="22" height="32" rx="2" class="sf"/>` + G(S('qFold', 2.8, '', 0, O(32, 32)), `<rect x="32" y="16" width="22" height="32" rx="2" class="sf"/><path d="M37 24h12M37 30h12M37 36h7" stroke-width="2"/>`),
+    turn:    `<path class="mu" d="M53 22a23 23 0 0 1 0 20M49 40l4 3 3-4"/>` + G(S('qTurn', 2.8, '', 0, O(32, 32)), `<circle cx="32" cy="32" r="16" class="sf"/><path d="M32 16v32M16 32h32" stroke-width="2.5"/>` + bean(32, 16, 5)),
+    twist:   `<path class="mu" d="M8 32h8M48 32h8"/>` + G(S('qSway', 1.6, '--r0:-25deg;--r1:25deg', 0, O(32, 32)), `<path d="M16 22q16 0 16 10t16 10M16 42q16 0 16-10t16-10" stroke-width="3.5"/>`),
+    give:    `<path class="mu" d="M40 54q10 0 16-7"/>` + G(S('qGo', 2.8, '--x0:-14px;--y0:6px;--x1:8px;--y1:-2px'), `<rect x="20" y="28" width="22" height="18" rx="2" class="sf"/><path d="M31 28v18M20 35h22" stroke-width="2"/><path d="M31 28q-6-8-9-3t9 3q6-8 9-3t-9 3" stroke-width="2"/>`) + G(S('qLate', 2.8, '', 0, O(52, 18)), star4(52, 18, 5)),
+    choose:  `<rect x="6" y="24" width="14" height="20" rx="3" class="mf"/><rect x="44" y="24" width="14" height="20" rx="3" class="mf"/>` + G(S('qPing', 2.8, '--y1:-7px'), `<rect x="24" y="22" width="16" height="24" rx="3" class="sf"/>`) + G(S('qMid', 2.8, '', 0, O(32, 26)), `<path d="M27 27l4 4 7-8" stroke-width="3"/>`),
+    seek:    `<circle cx="14" cy="50" r="2" class="mf"/><circle cx="52" cy="48" r="2" class="mf"/><circle cx="20" cy="16" r="2" class="mf"/>` + G(S('qPing', 2.8, '--x0:-12px;--y0:4px;--x1:8px'), `<circle cx="28" cy="28" r="11" class="pf" stroke-width="3.5"/><path d="M36 36l10 10" stroke-width="5"/>`) + G(S('qMid', 2.8, '', 0, O(36, 28)), star4(36, 28, 6)),
+    write:   `<rect x="6" y="10" width="52" height="44" rx="3" class="mf"/><path d="M10 42c4-7 8 3 12-2s8 3 12-2 7 2 12-2" stroke-width="2.5" ${DRAW} ${S('qDraw')}/>` + G(S('qGo', 2.8, '--x1:36px;--y1:-6px'), `<path class="sf" d="M10 42l1.8-6.5 10-10 4.7 4.7-10 10z" stroke-width="2.5"/><path d="M11.8 35.5l4.7 4.7" stroke-width="2"/>`),
+    line:    `<path d="M10 32h44" ${DRAW} ${S('qDraw')}/>` + G(S('qGo', 2.8, '--x1:44px'), `<circle cx="10" cy="32" r="4.5" class="ff"/>`),
+    straight:`<rect x="8" y="38" width="48" height="10" rx="2" class="mf"/><path class="mu" d="M14 38v4M22 38v3M30 38v4M38 38v3M46 38v4" stroke-width="2"/><path d="M8 28h48" stroke-width="3.5" ${DRAW} ${S('qDraw')}/>`,
+    measure: `<rect x="8" y="38" width="48" height="12" rx="2" class="mf"/><path class="mu" d="M14 38v5M20 38v3M26 38v5M32 38v3M38 38v5M44 38v3M50 38v5" stroke-width="2"/>` + G(S('qWide', 2.8, '', 0, O(32, 26)), `<path d="M12 26h40M12 26l5-5m-5 5 5 5M52 26l-5-5m5 5-5 5"/>`),
+    angle:   `<path d="M12 50h40M12 50 44 14"/><path d="M32 50a20 20 0 0 0-6-14" stroke-width="2.5" ${DRAW} ${S('qDraw')}/>` + G(S('qLate', 2.8, '', 0, O(38, 42)), `<circle cx="38" cy="42" r="2.5" class="ff"/>`),
+    prick:   `<circle cx="32" cy="42" r="12" class="sf"/><path d="M32 54l-2 4h4z" class="ff"/>` + G(S('qHit', 2.8, '--y0:-10px;--y1:4px'), `<path d="M32 2v24" stroke-width="2"/><circle cx="32" cy="2" r="2.5"/>`) + G(S('qFlash', 2.8, '', 0, O(32, 28)), `<path d="M22 28l-5-2M42 28l5-2M24 22l-3-4M40 22l3-4" stroke-width="2.5"/>`),
+    // ---- 移动 ----
+    walk:    [[12, 44], [24, 34], [36, 44], [48, 34]].map(([x, y], i) => G(S('qStep', 2.8, '', i * .38, O(x, y)), `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="3.6" class="ff"/><circle cx="${x + 8}" cy="${y - 2}" r="1.6" class="ff"/><circle cx="${x + 8}" cy="${y + 2}" r="1.6" class="ff"/>`)).join(''),
+    run:     GROUND + G(S('qGo', 1.6, '--x0:-22px;--x1:22px'), `<path class="mu" d="M18 40H8M20 46H6M18 51H10"/>` + bean(32, 46, 8)),
+    speed:   G(S('qGo', 1.1, '--x0:-20px;--x1:20px'), `<path class="mu" d="M20 26H6M22 32H4M20 38H8"/>` + bean(34, 32, 8)),
+    slide:   `<path class="mu" d="M6 20l52 32"/>` + G(S('qGo', 2.8, '--x1:34px;--y1:21px'), bean(14, 17, 5)),
+    jump:    GROUND + G(S('qShadow', 1.2, '', 0, O(32, 54)), `<ellipse cx="32" cy="54" rx="9" ry="2.2" class="mf"/>`) + G(S('qBounce', 1.2, '', 0, BOT), bean(32, 46, 8)),
+    ball:    G(S('qShadow', 1.2, '', 0, O(32, 54)), `<ellipse cx="32" cy="54" rx="10" ry="2.5" class="mf"/>`) + G(S('qBounce', 1.2, '', 0, BOT), `<circle cx="32" cy="42" r="10" class="sf"/><path d="M22 42h20M32 32q-6 10 0 20" stroke-width="2"/>`),
+    lead:    G(S('qPing', 2.8, '--x0:-4px;--x1:4px'), `<path d="M47 37V14" stroke-width="2.5"/><path class="ff" d="M47 14h11l-3 4 3 4H47z"/>` + bean(40, 42, 7) + G(S('qBob', .7, '--y1:-3px'), bean(26, 44, 5)) + G(S('qBob', .7, '--y1:-3px', .2), bean(15, 45, 4))),
+    road:    `<path class="mu" d="M14 58L28 8M50 58L36 8"/><path d="M32 8v52" stroke-width="3" stroke-dasharray="5 7" ${S('qDash', 1, '', 0, LIN)}/>`,
+    boat:    slideWave(52, 'mu', 1.6) + G(S('qSway', 2.8, '--r0:-7deg;--r1:7deg', 0, O(32, 46)), `<path class="ff" d="M12 40h40l-7 10H19z"/><path d="M32 40V12" stroke-width="2.5"/><path class="sf" d="M34 14l14 22H34z"/>`),
+    bird:    G(S('qBob', 1.4, '--y1:-6px'), birdArt(30, 34, 1.5)),
+    free:    `<path class="mu" d="M8 54V32a12 12 0 0 1 24 0v22M8 54h24M14 32v22M20 28v26M26 32v22M32 40l9-7"/>` + G(S('qGo', 2.8, '--x0:-20px;--y0:20px;--x1:2px;--y1:-2px'), birdArt(46, 20, 1)),
+    feather: G(S('qFloat', 3.2), `<path class="sf" d="M20 46q4-26 26-32-2 22-26 32z"/><path d="M20 46l15-19" stroke-width="2"/>`) + `<path class="mu" d="M8 56h48"/>`,
+    // ---- 东西、地方 ----
+    thing:   GROUND + G(S('qDrop', 2.8, '--y0:-28px', 0, BOT), `<path class="sf" d="M32 16l16 8v20l-16 8-16-8V24z"/><path d="M16 24l16 8 16-8M32 32v20" stroke-width="2.5"/>`),
+    place:   `<ellipse cx="32" cy="54" rx="8" ry="2" class="mf"/>` + G(S('qDrop', 2.8, '--y0:-24px', 0, BOT), `<path class="ff" d="M32 53s-13-13-13-23a13 13 0 0 1 26 0c0 10-13 23-13 23z"/><circle cx="32" cy="30" r="5" class="pf"/>`) + G(S('qLate', 2.8, '', 0, O(32, 54)), `<ellipse cx="32" cy="54" rx="16" ry="4" stroke-width="2"/>`),
+    earth:   `<path class="sf" d="M0 58q16-26 32-26t32 26z"/>` + G(S('qGrowY', 2.8, '', 0, BOT), `<path d="M32 33V12" stroke-width="2.5"/>`) + G(S('qLate', 2.8, '', 0, O(32, 12)), G(S('qSway', 1.2, '--r0:-6deg;--r1:6deg', 0, O(32, 15)), `<path class="ff" d="M32 11h15l-4 5 4 5H32z"/>`)),
+    build:   GROUND + [[8, 44, 23], [33, 44, 23], [14, 34, 18], [33, 34, 18], [22, 24, 20]].map(([x, y, w], i) => G(S('qDrop', 2.8, '--y0:-16px', i * .14, BOT), `<rect x="${x}" y="${y}" width="${w}" height="9" rx="1.5" class="sf"/>`)).join(''),
+    pile:    GROUND + [[14, 44, 36], [18, 34, 28], [23, 24, 18]].map(([x, y, w], i) => G(S('qDrop', 2.8, '--y0:-16px', i * .25, BOT), `<rect x="${x}" y="${y}" width="${w}" height="9" rx="3" class="ff" opacity="${.9 - i * .2}"/>`)).join(''),
+    stable:  GROUND + [[12, 42, 40], [18, 30, 28], [24, 18, 16]].map(([x, y, w], i) => G(S('qDrop', 2.8, '--y0:-14px', i * .25, BOT), `<rect x="${x}" y="${y}" width="${w}" height="12" rx="1.5" class="sf"/>`)).join(''),
+    board:   G(S('qDrop', 2.8, '--y0:-18px', 0, BOT), `<rect x="8" y="28" width="48" height="12" rx="2" class="sf"/><path d="M16 32q6 2 12 0M34 36q6-2 12 0" stroke-width="1.6"/>`) + GROUND,
+    stone:   G(S('qDrop', 2.8, '--y0:-30px', 0, BOT), `<path class="sf" d="M14 53l3-12 12-8 13 3 7 17z"/><path d="M26 42l5 3" stroke-width="2"/>`) + G(S('qFlash', 2.8, '', -.3, O(32, 52)), `<path class="mu" d="M10 50l-5-2M54 50l5-2M12 45l-4-4M52 45l4-4"/>`) + GROUND,
+    door:    `<rect x="16" y="10" width="32" height="44" rx="1.5" class="mf"/>` + G(S('qDoor', 2.8, '', 0, O(16, 32)), `<rect x="16" y="10" width="32" height="44" rx="1.5" class="sf"/><circle cx="42" cy="34" r="2.2" class="ff"/>`),
+    bed:     `<path d="M8 48V24M8 40h48v8M56 48V34"/>` + G(S('qBeat', 2.8, '--s1:1.04', 0, BOT), `<rect x="22" y="32" width="32" height="8" rx="3" class="sf"/>`) + `<rect x="11" y="32" width="10" height="8" rx="3" class="ff"/>`,
+    table:   `<rect x="10" y="14" width="44" height="36" rx="2"/><path d="M10 26h44M10 38h44M25 14v36M40 14v36" stroke-width="2"/>` + G(S('qPing', 2.8, '--x1:30px;--y1:12px'), `<rect x="11.5" y="27.5" width="12" height="9" class="ff" opacity=".55"/>`),
+    net:     G(S('qBeat', 2.8, '--s1:1.06'), `<path class="sf" d="M10 12h44v40H10z"/><path d="M10 22h44M10 32h44M10 42h44M21 12v40M32 12v40M43 12v40" stroke-width="2"/>`) + G(S('qLate', 2.8, '', 0, O(37, 37)), bean(37, 37, 4)),
+    surface: `<path class="sf" d="M6 42 22 26h36L42 42z"/>` + G(S('qSlide', 2.2, '--x0:-24px;--x1:24px', 0, LIN), `<path d="M24 40l12-12" stroke="var(--paper)" stroke-width="4"/>`),
+    // ---- 自然 ----
+    light:   G(S('qSpin', 9, '', 0, O(32, 32) + ';' + LIN), G(S('qFade', 1.6, '--o0:.35'), rays(32, 32, 15, 23))) + G(S('qBeat', 1.6, '--s1:1.1'), `<circle cx="32" cy="32" r="10" class="ff"/>`),
+    fire:    G(S('qFlicker', .9, '', 0, BOT), flame()) + G(S('qFlicker', .7, '', .2, BOT), `<path class="pf" d="M32 52c-5 0-7-4-5-8 1 2 2 2 3 1 0-4 2-7 4-9 0 4 5 6 5 10 0 3-3 6-7 6z"/>`),
+    water:   slideWave(42, '', 1.4) + slideWave(52, 'mu', 2) + G(S('qFall', 2.8, '--y0:-22px'), `<path class="ff" d="M32 20q-6 8-6 12a6 6 0 0 0 12 0q0-4-6-12z"/>`) + G(S('qMid', 2.8, '', 0, O(32, 41)), `<ellipse cx="32" cy="41" rx="12" ry="3" stroke-width="2"/>`),
+    flow:    slideWave(26, '', 1.2) + slideWave(38, '', 1.6) + slideWave(50, 'mu', 2),
+    wind:    G(S('qPing', 2.8, '--x0:-5px;--x1:5px'), `<path d="M8 23h30a6 6 0 1 0-6-6M8 33h40a6 6 0 1 1-6 6M8 43h22"/>`),
+    snow:    [[18, 20], [42, 14], [30, 36]].map(([x, y], i) => G(S('qGo', 2.8, '--y0:-12px;--y1:12px', i * .8), `<path d="M${x} ${y - 6}v12M${x - 5.2} ${y - 3}l10.4 6M${x - 5.2} ${y + 3}l10.4-6" stroke-width="2.5"/>`)).join('') + GROUND,
+    moon:    G(S('qBob', 2.8, '--y1:-3px'), `<path class="ff" d="M40 12a20 20 0 1 0 12 30A16 16 0 0 1 40 12z"/>`) + [[14, 16, 3.5], [52, 12, 2.5], [50, 50, 2.5]].map(([x, y, r], i) => G(S('qFade', 1.4, '--o0:.15', i * .4), star4(x, y, r))).join(''),
+    grow:    GROUND + `<ellipse cx="32" cy="54" rx="9" ry="2.5" class="mf"/><path d="M32 54V24" ${DRAW} ${S('qDraw')}/>` + G(S('qLate', 2.8, '', 0, O(32, 40)), `<path class="ff" d="M32 40q-13 0-15-11q13-1 15 11z"/>`) + G(S('qLate', 2.8, '', .1, O(32, 33)), `<path class="ff" d="M32 33q13 0 15-11q-13-1-15 11z"/>`) + G(S('qLate', 2.8, '', .2, O(32, 21)), `<circle cx="32" cy="21" r="5" class="ff"/>`),
+    die:     `<rect x="26" y="30" width="12" height="24" rx="2" class="sf"/><path d="M32 30v-4" stroke-width="2"/>` + G(S('qOut', 2.8, '', 0, BOT), `<path class="ff" d="M32 26c-4 0-6-3-4-7 1-3 4-5 4-9 2 3 5 6 5 10 0 4-2 6-5 6z"/>`) + G(S('qSmoke'), `<path class="mu" d="M32 24q-4-4 0-8t0-8" stroke-width="2.5"/>`),
+    time:    `<circle cx="32" cy="32" r="20" class="sf"/><path d="M32 15v3M32 46v3M15 32h3M46 32h3" stroke-width="2.5"/><path d="M32 32l-7-6" stroke-width="3.5"/>` + G(S('qSpin', 2.8, '', 0, O(32, 32) + ';' + LIN), `<path d="M32 32V16"/>`) + `<circle cx="32" cy="32" r="2.5" class="ff"/>`,
+    // ---- 抽象概念 ----
+    know:    `<path class="sf" d="M24 42c-5-4-8-9-8-15a16 16 0 0 1 32 0c0 6-3 11-8 15z"/>` + G(S('qOn'), `<path class="ff" d="M24 42c-5-4-8-9-8-15a16 16 0 0 1 32 0c0 6-3 11-8 15z"/><path d="M28 34l4-6 4 6" stroke="var(--paper)" stroke-width="2"/>`) + `<path d="M24 42c-5-4-8-9-8-15a16 16 0 0 1 32 0c0 6-3 11-8 15zM26 47h12M28 52h8"/>` + G(S('qLate', 2.8, '', 0, O(32, 24)), `<path d="M32 2v4M8 26h4M52 26h4M14 9l3 3M50 9l-3 3" stroke-width="2.5"/>`),
+    value:   G(S('qFlip', 2.8, '', 0, O(32, 32)), `<circle cx="32" cy="32" r="18" class="sf"/><circle cx="32" cy="32" r="13" stroke-width="1.6"/><text x="32" y="39" text-anchor="middle" font-size="19" font-weight="700" class="ff">¥</text>`) + G(S('qLate', 2.8, '', 0, O(52, 13)), star4(52, 13, 5)),
+    power:   G(S('qFade', 1.4, '--o0:0'), `<path d="M10 18l5 3M54 18l-5 3M8 40h6M50 40h6" stroke-width="2.5"/>`) + G(S('qBeat', 1.4, '--s1:1.15'), `<path class="ff" d="M36 7 18 36h12l-4 21 20-31H34z"/>`),
+    work:    G(S('qSpin', 4, '', 0, O(25, 38) + ';' + LIN), gear(25, 38, 12, 8)) + G(S('qSpin', 3, '--r1:-360deg', 0, O(44, 20) + ';' + LIN), gear(44, 20, 9, 6)),
+    rule:    G(S('qDrop', 2.8, '--y0:-20px', 0, BOT), `<path class="ff" d="M22 33l-2-14 7 6 5-9 5 9 7-6-2 14z"/>`) + bean(32, 45, 10) + G(S('qLate', 2.8, '', .1, O(50, 16)), star4(50, 16, 4)),
+    law:     `<path d="M32 13v38M22 53h20" stroke-width="3"/><circle cx="32" cy="11" r="3" class="ff"/>` + G(S('qSettle', 2.8, '', 0, O(32, 17)), `<path d="M11 17h42" stroke-width="3"/><path d="M11 17l-6 13M11 17l6 13M53 17l-6 13M53 17l6 13" stroke-width="1.6"/><path class="ff" d="M4 30h14q-1 6-7 6t-7-6zM46 30h14q-1 6-7 6t-7-6z"/>`),
+    equal:   `<path class="mf" d="M32 42l-8 12h16z"/>` + G(S('qSettle', 2.8, '', 0, O(32, 42)), `<path d="M8 42h48" stroke-width="3.5"/>` + bean(16, 35, 6) + bean(48, 35, 6)),
+    good:    G(S('qBob', 1.4, '--y1:-3px'), `<circle cx="32" cy="33" r="19" class="sf"/><path d="M22 29q3-3 6 0M36 29q3-3 6 0" stroke-width="2.5"/><path d="M23 37q9 9 18 0" stroke-width="3"/>`) + G(S('qLate', 2.8, '', 0, O(52, 13)), star4(52, 13, 5)) + G(S('qLate', 2.8, '', .2, O(11, 18)), star4(11, 18, 3.5)),
+    bad:     `<circle cx="32" cy="33" r="19" class="sf"/><circle cx="25" cy="30" r="2.5" class="ff"/><circle cx="39" cy="30" r="2.5" class="ff"/><path d="M21 23l7 3M43 23l-7 3M24 44q8-7 16 0" stroke-width="2.5"/>` + G(S('qGo', 2.8, '--y1:12px'), `<path class="ff" d="M21 33q-3 4-3 6a3 3 0 0 0 6 0q0-2-3-6z"/>`),
+    wrong:   G(S('qNo'), `<path d="M18 18l28 28" stroke-width="5" ${DRAW} ${S('qDraw')}/><path d="M46 18 18 46" stroke-width="5" ${DRAW} ${S('qDraw', 2.8, '', .2)}/>`),
+    new:     G(S('qBeat', 2.8, '--s1:1.2'), star4(32, 33, 17)) + G(S('qPopHold', 2.8, '', .3, O(51, 13)), star4(51, 13, 5)) + G(S('qPopHold', 2.8, '', .55, O(13, 48)), star4(13, 48, 4)),
+    shape:   G(S('qPopHold', 2.8, '', 0, O(21, 40)), `<path class="sf" d="M10 48 21 28l11 20z"/>`) + G(S('qPopHold', 2.8, '', .25, O(45, 38)), `<circle cx="45" cy="38" r="9" class="sf"/>`) + G(S('qPopHold', 2.8, '', .5, O(32, 16)), `<rect x="26" y="10" width="12" height="12" rx="1.5" class="sf"/>`),
+    shield:  G(S('qBeat', 2.8, '--s1:1.08'), `<path class="sf" d="M32 8l19 7v14c0 13-8 21-19 26-11-5-19-13-19-26V15z"/>`) + `<path d="M24 31l6 6 11-12" stroke-width="3.5" ${DRAW} ${S('qDraw')}/>`,
+    heal:    G(S('qBeat', 1.6, '--s1:1.12'), `<path class="ff" d="M26 11h12v15h15v12H38v15H26V38H11V26h15z"/>`) + G(S('qLate', 2.8, '', 0, O(52, 12)), star4(52, 12, 4.5)),
+    bound:   GROUND + `<path class="mu" d="M42 18v36M52 18v36M38 27h18M38 42h18" stroke-width="3.5"/>` + G(S('qBump'), bean(18, 47, 7)),
+    close:   `<path class="sf" d="M14 32h36v20H14z"/>` + G(S('qPing', 2.8, '--r0:-75deg;--r1:0deg', 0, O(13, 32)), `<rect x="12" y="26" width="40" height="6" rx="2" class="ff"/>`),
+    hang:    `<path class="mu" d="M10 10h44" stroke-width="2.5"/><circle cx="32" cy="10" r="2.2" class="ff"/>` + G(S('qSway', 2.8, '--r0:-12deg;--r1:12deg', 0, O(32, 10)), `<path d="M32 10l-12 14M32 10l12 14" stroke-width="2"/><rect x="16" y="24" width="32" height="24" rx="2" class="sf"/><path d="M20 44l8-9 6 6 4-4 6 7" stroke-width="2"/>`),
+    compass: `<circle cx="32" cy="32" r="20" class="sf"/><text x="32" y="21" text-anchor="middle" font-size="8" font-weight="700" class="ff">N</text>` + G(S('qSettle', 2.8, '', 0, O(32, 32)), `<path class="ff" d="M32 15l5 17h-10z"/><path class="mf" d="M32 49l5-17h-10z" style="opacity:.6"/>`) + `<circle cx="32" cy="32" r="2.5" class="pf" stroke="currentColor" stroke-width="1.5"/>`,
+    stick:   `<rect x="10" y="40" width="44" height="8" rx="2" class="mf"/>` + G(S('qGo', 2.8, '--y0:-14px'), `<rect x="22" y="26" width="20" height="14" rx="3" class="sf"/>`) + G(S('qLate', 2.8, '', 0, O(32, 42)), `<path d="M25 40v4M32 40v6M39 40v4" stroke-width="2.5"/>`),
+    hard:    `<path class="sf" d="M14 53l4-16 14-6 14 6 4 16z"/>` + G(S('qHit', 2.8, '--y0:-12px;--y1:-4px'), `<path d="M32-12V18" stroke-width="4"/><rect x="21" y="18" width="22" height="9" rx="2" class="ff"/>`) + G(S('qFlash', 2.8, '', 0, O(32, 30)), `<path d="M18 26l-5-4M46 26l5-4M20 32h-6M44 32h6" stroke-width="2.5"/>`),
+    soft:    `<path class="mu" d="M6 52h52"/>` + G(S('qSquish', 2.8, '', 0, BOT), `<path class="sf" d="M12 52q-2-16 6-20h28q8 4 6 20z"/>`) + G(S('qGo', 2.8, '--y0:-12px;--y1:6px'), bean(32, 24, 6)),
+    pure:    G(S('qBeat', 2.8, '--s1:1.08'), `<path class="sf" d="M32 9q17 21 17 31a17 17 0 0 1-34 0q0-10 17-31z"/><path d="M24 40a8 8 0 0 0 6 7" stroke="var(--paper)" stroke-width="2.5"/>`) + G(S('qFade', 1.6, '--o0:.1'), star4(50, 14, 5)),
+    flask:   `<path d="M26 10h12M28 10v14L16 48a4 4 0 0 0 4 6h24a4 4 0 0 0 4-6L36 24V10"/><path class="ff" d="M20 42h24l3.4 6.4a3 3 0 0 1-2.7 4.6H19.3a3 3 0 0 1-2.7-4.6z" opacity=".7"/>` + [[28, 0], [35, .5], [31, 1]].map(([x, dl]) => G(S('qGo', 1.6, '--y1:-16px', dl), `<circle cx="${x}" cy="40" r="2" class="ff"/>`)).join(''),
+    sing:    [[0, 0], [16, .9]].map(([dx, dl]) => G(S('qGo', 2.8, '--y0:6px;--y1:-12px;--x1:6px', dl), `<path d="M${18 + dx} 44V24l10-3v19" stroke-width="2.5"/><circle cx="${15 + dx}" cy="44" r="4" class="ff"/><circle cx="${25 + dx}" cy="40" r="4" class="ff"/>`)).join(''),
+  };
+  // 只表示词性的后缀（-tion、-ous、-ize、-ly…）：给词挂上一张「词性标签」
+  const TAGS = {tagN: 'n.', tagA: 'adj.', tagV: 'v.', tagAdv: 'adv.'};
+  const tagArt = lab => `<circle cx="32" cy="7" r="2.4" class="ff"/>` + G(S('qSway', 2.8, '--r0:-10deg;--r1:10deg', 0, O(32, 7)), `<path d="M32 7v9" stroke-width="2"/><path class="sf" d="M19 25l13-9 13 9v24a3 3 0 0 1-3 3H22a3 3 0 0 1-3-3z" stroke-width="2.5"/><circle cx="32" cy="25" r="2.4" class="pf" stroke="currentColor" stroke-width="1.6"/><text x="32" y="${lab.length > 2 ? 43 : 44}" text-anchor="middle" font-size="${lab.length > 2 ? 11 : 14}" font-family="Georgia,serif" font-style="italic" font-weight="700" class="ff">${lab}</text>`);
+  // 没有合适画面的：把这一段字母写大，下面画一道线
+  const letterArt = seg => { const n = seg.length, fs = n <= 2 ? 26 : n <= 4 ? 21 : n <= 6 ? 16 : 12; return `<text x="32" y="${f1(30 + fs * .34)}" text-anchor="middle" font-size="${fs}" font-family="Georgia,serif" font-weight="700" class="ff">${esc(seg)}</text><path d="M16 46h32" stroke-width="2.5" ${DRAW} ${S('qDraw')}/>`; };
   // 意思 → 动画：只认「意思完全对上」的，宁可显示字母也不乱配图
   const ANIM_WORDS = {
     tagN:'名词 学 学科 …学 状态 性质 行为 主义 …性 …者的状态', tagA:'…的 令人…的 值得…的 充满…的 多…的 易…的 要…的 有…的 似…的 形容词', tagAdv:'副词 …地',
@@ -1152,27 +1242,28 @@ window.CET6 = {
   const ANIM_RULES = [
     [/^.*…的$/, 'tagA'], [/^.*…地$/, 'tagAdv'], [/^使.{1,3}$/, 'tagV'], [/(者|[^国大]人|员|师|[^国]家)$/, 'person'],
   ];
-  function animFor(meaning){
+  function animKey(meaning){
     let m = String(meaning || '').trim();
     if (!m) return null;
     let k = ANIM_MAP.get(m);
     // 「…的 / …地」结尾的词根意思：去掉尾巴再查一次（如「明确的」→「明确」）
     if (!k && /[的地]$/.test(m) && m.length > 2) k = ANIM_MAP.get(m.slice(0, -1));
     if (!k) for (const [re, key] of ANIM_RULES) if (re.test(m)) { k = key; break; }
-    return k ? ANIM[k] : null;
+    return k && (ANIM[k] || TAGS[k]) ? k : null;
   }
   function animTile(seg, meaning, r, delay){
-    const art = animFor(meaning);
-    const svg = art
-      ? `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${art}</svg>`
-      : `<svg viewBox="0 0 64 64"><text x="32" y="40" text-anchor="middle" font-size="18" font-family="Georgia" font-weight="700" fill="currentColor">${esc(seg)}</text></svg>`;
-    return `<div class="anim-tile ${r}" style="--d:${delay}ms">${svg}<b>${esc(seg)}</b><em>${esc(meaning)}</em></div>`;
+    // 词性标签只挂在后缀上；词根意思是「性质 / 状态」这类时，直接把字母写大
+    const k = animKey(meaning), tag = r === 'suf' ? TAGS[k] : null;
+    const art = tag ? tagArt(tag) : k && ANIM[k] ? ANIM[k] : letterArt(seg);
+    return `<div class="anim-tile ${r}" style="--d:${delay}ms"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${art}</svg><b>${esc(seg)}</b><em>${esc(meaning)}</em></div>`;
   }
+  // 一块一块依次出场（每块 0.85 秒），最后弹出「拼好的词 + 意思」
   function animStripHtml(w){
     if (!w.parts) return '';
-    const n = w.parts.length, step = 700;
-    const tiles = w.parts.map(([seg, m], i) => (i ? `<span class="anim-op" style="--d:${i * step - 200}ms">+</span>` : '') + animTile(seg, m, role(seg, i, n), i * step)).join('');
-    return `<div class="anim-strip">${tiles}<span class="anim-op" style="--d:${n * step - 200}ms">=</span><span class="anim-res" style="--d:${n * step}ms">${esc(shortMean(w))}</span><button class="anim-replay" data-replay="1" title="重新播放">↻ 重播</button></div>`;
+    const n = w.parts.length, step = 850;
+    const tiles = w.parts.map(([seg, m], i) => (i ? `<span class="anim-op" style="--d:${i * step - 250}ms">+</span>` : '') + animTile(seg, m, role(seg, i, n), i * step)).join('');
+    const word = w.parts.map(([seg], i) => `<i class="r-${role(seg, i, n)}">${esc(seg)}</i>`).join('');
+    return `<div class="anim-strip">${tiles}<span class="anim-eqres"><span class="anim-op" style="--d:${n * step - 250}ms">=</span><span class="anim-res" style="--d:${n * step}ms"><small>${word}</small>${esc(shortMean(w))}</span></span><button class="anim-replay" data-replay="1" title="重新播放">↻ 重播</button></div>`;
   }
   // 简化版：词根积木 / 动画默认收起，点「词根拆解 ▸」才展开（完整版直接显示）
   // 简化版：词根拆解、助记、易混·串记默认收起。三个按钮固定排一行，展开的内容按固定顺序出现在按钮下方
@@ -1188,14 +1279,17 @@ window.CET6 = {
   function shortMean(w){ const t = (w.zh[0] || ['',''])[1]; return t.split(/[；;，,]/)[0]; }
   function partsHtml(w, opt){
     if (!w.parts) return '';
-    const n = w.parts.length, step = 160;
+    const n = w.parts.length, step = 130;
     const blocks = w.parts.map(([seg, m], i) => {
       const r = role(seg, i, n);
-      return `${i ? `<span class="plus" style="--d:${i * step - 60}ms">+</span>` : ''}<span class="blk ${r}" style="--d:${i * step}ms" data-seg="${esc(seg.toLowerCase())}" data-role="${r}" title="点我看同${ROLE_ZH[r]}的词"><i>${ROLE_ZH[r]}</i><b>${esc(seg)}</b><em>${esc(m)}</em></span>`;
+      // 首块从左边、末块从右边、中间的从上面滑进来，然后「咔」地拼上
+      const sx = n > 1 && i === 0 ? '-20px' : n > 1 && i === n - 1 ? '20px' : '0px', sy = sx === '0px' ? '-14px' : '0px';
+      return `<span class="blk ${r}" style="--d:${i * step}ms;--sx:${sx};--sy:${sy}" data-seg="${esc(seg.toLowerCase())}" data-role="${r}" title="点我看同${ROLE_ZH[r]}的词"><i>${ROLE_ZH[r]}</i><b>${esc(seg)}</b><em>${esc(m)}</em></span>`;
     }).join('');
-    const res = opt && opt.noResult ? '' : `<span class="eq" style="--d:${n * step}ms">=</span><span class="res" style="--d:${n * step + 80}ms">${esc(shortMean(w))}</span>`;
+    const snap = (n - 1) * step + 420;
+    const res = opt && opt.noResult ? '' : `<span class="eq" style="--d:${snap + 60}ms">=</span><span class="res" style="--d:${snap + 140}ms">${esc(shortMean(w))}</span>`;
     const btn = opt && opt.noResult ? '' : `<button class="anim-btn" data-anim="1" title="用动画演示这个词是怎么拼出来的">▶ 动画</button>`;
-    return `<div class="parts-d" aria-label="词根拆解">${blocks}${res}${btn}</div>`;
+    return `<div class="parts-d" aria-label="词根拆解"><span class="wbar" style="--t:${snap}ms">${blocks}</span>${res}${btn}</div>`;
   }
   // 易混词：词表里有的英文词变成可点击链接，方便来回对比
   // 形近词：把和当前词不一样的字母标红（按最长公共子序列对齐），一眼看出差在哪
