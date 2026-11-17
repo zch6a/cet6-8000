@@ -751,7 +751,9 @@ window.CET6 = {
     if (st.sort === 'stories') { renderStories(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
-    current = words.filter(w =>
+    // 搜英式拼法（behaviour、colour…）也能找到合并后的词条
+    const qa = q && (meta.alias || {})[q];
+    current = words.filter(w => (qa && w.w === qa) ||
       (st.lv === 'all' || w.lv === st.lv) &&
       (st.band === 'all' || String(w.b) === st.band) &&
       (st.sort !== 'write' || w.wr) &&
@@ -764,7 +766,7 @@ window.CET6 = {
     else if (st.sort === 'write' && st.wfreq) current.sort((a,b) => (b.wt - a.wt) || (b.n - a.n) || a.w.localeCompare(b.w));
     else current.sort((a,b) => a.w.localeCompare(b.w));
     $('#wfreqWrap').hidden = st.sort !== 'write';
-    if (q && /^[a-z]/.test(q)) current.sort((a,b) => (b.w === q) - (a.w === q) || (b.w.startsWith(q)) - (a.w.startsWith(q)));
+    if (q && /^[a-z]/.test(q)) current.sort((a,b) => (b.w === q || b.w === qa) - (a.w === q || a.w === qa) || (b.w.startsWith(q)) - (a.w.startsWith(q)));
     // 中文反查：意思完全等于搜索词的排最前，其余按真题出现次数从高到低
     if (q && /[^\x00-\x7f]/.test(q)) {
       const exact = w => w.zh.some(z => z[1].split(/[；;，,]/).some(s => s.replace(/[（(].*?[）)]/g, '').trim() === q));
