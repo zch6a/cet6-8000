@@ -673,7 +673,8 @@ window.CET6 = {
       if (seg.toLowerCase() === w.w) return;
       if (seg.replace(/[^a-z]/gi, '').length < 2) return;   // 单个字母（advise+r）不成卡
       // 同形不同义的词根分开成卡：man「人」≠ man「手」；词缀按角色合并（意思本就多样）
-      const sense = r === 'root' ? String(m).replace(/[（(].*$/, '').slice(0, 2) : '';
+      // 同拼写的词根按意思首字分卡：tend 伸 / 伸展 合成一张，port 运 / 港口 分两张（和卡片上的「同根」一致）
+      const sense = r === 'root' ? String(m).replace(/^[…\s（(]+/, '').replace(/[（(].*$/, '').charAt(0) : '';
       const k = r + ':' + seg.toLowerCase() + (sense ? ':' + sense : '');
       if (!affIdx.has(k)) affIdx.set(k, {k, seg: seg.toLowerCase(), r, means: {}, ws: []});
       const e = affIdx.get(k);
