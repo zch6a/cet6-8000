@@ -107,7 +107,11 @@ h1 em{font-style:normal;color:var(--accent)}
 .cta span:not(:empty){margin-left:6px;background:#fff;color:var(--accent);border-radius:99px;padding:0 7px;font-size:12px}
 /* ---------- study overlay ---------- */
 .ov{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column}
-.ov.show{display:flex}
+.ov.show{display:flex;animation:ovIn .22s ease-out}
+@keyframes ovIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.done-big{animation:donePop .5s cubic-bezier(.2,.9,.3,1.5)}
+@keyframes donePop{0%{opacity:0;transform:scale(.85)}60%{opacity:1;transform:scale(1.04)}100%{transform:none}}
+@media (prefers-reduced-motion: reduce){.ov.show,.done-big{animation:none}}
 .ov-top{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .ov-top .ttl{font-weight:700}
 .ov-top .meta{color:var(--ink3);font-size:13px;flex:1}
@@ -690,6 +694,8 @@ window.CET6 = {
     });
     let t; $('#q').addEventListener('input', e => { $('.search').classList.toggle('has', !!e.target.value); clearTimeout(t); t = setTimeout(() => { st.q = e.target.value.trim().toLowerCase(); apply(true); }, 120); });
     // 搜索框里的 ×：一点就清空，光标留在框里接着搜
+    // 搜索框里按 Esc：有字先清空，再按一次离开搜索框
+    $('#q').addEventListener('keydown', e => { if (e.key !== 'Escape') return; const q = e.target; if (q.value) { e.preventDefault(); q.value = ''; q.dispatchEvent(new Event('input', {bubbles: true})); } else q.blur(); });
     $('#qClr').addEventListener('click', e => { e.preventDefault(); const q = $('#q'); q.value = ''; q.dispatchEvent(new Event('input', {bubbles: true})); q.focus(); });
     $('#cover').checked = st.cover; $('#hideKnown').checked = st.hideKnown;
     $('#simple').checked = st.simple;
