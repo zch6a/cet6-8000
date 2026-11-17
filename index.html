@@ -1261,7 +1261,7 @@ window.CET6 = {
     while (daylog[dayKey(t)]) { n++; t -= DAY; }
     return n;
   }
-  const sk2 = () => { const n = streak(); return n ? `🔥 已连续打卡 ${n} 天。` : ''; };
+  const sk2 = () => { const n = streak(); return n ? `已连续打卡 ${n} 天。` : ''; };
   function weekHtml(){
     const days = [...Array(7)].map((_, i) => { const t = Date.now() - (6 - i) * DAY; return {k: dayKey(t), n: daylog[dayKey(t)] || 0, d: '日一二三四五六'[new Date(t).getDay()]}; });
     const max = Math.max(10, ...days.map(d => d.n));
@@ -1320,7 +1320,7 @@ window.CET6 = {
     const sk = streak(), learned = Object.keys(srs).length;
     fc.innerHTML = `
       <div class="done-big">今天：复习 ${due} 个 · 新词 ${Math.max(0, plan.daily - nt)} 个</div>
-      <p class="fc-sub" style="margin-top:8px">${sk ? `🔥 已连续打卡 <b>${sk}</b> 天` : '今天开始第一天打卡'} · 学过 <b>${learned.toLocaleString()}</b> 词 · 已掌握 <b>${known.size.toLocaleString()}</b> 词</p>
+      <p class="fc-sub" style="margin-top:8px">${sk ? `已连续打卡 <b>${sk}</b> 天` : '今天开始第一天打卡'} · 学过 <b>${learned.toLocaleString()}</b> 词 · 已掌握 <b>${known.size.toLocaleString()}</b> 词</p>
       ${weekHtml()}
       ${dailyStoryHtml()}
       <p class="fc-sub" style="margin-top:10px">新词取自当前列表的顺序（${esc($('#resinfo').textContent)}）${st.lv === 'all' ? '，已跳过中学基础词' : ''}。<br>想先背高频词，就先切到「真题频率」排序再点背诵；只背会写词就切到「会写词汇」。</p>
@@ -1445,7 +1445,7 @@ window.CET6 = {
       for (let k = 0; k < 3 && i < due.length; k++) q.push({w: due[i++], isNew: false});
       if (j < fresh.length) q.push({w: fresh[j++], isNew: true});
     }
-    if (!q.length) { fc.innerHTML = `<div class="done-big">今天的任务完成了 🎉</div><p class="fc-sub">没有到期的复习词，今天的新词额度也用完了。可以去「自测」再巩固一下。</p>`; return; }
+    if (!q.length) { fc.innerHTML = `<div class="done-big">今天的任务完成了</div><p class="fc-sub">没有到期的复习词，今天的新词额度也用完了。可以去「自测」再巩固一下。</p>`; return; }
     session = {q, idx: 0, total: q.length, done: 0, shown: false};
     showCard();
   }
@@ -1454,7 +1454,7 @@ window.CET6 = {
     if (s.idx >= s.q.length) {
       const t = s.tally || [0, 0, 0, 0];
       const hardN = hardWords().length;
-      fc.innerHTML = `<div class="done-big">本轮完成 🎉</div>
+      fc.innerHTML = `<div class="done-big">本轮完成</div>
         <p class="fc-sub">共 ${s.total} 个词：记得 <b>${t[2]}</b> · 太简单 <b>${t[3]}</b> · 模糊 <b>${t[1]}</b> · 忘了 <b>${t[0]}</b>（忘了的已在本轮补考）</p>
         <p class="fc-sub">${sk2()} 明天再来，到期的词会自动出现。</p>
         <div class="fc-acts"><button class="primary" id="again2">再来一轮</button>${hardN ? `<button id="hard2">专攻易忘词（${hardN}）</button>` : ''}</div>`;
