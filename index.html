@@ -338,8 +338,14 @@ main{padding:18px 0 60px}
   .card{grid-template-columns:1fr auto;padding:12px 13px}
   .card .body{grid-column:1/-1;grid-row:2}
   .card .freq{grid-column:2;grid-row:1;padding-bottom:0}
-  .tools{position:static;grid-column:1/-1;justify-content:flex-end}
   .spark i,.yrs span{width:10px}
+  /* 手机上卡片头只留单词、标签、按钮和次数：小柱图点开详情里再看 */
+  .card .spark{display:none}
+  .card .freq{align-items:center}
+  .card .head{gap:4px 6px}
+  .card .w{font-size:19.5px}
+  .card .lv,.card .hot{padding:2px 5px}
+  .card .ib{width:24px;height:24px}
   .letters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:8px;padding-bottom:2px}
   .letters::-webkit-scrollbar,.row2::-webkit-scrollbar{display:none}
   .letters button{min-width:28px;height:28px;padding:0 4px;flex:none}
