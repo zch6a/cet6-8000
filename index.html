@@ -261,6 +261,8 @@ main{padding:18px 0 60px}
 .detail .parts b{color:var(--ink)}
 .more{display:block;margin:18px auto 0;border:1px solid var(--line);background:var(--paper);padding:8px 22px;border-radius:99px;cursor:pointer;color:var(--ink2)}
 .empty{text-align:center;color:var(--ink3);padding:60px 0}
+#loading{animation:kLoad 1.4s ease-in-out infinite alternate}
+@keyframes kLoad{from{opacity:.35}to{opacity:1}}
 .legend{margin-top:40px;border-top:1px solid var(--line);padding-top:20px;color:var(--ink2);font-size:13px}
 .legend h3{font-size:14px;margin:0 0 6px;color:var(--ink)}
 .legend p{margin:4px 0}
@@ -478,7 +480,7 @@ main{padding:18px 0 60px}
 <main>
   <div class="wrap">
     <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
-    <div id="list"></div>
+    <div id="list"><div class="empty" id="loading">正在加载 8000 词的数据（约 650 KB），网速慢时要等几秒…</div></div>
     <button class="more" id="more" hidden>继续加载</button>
     <section class="legend" id="legend"></section>
   </div>
