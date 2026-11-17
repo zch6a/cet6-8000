@@ -2005,6 +2005,94 @@
         `<path d="M150 22a10 10 0 1 1 0 .1" fill="#f6d34a"/><path d="M150 12v-4M138 18l-3-3M162 18l3-3" ${sk(CL.g, 2)}/>` +
         `<g ${s.a(pop(50), ORG(240, 30))}><rect x="206" y="20" width="68" height="20" rx="6" ${fl(CL.t)}/><text x="240" y="34" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">流动中</text></g>`;
     }},
+    // ---------- 第二十批 ----------
+    disease: {dur: 6, hl: [30, 6], end: 60, lit: '浑身不舒服', mean: '疾病', draw: s => {
+      const germ = (x, y, p) => `<g ${s.a(moveIn([[p, 60, -40, 'scale(.4)'], [p + 10, 0, 0, 'scale(1)']]), ORG(x, y))}><g ${s.a({0: R(0), 100: R(360)}, ORG(x, y) + ';animation-timing-function:linear', 2)}><circle cx="${x}" cy="${y}" r="7" fill="#7fbf5a"/><path d="M${x - 10} ${y}h20M${x} ${y - 10}v20M${x - 7} ${y - 7}l14 14M${x + 7} ${y - 7}l-14 14" ${sk('#7fbf5a', 2)}/></g><circle cx="${x - 2}" cy="${y - 1}" r="1.2" fill="${INK}"/><circle cx="${x + 2}" cy="${y - 1}" r="1.2" fill="${INK}"/></g>`;
+      return `<path d="M60 128v-24q0-8 8-8h104q8 0 8 8v24z" ${fl(CL.v, .6)}/><path d="M60 104h120v-16q0-8-8-8H68q-8 0-8 8z" ${fl(CL.v, .4)}/>` + GND() +
+        kid(120, 104, CL.a, {noFace: true, aL: [-16, -24], aR: [16, -24]}) + `<g ${s.a(hideAt(30))}>${face(120, 104)}</g><g ${s.a(showAt(30))}>${face(120, 104, 1, 'sad')}<path d="M114 54q-3 5 0 7" ${sk('#6db7e8', 2.5)}/></g>` +
+        `<g ${s.a(showAt(30))}><circle cx="120" cy="52" r="11" fill="#9fd88a" opacity=".45"/></g>` +
+        germ(150, 60, 14) + germ(96, 70, 20) + germ(150, 90, 26) +
+        `<g ${s.a(pop(40), ORG(230, 50))}><rect x="224" y="30" width="8" height="30" rx="4" fill="#fff" style="stroke:var(--ink3);stroke-width:1.5px"/><circle cx="228" cy="64" r="6" fill="#e2473a"/><rect x="226" y="40" width="4" height="22" fill="#e2473a"/><text x="250" y="50" font-size="10" font-weight="700" ${fl(CL.a)}>39°</text></g>`;
+    }},
+    elderly: {dur: 6, hl: [6, 50], end: 60, lit: '上了年纪的', mean: '年长的；老年人', draw: s => {
+      return GND() + kid(110, 128, CL.m, {noFace: true, k: 1, aR: [14, -26]}) + `<path d="M98 72a12 12 0 0 1 24 0q-6-4-12-3t-12 3z" fill="#e6e6e6"/>` + face(110, 128) + `<path d="M104 80q6 4 12 0" ${sk('#e6e6e6', 2)}/><path d="M124 106v22" ${sk(WOOD, 3)}/><path d="M118 106h8" ${sk(WOOD, 3)}/>` +
+        `<g ${s.a(moveIn([[16, 60, 0], [30, 0, 0]]))}>${kid(150, 128, CL.t, {k: .7, aL: [-16, -30]})}</g>` +
+        `<rect x="210" y="98" width="56" height="30" rx="4" fill="#f2c9a0"/><path d="M210 106q14 6 28 0t28 0" fill="#fff" opacity=".8"/>` + [0, 1, 2, 3, 4].map(i => `<rect x="${216 + i * 10}" y="86" width="3" height="12" ${fl(CL.a)}/><path d="M${217.5 + i * 10} 80q-3 3 0 6q3-3 0-6z" fill="#f6a623" ${s.a(pop(8 + i * 4), ORG(217.5 + i * 10, 83))}/>`).join('') +
+        `<text x="238" y="120" font-size="12" font-weight="700" text-anchor="middle" fill="#b8432f">80</text>` +
+        `<g ${s.a(pop(46), ORG(130, 40))}>${heartAt(130, 40, .9)}</g>`;
+    }},
+    imagine: {dur: 6, hl: [20, 50], end: 60, lit: '在脑中成像', mean: '想象', draw: s => {
+      return GND() + kid(60, 128, CL.t, {noFace: true}) + face(60, 128) + `<path d="M54 76h4M62 76h4" ${sk(INK, 2)}/>` + `<circle cx="80" cy="66" r="3" ${fl(CL.m, .5)}/><circle cx="94" cy="58" r="4.5" ${fl(CL.m, .5)}/>` +
+        `<path d="M110 66a18 18 0 0 1 14-30 28 28 0 0 1 52-6 24 24 0 0 1 46 8 18 18 0 0 1 6 34H122a14 14 0 0 1-12-6z" ${fs(CL.p, CL.m, 2)}/>` +
+        `<g ${s.a({0: 'opacity:0;transform:scale(.6)', 16: 'opacity:0;transform:scale(.6)', 36: 'opacity:1;transform:scale(1)', 92: 'opacity:1;transform:scale(1)', 100: 'opacity:0;transform:scale(1)'}, ORG(170, 50))}>` +
+        `<path d="M140 70V40h10v-6h6v6h12v-6h6v6h10v30z" fill="#b8a0e8"/><rect x="156" y="54" width="10" height="16" rx="5" fill="${WOOD}"/><path d="M178 70V34l4-10 4 10v36z" fill="#9a84d0"/><path d="M182 24v-8l8 3-8 3" fill="#e2473a"/>` +
+        `<path d="M196 50q10-12 20-4l6-6v10l6 4-8 2q-10 10-24-6z" fill="#5fae6a"/></g>` +
+        `<g ${s.a(pop(50), ORG(170, 110))}><rect x="136" y="100" width="68" height="20" rx="6" ${fl(CL.v)}/><text x="170" y="114" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">想象出来</text></g>`;
+    }},
+    interaction: {dur: 5.6, hl: [10, 20, 50], end: 58, lit: '相互之间你来我往', mean: '互动；相互作用', draw: s => {
+      const ball = {0: 'opacity:1;' + T(0, 0)}; for (let i = 0; i < 4; i++) { const p = 6 + i * 10, go = i % 2 === 0; ball[p] = 'opacity:1;' + T(go ? 0 : 140, 0); ball[p + 5] = 'opacity:1;' + T(70, -40); ball[p + 10] = 'opacity:1;' + T(go ? 140 : 0, 0); } ball[92] = 'opacity:1;' + T(0, 0); ball[100] = 'opacity:1;' + T(0, 0);
+      return GND() + kid(60, 128, CL.t, {aR: [16, -40]}) + kid(240, 128, CL.a, {aL: [-16, -40]}) +
+        `<g ${s.a(ball)}><circle cx="80" cy="86" r="7" ${fl(CL.g)}/><path d="M73 86h14M80 79v14" ${sk('#fff', 1.2)}/></g>` +
+        `<path d="M90 60Q150 10 210 60" ${sk(CL.v, 2)} stroke-dasharray="4 5" ${s.a(fadeP(10, 16))}/><path d="M204 52l6 8-10 2" ${sk(CL.v, 2)} ${s.a(showAt(15))}/><path d="M96 66l-6-6 10-2" ${sk(CL.v, 2)} ${s.a(showAt(15))}/>` +
+        `<g ${s.a(pop(50), ORG(150, 112))}><rect x="116" y="102" width="68" height="20" rx="6" ${fl(CL.t)}/><text x="150" y="116" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">你来我往</text></g>`;
+    }},
+    recognize: {dur: 6, hl: [20, 30, 50], end: 60, lit: '再一次认出来', mean: '认出；认可', draw: s => {
+      return GND() + [130, 170, 250].map((x, i) => kid(x, 128, [CL.m, CL.v, CL.m][i], {k: .75})).join('') + kid(210, 128, CL.a, {k: .75}) +
+        kid(60, 128, CL.t, {noFace: true}) + `<g ${s.a(hideAt(30))}>${face(60, 128)}<text x="78" y="62" font-size="14" font-weight="700" ${fl(CL.v)}>?</text></g><g ${s.a(showAt(30))}>${face(60, 128)}<text x="78" y="62" font-size="16" font-weight="700" ${fl(CL.a)}>!</text></g>` +
+        `<g ${s.a({0: 'opacity:0', 12: 'opacity:0', 16: 'opacity:1', 92: 'opacity:1', 100: 'opacity:0'})}><path d="M84 48a10 10 0 0 1 8-14 14 14 0 0 1 24 0 10 10 0 0 1 6 14z" ${fs(CL.p, CL.m, 1.5)}/><circle cx="104" cy="40" r="5" fill="${SKIN}"/><path d="M98 50q0-6 6-6t6 6z" ${fl(CL.a)}/></g>` +
+        `<path d="M110 40Q170 20 210 70" ${sk(CL.a, 2)} stroke-dasharray="3 4" ${s.a(fadeP(28, 34))}/>` +
+        `<g ${s.a(pop(32), ORG(210, 62))}><circle cx="210" cy="84" r="22" ${sk(CL.a, 3)}/></g>` +
+        `<g ${s.a(pop(48), ORG(210, 30))}><rect x="176" y="18" width="68" height="20" rx="6" ${fl(CL.a)}/><text x="210" y="32" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">认出来了!</text></g>`;
+    }},
+    rely: {dur: 6, hl: [20, 10], end: 60, lit: '绑在别人身上', mean: '依靠；信赖', draw: s => {
+      const lean = {0: T(0, 0, 'rotate(0deg)'), 20: T(0, 0, 'rotate(0deg)'), 32: T(14, 0, 'rotate(16deg)'), 92: T(14, 0, 'rotate(16deg)'), 100: T(0, 0, 'rotate(0deg)')};
+      return GND() + kid(190, 128, '#3d4a5c', {k: 1.25}) + `<g ${s.a(lean, FOOT)}>${kid(144, 128, CL.t, {k: .75, aR: [16, -30]})}</g>` +
+        `<path d="M150 104q20 6 40 0" ${sk(WOOD, 3)} ${DASH} ${s.a(drawP(10, 20))}/><path d="M148 100q22 10 44 0" ${sk(WOOD, 3)} ${DASH} ${s.a(drawP(12, 22))}/>` +
+        `<g ${s.a(pop(36), ORG(170, 50))}>${heartAt(170, 50, .9)}</g>` +
+        `<g ${s.a(pop(48), ORG(80, 40))}><rect x="46" y="30" width="68" height="20" rx="6" ${fl(CL.t)}/><text x="80" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">靠着你</text></g>`;
+    }},
+    responsibility: {dur: 6, hl: [10, 20, 50], end: 60, lit: '答应了要回应的事', mean: '责任；职责', draw: s => {
+      return GND() + kid(100, 128, '#3d4a5c', {k: 1.05, aR: [20, -30]}) + kid(200, 128, CL.t, {aL: [-20, -30], aR: [14, -54]}) +
+        `<g ${s.a(pop(8), ORG(150, 96))}><circle cx="150" cy="98" r="6" fill="${SKIN}"/></g>` +
+        `<g ${s.a(pop(16), ORG(150, 50))}>${bubble(150, 50)}<text x="150" y="54" font-size="9" font-weight="700" text-anchor="middle" ${fl(CL.t)}>交给我!</text></g>` +
+        `<g ${s.a({0: 'opacity:0;' + T(-60, -20), 26: 'opacity:0;' + T(-60, -20), 28: 'opacity:1;' + T(-60, -20), 40: 'opacity:1;' + T(0, 0), 92: 'opacity:1;' + T(0, 0), 100: 'opacity:0;' + T(0, 0)})}><rect x="196" y="40" width="40" height="26" rx="3" fill="${WOOD}"/><text x="216" y="58" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">责任</text></g>` +
+        `<g ${s.a(pop(48), ORG(200, 100))}><rect x="192" y="94" width="16" height="11" rx="2" ${fl(CL.a)}/><text x="200" y="102.5" font-size="7" font-weight="700" text-anchor="middle" fill="#fff">负责</text></g>`;
+    }},
+    stranger: {dur: 6, hl: [10, 46], end: 60, lit: '陌生的人', mean: '陌生人', draw: s => {
+      return GND() + `<rect x="10" y="40" width="50" height="88" ${fl(WOOD, .55)}/>` +
+        `<g ${s.a(move([[6, 60, 0], [20, 0, 0]]))}><g>${kid(230, 128, '#5a5a6a', {k: 1.05, noFace: true})}<path d="M216 72h28l-3-10h-22z" fill="${INK}"/><path d="M212 72h36" ${sk(INK, 3)}/><path d="M220 84h20" ${sk(INK, 2)}/><circle cx="226" cy="79" r="1.5" fill="${INK}"/><circle cx="234" cy="79" r="1.5" fill="${INK}"/></g></g>` +
+        `<g ${s.a(pop(22), ORG(230, 40))}><text x="230" y="46" font-size="20" font-weight="700" text-anchor="middle" ${fl(CL.v)}>?</text></g>` +
+        kid(110, 128, CL.v, {k: 1.1}) + `<g ${s.a({0: T(), 20: T(), 28: T(-20, 0), 92: T(-20, 0), 100: T()})}>${kid(126, 128, CL.a, {k: .6, noFace: true})}${face(126, 128, .6, 'sad')}</g>` +
+        `<g ${s.a(pop(46), ORG(160, 30))}><rect x="126" y="20" width="68" height="20" rx="6" ${fl(CL.v)}/><text x="160" y="34" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">不认识他</text></g>`;
+    }},
+    teaching: {dur: 6, hl: [6, 50], end: 60, lit: '教的这件事', mean: '教学', draw: s => {
+      return GND() + `<rect x="150" y="84" width="110" height="8" fill="${WOOD}"/><path d="M160 92v36M250 92v36" ${sk(WOOD, 3)}/><rect x="176" y="60" width="64" height="24" rx="2" fill="#fffdf6" style="stroke:var(--ink3);stroke-width:1.5px"/>` +
+        `<path d="M200 66l-8 14M200 66l10 14" ${sk(INK, 3)} ${DASH} ${s.a(drawP(16, 30))}/>` +
+        kid(200, 128, CL.t, {k: .75, aR: [12, -32]}) + kid(140, 128, CL.v, {k: 1.05, aR: [34, -36]}) +
+        `<g ${s.a(move([[16, 0, 0], [24, -6, 10], [30, 10, 10]]))}><path d="M208 64l6-10" ${sk(CL.a, 2.5)}/></g>` +
+        `<g ${s.a(pop(34), ORG(80, 50))}>${bubble(80, 50)}<text x="80" y="54" font-size="9" font-weight="700" text-anchor="middle" ${fl(CL.v)}>一撇一捺</text></g>` +
+        `<g ${s.a(pop(50), ORG(240, 40))}><circle cx="246" cy="44" r="10" ${fl(CL.t)}/><path d="M242 44l3 3 5-6" ${sk('#fff', 2)}/></g>`;
+    }},
+    colleague: {dur: 6, hl: [20, 10], end: 60, lit: '同一个团队里的人', mean: '同事', draw: s => {
+      return GND() + `<rect x="100" y="14" width="100" height="26" rx="6" ${fl(CL.v)}/><text x="150" y="31" font-size="11" font-weight="700" text-anchor="middle" fill="#fff">市场部</text>` +
+        [80, 130, 180, 230].map((x, i) => `<g ${s.a(moveIn([[6 + i * 4, (x < 150 ? -60 : 60), 0], [20 + i * 4, 0, 0]]))}>${kid(x, 128, ['#3d4a5c', CL.t, CL.a, CL.g][i], {k: .85, aL: [-14, -46], aR: [14, -46]})}<rect x="${x - 6}" y="94" width="12" height="9" rx="2" ${fl(CL.v)}/></g>`).join('') +
+        `<g ${s.a(showAt(36, 46))}>${burst(155, 74, 14).replace('<path ', `<path ${sk(CL.g, 2)} `)}${burst(105, 74, 14).replace('<path ', `<path ${sk(CL.g, 2)} `)}${burst(205, 74, 14).replace('<path ', `<path ${sk(CL.g, 2)} `)}</g>` +
+        `<g ${s.a(pop(48), ORG(150, 140))}><rect x="110" y="132" width="80" height="16" rx="5" ${fl(CL.t)}/><text x="150" y="144" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">我们是同事</text></g>`;
+    }},
+    depend: {dur: 6, hl: [10, 10], end: 60, lit: '挂在别人身上', mean: '依靠；取决于', draw: s => {
+      const swing = {0: R(0), 100: R(0)}; for (let i = 0; i < 6; i++) swing[10 + i * 8] = R(i % 2 ? -14 : 14); swing[58] = R(0);
+      return `<path d="M0 40q80-14 300 0" ${sk(WOOD, 8)}/><path d="M260 40q10-20 30-24" ${sk(WOOD, 5)}/><circle cx="270" cy="24" r="14" fill="#3f8f4f"/>` +
+        `<g ${s.a(swing, ORG(150, 40))}><path d="M150 40v40" ${sk(CL.m, 2)}/><circle cx="150" cy="96" r="14" fill="#8b5a3a"/><circle cx="150" cy="82" r="8" fill="#8b5a3a"/><circle cx="147" cy="81" r="1.4" fill="${INK}"/><circle cx="153" cy="81" r="1.4" fill="${INK}"/><path d="M150 108q10 16 0 24" ${sk('#8b5a3a', 3)}/><path d="M144 76l-4-8M156 76l4-8" ${sk('#8b5a3a', 3)}/></g>` +
+        `<g ${s.a(pop(46), ORG(70, 100))}><rect x="34" y="90" width="72" height="20" rx="6" ${fl(CL.v)}/><text x="70" y="104" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">全靠这根枝</text></g>` + GND();
+    }},
+    major: {dur: 6, hl: [10, 50], end: 60, lit: '大的那个', mean: '主要的；专业', draw: s => {
+      return `<rect x="0" y="0" width="300" height="150" fill="#cfe5c8" opacity=".5"/>` +
+        `<path d="M0 90h300" ${sk(CL.m, 26)}/><path d="M0 90h300" ${sk('#fff', 2)} stroke-dasharray="10 10"/>` +
+        `<path d="M80 90L120 10M200 90L250 150" ${sk(CL.m, 8, .6)}/>` +
+        `<g ${s.a({0: 'opacity:0;' + T(-40, 0), 8: 'opacity:1;' + T(-40, 0), 50: 'opacity:1;' + T(300, 0), 52: 'opacity:0;' + T(320, 0), 100: 'opacity:0'})}><rect x="20" y="78" width="40" height="16" rx="5" fill="#e2473a"/><rect x="28" y="72" width="22" height="10" rx="3" fill="#e2473a"/><circle cx="30" cy="96" r="5" fill="${INK}"/><circle cx="52" cy="96" r="5" fill="${INK}"/></g>` +
+        `<g ${s.a(pop(10), ORG(150, 60))}><rect x="122" y="52" width="56" height="18" rx="4" fill="#3f8f4f"/><text x="150" y="65" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">主干道</text></g>` +
+        `<g ${s.a(pop(50), ORG(240, 30))}><rect x="206" y="20" width="68" height="20" rx="6" ${fl(CL.a)}/><text x="240" y="34" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">主要的</text></g>`;
+    }},
   };
   // 同一个标签上写了两个 style（颜色 + 动画）时合并成一个，否则浏览器只认第一个
   const mergeStyles = html => html.replace(/<[a-z][^>]*>/gi, tag => {
