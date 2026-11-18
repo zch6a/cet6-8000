@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>六级 8000 词</title>
-<link rel="preload" href="data/core.js?v=f0f62126" as="script">
+<link rel="preload" href="data/core.js?v=9ee7fde2" as="script">
 <meta name="description" content="大学英语六级 8000 词：近六年 13 次真题词频统计，只留考试常考义；每个词有助记，配词根积木和动画、500 多组形近词和翻译话题串记、熟词僻义和写作翻译搭配；支持间隔复习背诵、快速过词、四种自测，可导出 PDF。打开即用，不用登录。">
 <meta property="og:title" content="六级 8000 词 · 真题词频 + 助记 + 背诵">
 <meta property="og:description" content="近六年 13 次六级真题词频，8000 词每个都有精选释义和助记：词根动画、形近词串记段子、写作搭配，带间隔复习和自测，打开即用。">
@@ -677,7 +677,7 @@ window.CET6 = {
   stories(list){ this.storyList = list; }
 };
 </script>
-<script src="data/core.js?v=f0f62126"></script>
+<script src="data/core.js?v=9ee7fde2"></script>
 <script>
 (function(){
   'use strict';
@@ -1192,7 +1192,7 @@ window.CET6 = {
   // 有手绘场景的词用场景，没有的用通用画面串
   const animBlockHtml = w => window.CET6_SCENES && CET6_SCENES.has(w.w) ? CET6_SCENES.html(w) : animStripHtml(w);
   // 没有词根拆分的词：手绘场景走单独的「动画」入口（卡片、背诵、快速过词都用 pgroup，在那里加一栏）
-  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client web incentive stray deem irritate refrain spouse cape chip norm subtle bamboo cite forge oak snob trigger absurd cluster fascinate prey random shabby baffle category flaw formidable pregnant shark silicon surge ample array authentic cater dine drastic entail indulge plague prestige prone stun tackle thrifty apt ballet bizarre bug clash clip cruise curb forum grab haunt hip naive opaque pledge ranch recipe slack snack spice stagger stall studio therapy arch asset bid compliment counsel cozy diesel dwarf dwell gamble greed hamper haul howl hurricane idiot lobby logistics maritime myth odor outrage pest probe quest shrewd shrub '.indexOf(' ' + w.w + ' ') >= 0; }
+  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client web incentive stray deem irritate refrain spouse cape chip norm subtle bamboo cite forge oak snob trigger absurd cluster fascinate prey random shabby baffle category flaw formidable pregnant shark silicon surge ample array authentic cater dine drastic entail indulge plague prestige prone stun tackle thrifty apt ballet bizarre bug clash clip cruise curb forum grab haunt hip naive opaque pledge ranch recipe slack snack spice stagger stall studio therapy arch asset bid compliment counsel cozy diesel dwarf dwell gamble greed hamper haul howl hurricane idiot lobby logistics maritime myth odor outrage pest probe quest shrewd shrub stubborn sturdy thesis turmoil turtle wield allege ambassador ambiguous arctic bacon bleak '.indexOf(' ' + w.w + ' ') >= 0; }
   function npSlot(w){ return `<div class="sc-np" data-w="${esc(w.w)}"><button class="anim-btn" data-npanim="1" title="看这个词的手绘动画">▶ 动画</button></div>`; }
   // 点「▶ 动画」或展开「动画」栏：放一遍；再点按钮收起。不在单词卡里（背诵 / 快速过词）就不放重播按钮
   function npScene(np, force){
