@@ -10155,7 +10155,7 @@
         chip(s, 236, 60, 76, '岛上的人', CL.t, 20) + chip(s, 60, 24, 52, '岛民', '#d23c2f', 40);
     }},
 // ---------- 第一百零八批（六级词优先） ----------
-    legacy: {dur: 6, hl: [8, 34], end: 60, lit: '依法留给后人的东西', mean: '遗产；遗留问题', draw: s => {
+    legacy: {dur: 6, hl: [8, 34], end: 60, lit: '依法留给后人', mean: '遗产', draw: s => {
       return GND() + `<rect x="110" y="96" width="80" height="6" fill="${WOOD}"/><path d="M116 102v26M184 102v26" ${sk(WOOD, 3)}/>` +
         `<g ${s.a(pop(6), ORG(150, 40))}><path d="M150 26v30M132 34h36" ${sk('#a8641a', 2.5)}/><path d="M132 34l-7 12h14zM168 34l-7 12h14z" fill="#f2b632"/><path d="M142 56h16" ${sk('#a8641a', 3)}/></g>` +
         `<g ${s.a(pop(10), ORG(150, 82))}><rect x="130" y="66" width="40" height="30" fill="#fff6e8" ${sk('#c9a06a', 1.5)}/><text x="150" y="80" font-size="9" font-weight="700" text-anchor="middle" fill="#a8641a">遗嘱</text><circle cx="162" cy="89" r="4.5" fill="#d23c2f"/></g>` +
@@ -10246,7 +10246,7 @@
         `<g ${s.a(slot([0, 20, 38, 99], 0))}>${robot(0)}</g><g ${s.a(slot([0, 20, 38, 99], 1))}>${robot(1)}</g><g ${s.a(slot([0, 20, 38, 99], 2))}>${robot(2)}</g></g>` +
         chip(s, 70, 24, 76, '往上提一级', CL.t, 20) + chip(s, 246, 24, 52, '升级', '#d23c2f', 36);
     }},
-    adolescent: {dur: 6, hl: [6, 18, 36], end: 60, lit: '正在长大的人', mean: '青少年；青春期的', draw: s => {
+    adolescent: {dur: 6, hl: [6, 18, 36], end: 60, lit: '正在长大的人', mean: '青少年', draw: s => {
       return GND() + `<path d="M30 140H270" ${sk('#d23c2f', 2)} ${DASH} ${s.a(drawP(4, 10))}/><path d="M266 136l6 4-6 4z" fill="#d23c2f" ${s.a(showAt(10))}/>` +
         `<text x="40" y="146" font-size="8" font-weight="700" text-anchor="middle" ${fl(CL.m)}>小孩</text><text x="250" y="146" font-size="8" font-weight="700" text-anchor="middle" ${fl(CL.m)}>大人</text>` +
         `<g ${s.a(move([[6, 0, 0], [34, 170, 0]]))}><g ${s.a({0: 'transform:scale(.6)', 8: 'transform:scale(.6)', 34: 'transform:scale(1)', 92: 'transform:scale(1)', 100: 'transform:scale(.6)'}, ORG(40, 128))}>` +
