@@ -1198,7 +1198,7 @@ window.CET6 = {
   // 有手绘场景的词用场景，没有的用通用画面串
   const animBlockHtml = w => window.CET6_SCENES && CET6_SCENES.has(w.w) ? CET6_SCENES.html(w) : animStripHtml(w);
   // 没有词根拆分的词：手绘场景走单独的「动画」入口（卡片、背诵、快速过词都用 pgroup，在那里加一栏）
-  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client web incentive stray deem irritate refrain spouse cape chip norm subtle bamboo cite forge oak snob trigger absurd cluster fascinate prey random shabby baffle '.indexOf(' ' + w.w + ' ') >= 0; }
+  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client web incentive stray deem irritate refrain spouse cape chip norm subtle bamboo cite forge oak snob trigger absurd cluster fascinate prey random shabby baffle category flaw formidable pregnant shark silicon surge ample array authentic cater dine '.indexOf(' ' + w.w + ' ') >= 0; }
   function npSlot(w){ return `<div class="sc-np" data-w="${esc(w.w)}"><button class="anim-btn" data-npanim="1" title="看这个词的手绘动画">▶ 动画</button></div>`; }
   // 点「▶ 动画」或展开「动画」栏：放一遍；再点按钮收起。不在单词卡里（背诵 / 快速过词）就不放重播按钮
   function npScene(np, force){
