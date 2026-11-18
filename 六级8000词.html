@@ -490,6 +490,9 @@ body.simple .pgroup .pbody:not(.open){display:none}
 .sc-end{color:var(--ink2);font-weight:600}
 .sc-end b{color:var(--ink);background:var(--paper);border:1.5px solid var(--ink);border-radius:8px;padding:1px 8px;margin-left:2px}
 .scene .anim-replay{display:block;margin:0 0 0 auto}
+.sc-np>.anim-btn{margin:6px 0 0}
+.fc-back .sc-np>.anim-btn{margin:6px auto 0;display:block}
+body.simple .sc-np>.anim-btn{display:none}
 @media (prefers-reduced-motion: reduce){.anim-tile svg *,.scene *{animation:none!important}}
 /* ===== 紧凑双栏卡片 ===== */
 .wrap{max-width:1240px}
@@ -796,11 +799,11 @@ window.CET6 = {
     $('#simple').onchange = e => { st.simple = e.target.checked; document.body.classList.toggle('simple', st.simple); save(); };
     // 词根拆解的展开 / 收起（卡片、背诵、快速过词通用）
     document.addEventListener('click', e => {
-      const t = e.target.closest('[data-ptog]'); if (!t) return;
+      const t = e.target.closest('[data-ptog],[data-npanim]'); if (!t) return; if (t.dataset.npanim) { e.stopPropagation(); npScene(t.closest('.sc-np')); return; }
       e.stopPropagation();
       const g = t.closest('.pgroup'), body = g && g.querySelector(`.pbody[data-pb="${t.dataset.ptog}"]`); if (!body) return;
       const on = body.classList.toggle('open'); t.classList.toggle('on', on);
-      t.textContent = t.dataset.label + (on ? ' ▾' : ' ▸');
+      t.textContent = t.dataset.label + (on ? ' ▾' : ' ▸'), npOpen(body, on);
     }, true);
     $('#cover').onchange = e => { st.cover = e.target.checked; document.body.classList.toggle('cover', st.cover); save(); const c = $('#fCount'); c.textContent = String((+c.textContent || 0) + (st.cover ? 1 : -1)).replace(/^0$/, ''); };
     $('#hideKnown').onchange = e => { st.hideKnown = e.target.checked; apply(); };
@@ -1194,6 +1197,20 @@ window.CET6 = {
   (window.requestIdleCallback || (f => setTimeout(f, 1500)))(() => loadScenes());
   // 有手绘场景的词用场景，没有的用通用画面串
   const animBlockHtml = w => window.CET6_SCENES && CET6_SCENES.has(w.w) ? CET6_SCENES.html(w) : animStripHtml(w);
+  // 没有词根拆分的词：手绘场景走单独的「动画」入口（卡片、背诵、快速过词都用 pgroup，在那里加一栏）
+  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client '.indexOf(' ' + w.w + ' ') >= 0; }
+  function npSlot(w){ return `<div class="sc-np" data-w="${esc(w.w)}"><button class="anim-btn" data-npanim="1" title="看这个词的手绘动画">▶ 动画</button></div>`; }
+  // 点「▶ 动画」或展开「动画」栏：放一遍；再点按钮收起。不在单词卡里（背诵 / 快速过词）就不放重播按钮
+  function npScene(np, force){
+    if (!np) return; const old = np.querySelector('.scene'), btn = np.querySelector('.anim-btn');
+    if (old) { old.remove(); if (btn) btn.textContent = '▶ 动画'; if (!force) return; }
+    loadScenes().then(() => {
+      const w = byWord.get(np.dataset.w); if (!w || !window.CET6_SCENES || np.querySelector('.scene')) return;
+      let h = CET6_SCENES.html(w); if (!np.closest('.card')) h = h.replace(/<button class="anim-replay"[^>]*>.*?<\/button>/, '');
+      np.insertAdjacentHTML('beforeend', h); if (btn) btn.textContent = '■ 收起';
+    });
+  }
+  function npOpen(body, on){ const np = on && body.querySelector('.sc-np'); if (np) npScene(np, true); }
   // 检查用：网址带 ?scenedebug 时可以在控制台直接按词生成场景
   if (/[?&]scenedebug/.test(location.search)) window.__scene = word => { const w = byWord.get(word); return w ? animBlockHtml(w) : ''; };
   /* ===== 单词场景结束 ===== */
@@ -1307,7 +1324,7 @@ window.CET6 = {
   // 简化版：词根拆解、助记、易混·串记默认收起。三个按钮固定排一行，展开的内容按固定顺序出现在按钮下方
   function pgroup(w, partsInner, vs, st){
     const items = [];
-    if (w.parts) items.push(['词根拆解', partsInner]);
+    items.push(...(w.parts ? [['词根拆解', partsInner]] : hasNpScene(w) ? [['动画', npSlot(w)]] : []));
     if (w.mem) items.push(['助记', `<div class="mem">${memHtml(w.mem)}</div>`]);
     if (vs || st) items.push([vs && st ? '易混·串记' : vs ? '易混' : '串记', vs + st]);
     if (!items.length) return '';
