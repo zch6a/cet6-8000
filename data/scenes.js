@@ -24261,7 +24261,7 @@
         chip(s, 60, 142, 76, '有钱舍不得花', CL.t, 16) + chip(s, 230, 142, 88, '守财奴；吝啬鬼', '#d23c2f', 44);
     }},
     mitten: {dur: 6, hl: [16], end: 60, lit: '四指不分开的手套', mean: '连指手套', draw: s => {
-      const mitt = (x, c, d) => `<path d="M${x - 16} 120V80q0-14 16-14t16 14v40z" fill="${c}"/><path d="M${x + d * 16} 96q${d * 14}-4 ${d * 12} 12q-2 8-${d * 12} 4" fill="${c}"/><path d="M${x - 16} 112h32" ${sk('#fff', 4)}/>`;
+      const mitt = (x, c, d) => `<path d="M${x - 16} 120V80q0-14 16-14t16 14v40z" fill="${c}"/><path d="M${x + d * 16} 96q${d * 14}-4 ${d * 12} 12q-2 8 ${-d * 12} 4" fill="${c}"/><path d="M${x - 16} 112h32" ${sk('#fff', 4)}/>`;
       return [0, 1, 2, 3, 4].map(i => `<path d="M${30 + i * 60} 10l4 6M${34 + i * 60} 10l-4 6M${28 + i * 60} 13h8" ${sk('#cfe8f5', 1.5)} ${s.a({0: T(0, 0) + ';opacity:0', 10: 'opacity:1', 100: T(6, 120) + ';opacity:0'}, `animation-delay:${i * .4}s;animation-timing-function:linear`, 2.4)}/>`).join('') +
         `<g ${s.a(moveIn([[6, -40, 0], [18, 0, 0]]))}>${mitt(110, '#e2473a', -1)}</g><g ${s.a(moveIn([[12, 40, 0], [24, 0, 0]]))}>${mitt(190, '#e2473a', 1)}</g>` +
         `<path d="M94 66h0" ${sk('#d23c2f', 1)}/><g ${s.a(pop(30), ORG(150, 40))}><rect x="114" y="30" width="72" height="20" rx="4" fill="#e2473a"/><text x="150" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">只分大拇指</text></g>` +

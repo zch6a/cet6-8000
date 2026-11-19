@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>六级 8000 词</title>
-<link rel="preload" href="data/core.js?v=8f712063" as="script">
+<link rel="preload" href="data/core.js?v=eef3b734" as="script">
 <meta name="description" content="大学英语六级 8000 词：近六年 13 次真题词频统计，只留考试常考义；每个词有助记，配词根积木和动画、500 多组形近词和翻译话题串记、熟词僻义和写作翻译搭配；支持间隔复习背诵、快速过词、四种自测，可导出 PDF。打开即用，不用登录。">
 <meta property="og:title" content="六级 8000 词 · 真题词频 + 助记 + 背诵">
 <meta property="og:description" content="近六年 13 次六级真题词频，8000 词每个都有精选释义和助记：词根动画、形近词串记段子、写作搭配，带间隔复习和自测，打开即用。">
@@ -164,6 +164,20 @@ h1 em{font-style:normal;color:var(--accent)}
 /* ---------- list ---------- */
 main{padding:18px 0 60px}
 .resinfo{color:var(--ink3);font-size:13px;margin:4px 2px 12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+/* 分组切换条和卡片上的「组号-序号」 */
+.gbar{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin:0 2px 14px;font-size:13px;color:var(--ink3)}
+.gbar-b{margin:16px 2px 6px;justify-content:center}
+.gbar button,.gbar select{font:inherit;font-size:13px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:9px}
+.gbar button{padding:7px 13px;cursor:pointer}
+.gbar button:hover:not(:disabled){border-color:var(--ink3)}
+.gbar button:disabled{opacity:.4;cursor:default}
+.gbar select{padding:6px 6px;max-width:190px}
+.gbar label{display:inline-flex;align-items:center;gap:5px}
+.gbar .gb-of{margin-left:2px;white-space:nowrap}
+.gbar .gb-size{white-space:nowrap}
+.gbar .gb-size{margin-left:auto}
+.gbar-b .gb-info b{color:var(--ink)}
+.gno{display:inline-block;font:600 12px/1 Georgia,serif;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:3px 6px;margin-right:8px;vertical-align:3px;letter-spacing:.02em}
 .group{font:700 30px/1 Georgia,serif;color:var(--accent);margin:26px 4px 10px;display:flex;align-items:baseline;gap:10px}
 .group small{font:13px/1 "PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink3);font-weight:400}
 .list{display:grid;gap:10px}
@@ -543,6 +557,12 @@ body.simple .sc-np>.anim-btn{display:none}
   .card .head{gap:4px 6px}
   .card .w{font-size:19.5px}
   .card .lv,.card .hot{padding:2px 5px}
+  .gno{font-size:11px;padding:3px 5px;margin-right:6px}
+  .gbar{gap:8px}
+  .gbar button{padding:7px 10px}
+  .gbar .gb-sel{order:3;flex:1 1 100%;min-width:0}
+  .gbar .gb-sel select{flex:1;min-width:0;max-width:none}
+  .gbar .gb-size{margin-left:auto}
   .card .ib{width:24px;height:24px}
   .letters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-top:8px;padding-bottom:2px}
   .letters::-webkit-scrollbar,.row2::-webkit-scrollbar{display:none}
@@ -655,8 +675,10 @@ body.simple .sc-np>.anim-btn{display:none}
 <main>
   <div class="wrap">
     <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布和近义词 · 「词根拆解」里有同根词 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
+    <div class="gbar" id="gbar" hidden></div>
     <div id="list"><div class="empty" id="loading">正在加载 8000 词的数据（约 650 KB），网速慢时要等几秒…</div></div>
     <button class="more" id="more" hidden>继续加载</button>
+    <div class="gbar gbar-b" id="gbar2" hidden></div>
     <section class="legend" id="legend"></section>
   </div>
 </main>
@@ -695,7 +717,7 @@ window.CET6 = {
   }
 };
 </script>
-<script src="data/core.js?v=8f712063"></script>
+<script src="data/core.js?v=eef3b734"></script>
 <script>
 (function(){
   'use strict';
@@ -742,11 +764,12 @@ window.CET6 = {
   const ALIAS = meta.alias || {};
   const TOPICS = new Set(meta.topics || []);   // 翻译话题词：中国文化、社会热点（真题翻译给中文，英文里多为 0 次）
   const known = new Set(store.get('cet6-known', []).map(w => ALIAS[w] || w));
-  const st = Object.assign({sort:'alpha', lv:'all', band:'all', letter:'all', q:'', cover:false, hideKnown:false, simple:true}, store.get('cet6-view', {}));
+  const st = Object.assign({sort:'alpha', lv:'all', band:'all', letter:'all', q:'', cover:false, hideKnown:false, simple:true, gsize:20, g:1}, store.get('cet6-view', {}));
   document.body.classList.toggle('simple', st.simple);
   st.q = '';
   const PAGE = 120;
-  let shown = 0, current = [];
+  // 分组：当前列表按顺序每 gsize 个词一组，编号「组号-组内序号」；viewList 是这一组里要显示的词
+  let shown = 0, current = [], viewList = [], gAll = [], gCount = 1, gno = new Map();
 
   /* ---------- header stats ---------- */
   function renderStats(){
@@ -961,6 +984,7 @@ window.CET6 = {
     $('#viewName').textContent = {alpha:'字母', freq:'频率', write:'会写', roots:'词根', stories:'串记'}[st.sort] || '筛选';
     const nf = [st.lv !== 'all', st.band !== 'all', st.letter !== 'all', st.cover, st.hideKnown, st.rareOnly, st.topicOnly].filter(Boolean).length;
     $('#fCount').textContent = nf ? String(nf) : '';
+    $('#gbar').hidden = $('#gbar2').hidden = true; gno = new Map();
     if (st.sort === 'stories') { renderStories(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
@@ -971,7 +995,6 @@ window.CET6 = {
       (st.band === 'all' || String(w.b) === st.band) &&
       (st.sort !== 'write' || w.wr) &&
       (st.letter === 'all' || q || w.w[0] === st.letter) &&   // 搜索时不受字母筛选限制
-      (!st.hideKnown || !known.has(w.w)) &&
       (!st.rareOnly || w.rs) &&
       (!st.topicOnly || TOPICS.has(w.w)) &&
       (!q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && (zhHit(w, q) || (q.length > 1 && memHit(w, q)))) || (q.length > 2 && w.w.includes(q)))
@@ -987,6 +1010,19 @@ window.CET6 = {
       const inZh = w => zhHit(w, q);
       current.sort((a,b) => exact(b) - exact(a) || inZh(b) - inZh(a) || b.n - a.n || a.w.localeCompare(b.w));
     }
+    // 分组编号按「隐藏已掌握」之前的列表来排：标了已掌握，其它词的编号和组都不变
+    const gs = st.gsize || 0;
+    gAll = current; gno = new Map();
+    if (gs) gAll.forEach((w, i) => gno.set(w.w, `${Math.floor(i / gs) + 1}-${i % gs + 1}`));
+    gCount = gs ? Math.max(1, Math.ceil(gAll.length / gs)) : 1;
+    // 换了排序 / 筛选 / 搜索就回到第 1 组；只是改每组词数时，停在原来那组第一个词所在的组
+    const sig = [st.sort, st.lv, st.band, st.letter, q, !!st.rareOnly, !!st.topicOnly, !!st.wfreq].join('|');
+    if (sig !== st.gsig) { st.gsig = sig; st.g = 1; }
+    if (st.gKeep != null) { st.g = gs ? Math.floor(st.gKeep / gs) + 1 : 1; st.gKeep = null; }
+    st.g = Math.min(Math.max(1, st.g || 1), gCount);
+    save();
+    if (st.hideKnown) current = gAll.filter(w => !known.has(w.w));
+    viewList = gs ? gAll.slice((st.g - 1) * gs, st.g * gs).filter(w => !st.hideKnown || !known.has(w.w)) : current;
     $('#list').innerHTML = ''; shown = 0; lastGroup = null;
     const parts = [];
     if (st.letter !== 'all' && !q) parts.push('字母 ' + st.letter.toUpperCase());
@@ -997,7 +1033,8 @@ window.CET6 = {
     const how = (q && /[^\x00-\x7f]/.test(q)) ? ' · 中文反查：释义完全匹配 → 释义包含 → 助记搭配包含，同类按真题出现次数'
       : st.sort === 'freq' ? ' · 按真题出现次数从高到低'
       : st.sort === 'write' ? (st.wfreq ? ' · 会写词汇 · 按写作+翻译出现次数' : ' · 会写词汇 · 按字母顺序') : ' · 按字母顺序';
-    $('#resinfo').textContent = `共 ${current.length.toLocaleString()} 词` + (parts.length ? ' · ' + parts.join(' · ') : '') + how;
+    $('#resinfo').textContent = `共 ${current.length.toLocaleString()} 词` + (gs && gCount > 1 ? ` · 每组 ${gs} 词，共 ${gCount} 组` : '') + (parts.length ? ' · ' + parts.join(' · ') : '') + how;
+    renderGbar();
     if (!current.length) {
       const filtered = st.lv !== 'all' || st.band !== 'all' || st.hideKnown || st.rareOnly || st.topicOnly || st.sort === 'write';
       $('#list').innerHTML = `<div class="empty">没有符合条件的词${filtered ? '<br><button class="chip" id="clearF" style="margin-top:12px">清除级别 / 频率等筛选再找找</button>' : ''}</div>`;
@@ -1467,7 +1504,7 @@ window.CET6 = {
     const nS = (meta.sittings||[]).length;
     const isK = known.has(w.w);
     return `<article class="card${isK ? ' known' : ''}" data-w="${esc(w.w)}">
-      <div class="head"><div class="w">${rank}${esc(w.w)}</div>
+      <div class="head"><div class="w">${gno.has(w.w) ? `<span class="gno" title="第 ${gno.get(w.w).replace('-', ' 组第 ')} 个">${gno.get(w.w)}</span>` : ''}${rank}${esc(w.w)}</div>
         <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div>
         <div class="tools"><button class="ib spk" title="朗读" aria-label="朗读">${ICON_SPK}</button><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
@@ -1483,10 +1520,11 @@ window.CET6 = {
   }
   function renderMore(){
     const list = $('#list');
-    const end = Math.min(current.length, shown + PAGE);
+    if (!viewList.length) { list.innerHTML = '<div class="empty">这一组的词都标成已掌握了<br>换一组，或者在筛选里关掉「隐藏已掌握」</div>'; $('#more').hidden = true; return; }
+    const end = Math.min(viewList.length, shown + PAGE);
     let html = '';
     for (let i = shown; i < end; i++) {
-      const w = current[i];
+      const w = viewList[i];
       if ((st.sort === 'alpha' || (st.sort === 'write' && !st.wfreq)) && !st.q) {
         const g = w.w[0];
         if (g !== lastGroup) {
@@ -1502,12 +1540,48 @@ window.CET6 = {
     listEl = null;
     list.insertAdjacentHTML('beforeend', html);
     shown = end;
-    $('#more').hidden = shown >= current.length;
-    if (!$('#more').hidden) $('#more').textContent = `继续加载（还剩 ${(current.length - shown).toLocaleString()} 词）`;
+    $('#more').hidden = shown >= viewList.length;
+    if (!$('#more').hidden) $('#more').textContent = `继续加载（还剩 ${(viewList.length - shown).toLocaleString()} 词）`;
   }
   // infinite scroll
-  const io = new IntersectionObserver(es => { if (es[0].isIntersecting && shown < current.length) renderMore(); }, {rootMargin:'800px'});
+  const io = new IntersectionObserver(es => { if (es[0].isIntersecting && shown < viewList.length) renderMore(); }, {rootMargin:'800px'});
   io.observe($('#more'));
+
+  /* ---------- 分组切换：列表上下各一条，上一组 / 下一组 / 跳到第几组 / 每组几个词 ---------- */
+  const GSIZES = [10, 20, 30, 50, 100, 0];
+  function renderGbar(){
+    const gs = st.gsize || 0, top = $('#gbar'), bot = $('#gbar2');
+    const sizeSel = `<label class="gb-size">每组 <select data-gsize aria-label="每组词数">${GSIZES.map(n => `<option value="${n}"${n === gs ? ' selected' : ''}>${n ? n + ' 词' : '不分组'}</option>`).join('')}</select></label>`;
+    if (!gs || gCount <= 1) {
+      // 不分组，或者整个列表不到一组：只留「每组几个词」的开关
+      top.innerHTML = gAll.length > 10 ? `<span class="gb-info">${gs ? `共 1 组（${gAll.length} 词）` : '不分组：往下滑一直加载'}</span>${sizeSel}` : '';
+      top.hidden = !top.innerHTML; bot.hidden = true; return;
+    }
+    const g = st.g, opts = [];
+    for (let i = 1; i <= gCount; i++) { const a = gAll[(i - 1) * gs], b = gAll[Math.min(i * gs, gAll.length) - 1]; opts.push(`<option value="${i}"${i === g ? ' selected' : ''}>${i}（${esc(a.w)}–${esc(b.w)}）</option>`); }
+    const prev = `<button type="button" class="gb-step" data-gstep="-1"${g <= 1 ? ' disabled' : ''}>‹ 上一组</button>`;
+    const next = `<button type="button" class="gb-step" data-gstep="1"${g >= gCount ? ' disabled' : ''}>下一组 ›</button>`;
+    top.innerHTML = prev + `<label class="gb-sel">第 <select data-gsel aria-label="跳到第几组">${opts.join('')}</select> 组<span class="gb-of">/ 共 ${gCount} 组</span></label>` + next + sizeSel;
+    bot.innerHTML = prev + `<span class="gb-info">第 <b>${g}</b> / ${gCount} 组</span>` + next;
+    top.hidden = bot.hidden = false;
+  }
+  function goGroup(g){
+    st.g = Math.min(Math.max(1, g), gCount); apply();
+    const top = $('#gbar'); if (top.getBoundingClientRect().top < 0) scrollTo({top: scrollY + top.getBoundingClientRect().top - 70});
+  }
+  for (const id of ['#gbar', '#gbar2']) {
+    $(id).addEventListener('click', e => { const b = e.target.closest('[data-gstep]'); if (b && !b.disabled) goGroup(st.g + +b.dataset.gstep); });
+    $(id).addEventListener('change', e => {
+      if (e.target.matches('[data-gsel]')) goGroup(+e.target.value);
+      else if (e.target.matches('[data-gsize]')) { st.gKeep = ((st.g || 1) - 1) * (st.gsize || 0); st.gsize = +e.target.value; apply(); }
+    });
+  }
+  // 电脑上按 ← / → 也能换组（在输入框里、或背诵自测打开时不管）
+  document.addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    if ($('#gbar2').hidden || $('#ov').classList.contains('show') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '')) return;
+    e.preventDefault(); goGroup(st.g + (e.key === 'ArrowRight' ? 1 : -1));
+  });
 
   // card interactions
   // play the block-assembly animation when a card scrolls into view
