@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>六级 8000 词</title>
-<link rel="preload" href="data/core.js?v=0de34453" as="script">
+<link rel="preload" href="data/core.js?v=e46eaf0b" as="script">
 <meta name="description" content="大学英语六级 8000 词：近六年 13 次真题词频统计，只留考试常考义；每个词有助记，配词根积木和动画、500 多组形近词和翻译话题串记、熟词僻义和写作翻译搭配；支持间隔复习背诵、快速过词、四种自测，可导出 PDF。打开即用，不用登录。">
 <meta property="og:title" content="六级 8000 词 · 真题词频 + 助记 + 背诵">
 <meta property="og:description" content="近六年 13 次六级真题词频，8000 词每个都有精选释义和助记：词根动画、形近词串记段子、写作搭配，带间隔复习和自测，打开即用。">
@@ -536,9 +536,10 @@ body.simple .sc-np>.anim-btn{display:none}
   .card .body{grid-column:1/-1;grid-row:2}
   .card .freq{grid-column:2;grid-row:1;padding-bottom:0}
   .spark i,.yrs span{width:10px}
-  /* 手机上卡片头只留单词、标签、按钮和次数：小柱图点开详情里再看 */
-  .card .spark{display:none}
-  .card .freq{align-items:center}
+  /* 手机上小柱图缩窄一点，叠在次数上面（不和单词抢一行的宽度） */
+  .card .spark{gap:2px;height:18px}
+  .card .spark i{width:4px}
+  .card .freq{flex-direction:column;align-items:flex-end;gap:3px}
   .card .head{gap:4px 6px}
   .card .w{font-size:19.5px}
   .card .lv,.card .hot{padding:2px 5px}
@@ -674,10 +675,27 @@ window.CET6 = {
   rows: [], info: null,
   add(letter, rows){ for (const r of rows) this.rows.push(r); },
   meta(m){ this.info = m; },
-  stories(list){ this.storyList = list; }
+  stories(list){ this.storyList = list; },
+  // 网络不稳（手机流量、海外站点慢）时：下载失败或卡住就换个地址再试，最多 tries 次；成功 true，都不行 false
+  loadJs(url, tries = 3, wait = 20000){
+    return new Promise(res => {
+      let n = 0, settled = false;
+      const end = v => { if (!settled) { settled = true; res(v); } };
+      const go = () => {
+        const sc = document.createElement('script'), k = n; let t = 0, gone = false;
+        const next = () => { if (gone) return; gone = true; clearTimeout(t); if (settled) return; if (++n < tries) go(); else end(false); };
+        sc.async = true; sc.src = k ? url + (url.indexOf('?') >= 0 ? '&' : '?') + 'r=' + k : url;
+        sc.onload = () => { clearTimeout(t); end(true); };
+        sc.onerror = next;
+        t = setTimeout(next, wait * (k + 1));
+        document.head.appendChild(sc);
+      };
+      go();
+    });
+  }
 };
 </script>
-<script src="data/core.js?v=0de34453"></script>
+<script src="data/core.js?v=e46eaf0b"></script>
 <script>
 (function(){
   'use strict';
@@ -1187,12 +1205,13 @@ window.CET6 = {
   // 逐词手绘场景放在 data/scenes.js（约 200 KB），不拖慢首屏：页面空闲时加载，点「▶ 动画」时若还没到就先等它
   window.CET6_LIB = {f1, burst, rays, flame, esc, role, shortMean};
   let scenesReady = null;
-  const loadScenes = () => scenesReady || (scenesReady = new Promise(res => { const sc = document.createElement('script'); sc.src = (window.CET6 && CET6.scenesUrl) || 'data/scenes.js'; sc.onload = () => res(true); sc.onerror = () => { scenesReady = null; res(false); }; document.head.appendChild(sc); }));
+  // 网络卡住或失败会自动换地址重试（CET6.loadJs）；都不行先用通用画面，下次点「▶ 动画」再重新下载
+  const loadScenes = () => window.CET6_SCENES ? Promise.resolve(true) : scenesReady || (scenesReady = CET6.loadJs((window.CET6 && CET6.scenesUrl) || 'data/scenes.js', 3, 25000).then(ok => { ok = ok || !!window.CET6_SCENES; if (!ok) scenesReady = null; return ok; }));
   (window.requestIdleCallback || (f => setTimeout(f, 1500)))(() => loadScenes());
   // 有手绘场景的词用场景，没有的用通用画面串
   const animBlockHtml = w => window.CET6_SCENES && CET6_SCENES.has(w.w) ? CET6_SCENES.html(w) : animStripHtml(w);
   // 没有词根拆分的词：手绘场景走单独的「动画」入口（卡片、背诵、快速过词都用 pgroup，在那里加一栏）
-  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client web incentive stray deem irritate refrain spouse cape chip norm subtle bamboo cite forge oak snob trigger absurd cluster fascinate prey random shabby baffle category flaw formidable pregnant shark silicon surge ample array authentic cater dine drastic entail indulge plague prestige prone stun tackle thrifty apt ballet bizarre bug clash clip cruise curb forum grab haunt hip naive opaque pledge ranch recipe slack snack spice stagger stall studio therapy arch asset bid compliment counsel cozy diesel dwarf dwell gamble greed hamper haul howl hurricane idiot lobby logistics maritime myth odor outrage pest probe quest shrewd shrub stubborn sturdy thesis turmoil turtle wield allege ambassador ambiguous arctic bacon bleak blur bonus bump charm charter chord cling closet corps couch cradle crisp dazzle defy dessert dome doom edit fake fiber flatter galaxy graze guilt inertia ion irony junk marsh marvel merge momentum monster orchard ponder preach robust scramble scrap shatter sneak soar tease threshold tickle tract tranquil tug vent vow ward arc attorney badge bait barren blunt buffalo buzz cane cartoon cereal commence contrive cosmos crab dizzy ego escort ferry fitting foam fraud fright fro fuss grim hail ham handicap harbor herald hose hover hum ingenuity interim intrinsic jean jerk jog lily limp litter mall martyr mingle moss nickel obscene olive overt porcelain pregnancy pumpkin rash rattle reckon remnant rig riot roam scarlet scrub sheer sheriff skip snail sniff sofa spiral stalk steak strait stride sue tread valve vein void warrant wedge wither wrestle wrinkle alas allegiance ambiguity antenna ass assassinate axle bald bandit barge barley baron batch bazaar bead beetle bishop bleach blink blond blouse blunder blush bourgeois boycott brace bribe bridle browse buddhism bugle bulletin burglar bushel butt calculus cartridge chasm chatter cigar cigaret clamp clatter climax clown clutch coffin conceit consul costume crank cuckoo curt cylinder damn datum dean decree despatch discrete dispatch dissipate dove duke elliptical embassy epoch errand exile fell filament filth flake flank flannel flap flask fling fluorescent flutter flux foil fore forsake fort foul fowl frail fret fringe frock fury fuse gaol garment gigantic ginger glamour gleam gnaw gorgeous gorilla gossip gravel grease grief grin groove grope grove growl grumble grunt guitar gust gutter halve harp hassle hearth heave herb hike hinge hiss hitherto hoarse hoe hoist hop hostage hound huddle hug hull hurl hurrah hush hymn hysteria hysterical invoice ivory jack jelly jingle jug kernel kidney kin kindle kit knight lathe lattice lease linger locust lounge maple marshal mast meditate menace mesh miniature mint miser mitten mob mock modulate monk monstrous moor mop mosque murmur muse mustard nave nought nun oar oath ohm opium oyster pal pamphlet panther pantry patrol peck pedlar perch petty pickle pier pilgrim pirate '.indexOf(' ' + w.w + ' ') >= 0; }
+  function hasNpScene(w){ return !w.parts && ' trait bias foster strive peer marathon client web incentive stray deem irritate refrain spouse cape chip norm subtle bamboo cite forge oak snob trigger absurd cluster fascinate prey random shabby baffle category flaw formidable pregnant shark silicon surge ample array authentic cater dine drastic entail indulge plague prestige prone stun tackle thrifty apt ballet bizarre bug clash clip cruise curb forum grab haunt hip naive opaque pledge ranch recipe slack snack spice stagger stall studio therapy arch asset bid compliment counsel cozy diesel dwarf dwell gamble greed hamper haul howl hurricane idiot lobby logistics maritime myth odor outrage pest probe quest shrewd shrub stubborn sturdy thesis turmoil turtle wield allege ambassador ambiguous arctic bacon bleak blur bonus bump charm charter chord cling closet corps couch cradle crisp dazzle defy dessert dome doom edit fake fiber flatter galaxy graze guilt inertia ion irony junk marsh marvel merge momentum monster orchard ponder preach robust scramble scrap shatter sneak soar tease threshold tickle tract tranquil tug vent vow ward arc attorney badge bait barren blunt buffalo buzz cane cartoon cereal commence contrive cosmos crab dizzy ego escort ferry fitting foam fraud fright fro fuss grim hail ham handicap harbor herald hose hover hum ingenuity interim intrinsic jean jerk jog lily limp litter mall martyr mingle moss nickel obscene olive overt porcelain pregnancy pumpkin rash rattle reckon remnant rig riot roam scarlet scrub sheer sheriff skip snail sniff sofa spiral stalk steak strait stride sue tread valve vein void warrant wedge wither wrestle wrinkle alas allegiance ambiguity antenna ass assassinate axle bald bandit barge barley baron batch bazaar bead beetle bishop bleach blink blond blouse blunder blush bourgeois boycott brace bribe bridle browse buddhism bugle bulletin burglar bushel butt calculus cartridge chasm chatter cigar cigaret clamp clatter climax clown clutch coffin conceit consul costume crank cuckoo curt cylinder damn datum dean decree despatch discrete dispatch dissipate dove duke elliptical embassy epoch errand exile fell filament filth flake flank flannel flap flask fling fluorescent flutter flux foil fore forsake fort foul fowl frail fret fringe frock fury fuse gaol garment gigantic ginger glamour gleam gnaw gorgeous gorilla gossip gravel grease grief grin groove grope grove growl grumble grunt guitar gust gutter halve harp hassle hearth heave herb hike hinge hiss hitherto hoarse hoe hoist hop hostage hound huddle hug hull hurl hurrah hush hymn hysteria hysterical invoice ivory jack jelly jingle jug kernel kidney kin kindle kit knight lathe lattice lease linger locust lounge maple marshal mast meditate menace mesh miniature mint miser mitten mob mock modulate monk monstrous moor mop mosque murmur muse mustard nave nought nun oar oath ohm opium oyster pal pamphlet panther pantry patrol peck pedlar perch petty pickle pier pilgrim pirate piston plea plead plump plunder pope pore postulate prairie precipitate prick prism '.indexOf(' ' + w.w + ' ') >= 0; }
   function npSlot(w){ return `<div class="sc-np" data-w="${esc(w.w)}"><button class="anim-btn" data-npanim="1" title="看这个词的手绘动画">▶ 动画</button></div>`; }
   // 点「▶ 动画」或展开「动画」栏：放一遍；再点按钮收起。不在单词卡里（背诵 / 快速过词）就不放重播按钮
   function npScene(np, force){
@@ -2082,13 +2101,25 @@ window.CET6 = {
   // 第二步：列表先显示出来，再在后台补上助记、易混词、逐年次数和串记段子
   if (CET6.extraUrl) {
     CET6.extra = (list, stories) => {
+      // 重试时两份可能都到了：只用第一份；条数和词表对不上（版本错位）就不用，免得助记挂错词
+      if (CET6.extraLoaded || !list || list.length !== words.length) return;
       list.forEach((x, i) => { const w = words[i]; if (!w || !x) return; w.mem = x[0] || ''; w.vs = x[1] || ''; w.y = x[2] || w.y; w.pt = x[3] || w.pt; w.wt = (w.pt[2] || 0) + (w.pt[3] || 0); });
       CET6.storyList = stories || []; indexStories(); CET6.extraLoaded = true;
       // 已经显示出来的卡片原地换成完整版（不打乱滚动位置）；串记视图要等段子到了才能画
       if (st.sort === 'stories') apply();
       else document.querySelectorAll('#list .card').forEach(c => { const w = byWord.get(c.dataset.w); if (w) c.outerHTML = card(w); });
     };
-    const sc = document.createElement('script'); sc.src = CET6.extraUrl; sc.async = true; document.head.appendChild(sc);
+    // 下载失败会自动重试；三次都不行就在底部给一个「重试」按钮（词表本身已经能用）
+    const loadExtra = () => CET6.loadJs(CET6.extraUrl).then(ok => {
+      if (ok || CET6.extraLoaded) return;
+      const bar = document.createElement('button');
+      bar.type = 'button';
+      bar.textContent = '助记和逐年次数没下载完（网络不稳）· 点这里重试';
+      bar.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;width:max-content;max-width:calc(100vw - 32px);padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card,var(--paper));color:var(--ink);font-family:inherit;font-size:13px;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.18);cursor:pointer';
+      bar.onclick = () => { bar.remove(); loadExtra(); };
+      document.body.appendChild(bar);
+    });
+    loadExtra();
   }
 })();
 </script>
