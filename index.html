@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>六级 8000 词</title>
-<link rel="preload" href="data/core.js?v=be5bebbe" as="script">
+<link rel="preload" href="data/core.js?v=138963e3" as="script">
 <meta name="description" content="大学英语六级 8000 词：近六年 13 次真题词频统计，只留考试常考义；每个词有助记，配词根积木和动画、500 多组形近词和翻译话题串记、熟词僻义和写作翻译搭配；支持间隔复习背诵、快速过词、四种自测，可导出 PDF。打开即用，不用登录。">
 <meta property="og:title" content="六级 8000 词 · 真题词频 + 助记 + 背诵">
 <meta property="og:description" content="近六年 13 次六级真题词频，8000 词每个都有精选释义和助记：词根动画、形近词串记段子、写作搭配，带间隔复习和自测，打开即用。">
@@ -745,7 +745,7 @@ window.CET6 = {
   }
 };
 </script>
-<script src="data/core.js?v=be5bebbe"></script>
+<script src="data/core.js?v=138963e3"></script>
 <script>
 (function(){
   'use strict';
@@ -1609,7 +1609,10 @@ window.CET6 = {
   CET6.passages = d => { CET6.passageData = d; };
   const loadPassages = () => CET6.passageData ? Promise.resolve(true) : psgReady || (psgReady = CET6.loadJs(CET6.passagesUrl || 'data/passages.js', 3, 20000).then(ok => { ok = ok || !!CET6.passageData; if (!ok) psgReady = null; return ok; }));
   const PSG_LV = ['basic', 'cet4', 'cet6', 'ext'];
-  function psgMode(){ return st.sort === 'alpha' && st.band === 'all' && st.letter === 'all' && !st.q && !st.rareOnly && !st.topicOnly && st.gsize === 20; }
+  // 短文按「排序 + 级别」分套：字母排序用 basic/cet4/…，频率排序用 freq.basic/freq.cet4/…
+  const psgKey = () => st.sort === 'alpha' ? st.lv : st.sort + '.' + st.lv;
+  const PSG_SORT = {alpha: '', freq: '（频率排序）'};
+  function psgMode(){ return (st.sort in PSG_SORT) && st.band === 'all' && st.letter === 'all' && !st.q && !st.rareOnly && !st.topicOnly && st.gsize === 20; }
   function psgHtml(p){
     // **form** 或 **form|lemma** → 可以点的加粗词（点一下跳到下面这个词的卡片）
     const paras = p.t.split(/\n\s*\n|\n/).map(s => s.trim()).filter(Boolean);
@@ -1623,22 +1626,22 @@ window.CET6 = {
     if (!psgMode() || !PSG_LV.includes(st.lv)) {
       const lv = PSG_LV.includes(st.lv) ? st.lv : 'basic';
       box.className = 'psg-tip'; box.hidden = false;
-      box.innerHTML = `<b>每组配套短文</b>：字母排序、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组上面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
+      box.innerHTML = `<b>每组配套短文</b>：字母排序（或频率排序）、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组上面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
       return;
     }
     if (!CET6.passageData) { box.hidden = true; loadPassages().then(ok => { if (ok) renderPassage(); }); return; }
-    const all = CET6.passageData[st.lv] || {}, p = all[st.g];
+    const all = CET6.passageData[psgKey()] || {}, p = all[st.g], tag = PSG_SORT[st.sort] || '';
     const ws = gAll.slice((st.g - 1) * 20, st.g * 20).map(w => w.w);
     box.hidden = false;
     if (!p || p.w.join(',') !== ws.join(',')) {
       const done = Object.keys(all).map(Number).sort((a, b) => a - b);
       box.className = 'psg-tip';
-      box.innerHTML = `第 ${st.g} 组的短文还在写。` + (done.length ? `${LV[st.lv]}已写好：第 ${done.length > 8 ? done[0] + '–' + done[done.length - 1] : done.join('、')} 组（共 ${done.length} 篇）。` : '');
+      box.innerHTML = `第 ${st.g} 组的短文还在写。` + (done.length ? `${LV[st.lv]}${tag}已写好：第 ${done.length > 8 ? done[0] + '–' + done[done.length - 1] : done.join('、')} 组（共 ${done.length} 篇）。` : (tag ? `${LV[st.lv]}${tag}的短文正在依次写，字母排序的 402 篇已全部写好。` : ''));
       return;
     }
     const n = p.t.replace(/\*\*([^*|]+?)(\|[^*]+?)?\*\*/g, '$1').split(/\s+/).filter(Boolean).length;
     box.className = 'psg' + (st.psgOff ? ' off' : '');
-    box.innerHTML = `<div class="psg-h"><span class="psg-k">第 ${st.g} 组短文</span><h3 class="psg-title">${esc(p.title)}</h3>
+    box.innerHTML = `<div class="psg-h"><span class="psg-k">第 ${st.g} 组短文${tag}</span><h3 class="psg-title">${esc(p.title)}</h3>
       <div class="psg-tools"><button type="button" class="psg-b" data-psg="say">朗读</button><button type="button" class="psg-b" data-psg="tog">${st.psgOff ? '展开' : '收起'}</button></div></div>
       <div class="psg-t" lang="en">${psgHtml(p)}</div>
       <div class="psg-f">${n} 词 · 本组 ${p.w.length} 个词都已加粗，点加粗的词跳到它的卡片</div>`;
