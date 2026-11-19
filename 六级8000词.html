@@ -1647,7 +1647,7 @@ window.CET6 = {
     box.innerHTML = `<div class="psg-h"><span class="psg-k">第 ${st.g} 组短文</span><h3 class="psg-title">${esc(p.title)}</h3>
       <div class="psg-tools"><button type="button" class="psg-b" data-psg="say">朗读</button><button type="button" class="psg-b" data-psg="tog">${st.psgOff ? '展开' : '收起'}</button></div></div>
       <div class="psg-t" lang="en">${psgHtml(p)}</div>
-      <div class="psg-f">${n} 词 · 本组 20 个词都已加粗，点加粗的词跳到它的卡片</div>`;
+      <div class="psg-f">${n} 词 · 本组 ${p.w.length} 个词都已加粗，点加粗的词跳到它的卡片</div>`;
   }
   $('#psg').addEventListener('click', e => {
     const b = e.target.closest('[data-psg]'), pw = e.target.closest('.pw');
