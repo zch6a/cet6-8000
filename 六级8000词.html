@@ -176,6 +176,26 @@ main{padding:18px 0 60px}
 .gbar .gb-size{white-space:nowrap}
 .gbar .gb-size{margin-left:auto}
 .gbar-b .gb-info b{color:var(--ink)}
+/* 每组配套短文：按读文章的习惯排——衬线正文、舒适行宽和行距、段间留白，加粗词用强调色 */
+.psg{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px 26px 16px;margin:0 2px 18px}
+.psg-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.psg-k{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+.psg-title{flex:1 1 auto;margin:0;font:700 21px/1.3 Georgia,"Times New Roman",serif;color:var(--ink)}
+.psg-tools{display:flex;gap:6px;margin-left:auto}
+.psg-b{font:inherit;font-size:12.5px;color:var(--ink);background:none;border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+.psg-b:hover{border-color:var(--ink3)}
+.psg-t{max-width:72ch;font:17px/1.8 Georgia,"Times New Roman",serif;color:var(--ink)}
+.psg-t p{margin:0 0 .95em}
+.psg-t p:last-child{margin-bottom:0}
+.psg-t .pw{color:var(--accent);font-weight:700;cursor:pointer;border-bottom:1px dotted transparent;transition:border-color .15s}
+.psg-t .pw:hover{border-bottom-color:var(--accent)}
+.psg-f{margin-top:14px;font-size:12px;color:var(--ink3)}
+.psg.off{padding-bottom:6px}
+.psg.off .psg-h{border-bottom:0;margin-bottom:0}
+.psg.off .psg-t,.psg.off .psg-f{display:none}
+.psg-tip{margin:0 2px 14px;padding:10px 14px;border:1px dashed var(--line);border-radius:10px;font-size:13px;line-height:1.6;color:var(--ink3)}
+@keyframes cardFlash{0%,60%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--shadow)}}
+.card.flash{animation:cardFlash 1.4s ease-out}
 .gno{display:inline-block;font:600 12px/1 Georgia,serif;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:3px 6px;margin-right:8px;vertical-align:3px;letter-spacing:.02em}
 .group{font:700 30px/1 Georgia,serif;color:var(--accent);margin:26px 4px 10px;display:flex;align-items:baseline;gap:10px}
 .group small{font:13px/1 "PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink3);font-weight:400}
@@ -557,6 +577,11 @@ body.simple .sc-np>.anim-btn{display:none}
   .card .w{font-size:19.5px}
   .card .lv,.card .hot{padding:2px 5px}
   .gno{font-size:11px;padding:3px 5px;margin-right:6px}
+  .psg{padding:15px 16px 13px;border-radius:12px}
+  .psg-title{font-size:18.5px;flex-basis:100%;order:2}
+  .psg-k{order:1}
+  .psg-tools{order:1}
+  .psg-t{font-size:16.5px;line-height:1.75}
   .gbar{gap:8px}
   .gbar button{padding:7px 10px}
   .gbar .gb-sel{order:3;flex:1 1 100%;min-width:0}
@@ -675,6 +700,7 @@ body.simple .sc-np>.anim-btn{display:none}
   <div class="wrap">
     <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布和近义词 · 「词根拆解」里有同根词 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
     <div class="gbar" id="gbar" hidden></div>
+    <div id="psg" hidden></div>
     <div id="list"><div class="empty" id="loading">正在加载 8000 词的数据（约 650 KB），网速慢时要等几秒…</div></div>
     <button class="more" id="more" hidden>继续加载</button>
     <div class="gbar gbar-b" id="gbar2" hidden></div>
@@ -990,7 +1016,7 @@ window.CET6 = {
     $('#viewName').textContent = {alpha:'字母', freq:'频率', write:'会写', roots:'词根', stories:'串记'}[st.sort] || '筛选';
     const nf = [st.lv !== 'all', st.band !== 'all', st.letter !== 'all', st.cover, st.hideKnown, st.rareOnly, st.topicOnly].filter(Boolean).length;
     $('#fCount').textContent = nf ? String(nf) : '';
-    $('#gbar').hidden = $('#gbar2').hidden = true; gno = new Map();
+    $('#gbar').hidden = $('#gbar2').hidden = $('#psg').hidden = true; gno = new Map();
     if (st.sort === 'stories') { renderStories(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
@@ -1040,7 +1066,7 @@ window.CET6 = {
       : st.sort === 'freq' ? ' · 按真题出现次数从高到低'
       : st.sort === 'write' ? (st.wfreq ? ' · 会写词汇 · 按写作+翻译出现次数' : ' · 会写词汇 · 按字母顺序') : ' · 按字母顺序';
     $('#resinfo').textContent = `共 ${current.length.toLocaleString()} 词` + (gs && gCount > 1 ? ` · 每组 ${gs} 词，共 ${gCount} 组` : '') + (parts.length ? ' · ' + parts.join(' · ') : '') + how;
-    renderGbar();
+    renderGbar(); renderPassage();
     if (!current.length) {
       const filtered = st.lv !== 'all' || st.band !== 'all' || st.hideKnown || st.rareOnly || st.topicOnly || st.sort === 'write';
       $('#list').innerHTML = `<div class="empty">没有符合条件的词${filtered ? '<br><button class="chip" id="clearF" style="margin-top:12px">清除级别 / 频率等筛选再找找</button>' : ''}</div>`;
@@ -1582,6 +1608,60 @@ window.CET6 = {
       else if (e.target.matches('[data-gsize]')) { st.gKeep = ((st.g || 1) - 1) * (st.gsize || 0); st.gsize = +e.target.value; apply(); }
     });
   }
+  /* ---------- 每组配套短文：字母排序 + 频率全部 + 选一个级别、每组 20 词时显示在这一组上面 ---------- */
+  let psgReady = null;
+  CET6.passages = d => { CET6.passageData = d; };
+  const loadPassages = () => CET6.passageData ? Promise.resolve(true) : psgReady || (psgReady = CET6.loadJs(CET6.passagesUrl || 'data/passages.js', 3, 20000).then(ok => { ok = ok || !!CET6.passageData; if (!ok) psgReady = null; return ok; }));
+  const PSG_LV = ['basic', 'cet4', 'cet6', 'ext'];
+  function psgMode(){ return st.sort === 'alpha' && st.band === 'all' && st.letter === 'all' && !st.q && !st.rareOnly && !st.topicOnly && st.gsize === 20; }
+  function psgHtml(p){
+    // **form** 或 **form|lemma** → 可以点的加粗词（点一下跳到下面这个词的卡片）
+    const paras = p.t.split(/\n\s*\n|\n/).map(s => s.trim()).filter(Boolean);
+    const body = paras.map(s => `<p>${esc(s).replace(/\*\*([^*|]+?)(?:\|([^*]+?))?\*\*/g, (m, f, l) => { const w = l || p.w.find(x => x.toLowerCase() === f.toLowerCase()) || ''; return `<b class="pw" data-pw="${esc(w)}">${f}</b>`; })}</p>`).join('');
+    return body;
+  }
+  function renderPassage(){
+    const box = $('#psg');
+    if (!psgMode() || !current.length) { box.hidden = true; return; }
+    if (!PSG_LV.includes(st.lv)) {
+      box.className = 'psg-tip'; box.hidden = false;
+      box.innerHTML = '每组配套短文：在「筛选」里选一个级别（基础 / 四级 / 六级 / 超纲），每组 20 个词会配一篇六级阅读难度的英文短文。';
+      return;
+    }
+    if (!CET6.passageData) { box.hidden = true; loadPassages().then(ok => { if (ok) renderPassage(); }); return; }
+    const all = CET6.passageData[st.lv] || {}, p = all[st.g];
+    const ws = gAll.slice((st.g - 1) * 20, st.g * 20).map(w => w.w);
+    box.hidden = false;
+    if (!p || p.w.join(',') !== ws.join(',')) {
+      const done = Object.keys(all).map(Number).sort((a, b) => a - b);
+      box.className = 'psg-tip';
+      box.innerHTML = `第 ${st.g} 组的短文还在写。` + (done.length ? `${LV[st.lv]}已写好：第 ${done.length > 8 ? done[0] + '–' + done[done.length - 1] : done.join('、')} 组（共 ${done.length} 篇）。` : '');
+      return;
+    }
+    const n = p.t.replace(/\*\*([^*|]+?)(\|[^*]+?)?\*\*/g, '$1').split(/\s+/).filter(Boolean).length;
+    box.className = 'psg' + (st.psgOff ? ' off' : '');
+    box.innerHTML = `<div class="psg-h"><span class="psg-k">第 ${st.g} 组短文</span><h3 class="psg-title">${esc(p.title)}</h3>
+      <div class="psg-tools"><button type="button" class="psg-b" data-psg="say">朗读</button><button type="button" class="psg-b" data-psg="tog">${st.psgOff ? '展开' : '收起'}</button></div></div>
+      <div class="psg-t" lang="en">${psgHtml(p)}</div>
+      <div class="psg-f">${n} 词 · 本组 20 个词都已加粗，点加粗的词跳到它的卡片</div>`;
+  }
+  $('#psg').addEventListener('click', e => {
+    const b = e.target.closest('[data-psg]'), pw = e.target.closest('.pw');
+    if (b && b.dataset.psg === 'tog') { st.psgOff = !st.psgOff; save(); try { speechSynthesis.cancel(); } catch (err) {} renderPassage(); return; }
+    if (b && b.dataset.psg === 'say') {
+      try {
+        if (speechSynthesis.speaking) { speechSynthesis.cancel(); b.textContent = '朗读'; return; }
+        const u = new SpeechSynthesisUtterance($('#psg .psg-t').innerText); u.lang = 'en-US'; u.rate = .9;
+        u.onend = u.onerror = () => { b.textContent = '朗读'; };
+        speechSynthesis.speak(u); b.textContent = '停止';
+      } catch (err) {}
+      return;
+    }
+    if (pw && pw.dataset.pw) {
+      const c = [...document.querySelectorAll('#list .card')].find(x => x.dataset.w === pw.dataset.pw); if (!c) return;
+      c.scrollIntoView({behavior: 'smooth', block: 'center'}); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash');
+    }
+  });
   // 电脑上按 ← / → 也能换组（在输入框里、或背诵自测打开时不管）
   document.addEventListener('keydown', e => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
