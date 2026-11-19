@@ -22418,6 +22418,104 @@
         `<g ${s.a(pop(36), ORG(240, 50))}><rect x="204" y="40" width="72" height="20" rx="4" fill="#3fbf6a"/><text x="240" y="54" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">悬在半空不走</text></g>` +
         chip(s, 60, 22, 76, '一直停在上空', CL.t, 16) + chip(s, 240, 142, 66, '盘旋；徘徊', '#d23c2f', 44);
     }},
+    // ---------- 第二百二十五批（六级词） ----------
+    hum: {dur: 6, hl: [16], end: 60, lit: '闭着嘴哼歌', mean: '哼唱；嗡嗡响', draw: s => {
+      return GND() + `<g ${s.a(swing(8, 60, 8, 6, -6), ORG(110, 128))}>${kid(110, 128, '#8e6bd0', {noFace: true, aL: [-14, -22], aR: [14, -22]})}<path d="M103 76q3-3 6 0M111 76q3-3 6 0" ${sk(INK, 1.6)}/><path d="M106 84h8" ${sk(INK, 2)}/></g>` +
+        [[140, 60, 10], [170, 44, 18], [200, 56, 26], [230, 40, 34]].map(([x, y, p]) => `<g ${s.a({0: T(0, 10) + ';opacity:0', [p]: T(0, 10) + ';opacity:0', [p + 6]: T(0, 0) + ';opacity:1', [p + 30]: T(10, -14) + ';opacity:0', 100: 'opacity:0'})}><path d="M${x} ${y}v-14l10-3v14" ${sk('#8e6bd0', 2)}/><circle cx="${x - 3}" cy="${y}" r="3.5" fill="#8e6bd0"/><circle cx="${x + 7}" cy="${y - 3}" r="3.5" fill="#8e6bd0"/></g>`).join('') +
+        `<text x="160" y="96" font-size="11" font-weight="700" text-anchor="middle" fill="#8e6bd0" ${s.a(showAt(14))}>嗯嗯嗯</text>` +
+        `<g ${s.a(pop(44), ORG(240, 100))}><rect x="204" y="90" width="72" height="20" rx="4" fill="#8e6bd0"/><text x="240" y="104" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">蜜蜂也会哼</text></g>` +
+        chip(s, 60, 22, 64, '闭着嘴哼歌', CL.t, 16) + chip(s, 60, 142, 76, '哼唱；嗡嗡响', '#d23c2f', 44);
+    }},
+    ingenuity: {dur: 6, hl: [16], end: 60, lit: '想出巧妙的办法', mean: '独创性；聪明才智', draw: s => {
+      return GND() + `<path d="M150 128l-10-16h20z" fill="#5a5f6a"/>` +
+        `<g ${s.a({0: R(0), 26: R(0), 36: R(-14), 92: R(-14), 100: R(0)}, ORG(150, 112))}><path d="M60 112H250" ${sk('#a0805a', 6)}/><path d="M210 112v-34h40v34z" fill="#7a808a"/><text x="230" y="100" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">大石头</text></g>` +
+        `<g ${s.a({0: T(0, -10), 20: T(0, -10), 26: T(0, 0), 36: T(0, 10), 92: T(0, 10), 100: T(0, -10)})}>${kid(70, 108, '#4a90d0', {aL: [-10, -16], aR: [10, -16]})}</g>` +
+        `<g ${s.a(pop(10), ORG(70, 30))}><circle cx="70" cy="30" r="10" fill="#f6e07a"/><rect x="65" y="40" width="10" height="6" fill="#9aa8b8"/>${[0, 1, 2, 3, 4].map(i => { const a = (200 + i * 35) * Math.PI / 180; return `<path d="M${f1(70 + 14 * Math.cos(a))} ${f1(30 + 14 * Math.sin(a))}l${f1(5 * Math.cos(a))} ${f1(5 * Math.sin(a))}" ${sk('#f6c43a', 2)}/>`; }).join('')}</g>` +
+        `<g ${s.a(pop(40), ORG(160, 40))}><rect x="114" y="30" width="92" height="20" rx="4" fill="#4a90d0"/><text x="160" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">巧用杠杆撬起来</text></g>` +
+        chip(s, 70, 142, 88, '想出巧妙的办法', CL.t, 16) + chip(s, 230, 142, 100, '独创性；聪明才智', '#d23c2f', 44);
+    }},
+    interim: {dur: 6, hl: [16], end: 60, lit: '两件事之间的那段', mean: '临时的；过渡的', draw: s => {
+      return `<path d="M30 100H270" ${sk('var(--ink3)', 3)}/>` +
+        [[70, '旧校长', '#9aa8b8', 6], [230, '新校长', '#4a90d0', 12]].map(([x, t, c, p]) => `<g ${s.a(pop(p), ORG(x, 100))}><path d="M${x} 100V60" ${sk('#5a5f6a', 2)}/><rect x="${x}" y="60" width="44" height="18" fill="${c}"/><text x="${x + 22}" y="73" font-size="9" font-weight="700" text-anchor="middle" fill="#fff">${t}</text></g>`).join('') +
+        `<rect x="70" y="94" width="160" height="12" rx="3" fill="#f6c43a" ${s.a(growX(18, 34), ORG(70, 100))}/>` +
+        `<g ${s.a(pop(38), ORG(150, 124))}><rect x="110" y="114" width="80" height="20" rx="4" fill="#f2a03a"/><text x="150" y="128" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">临时代理一下</text></g>` +
+        chip(s, 70, 22, 100, '两件事之间的那段', CL.t, 16) + chip(s, 230, 22, 88, '临时的；过渡的', '#d23c2f', 44);
+    }},
+    intrinsic: {dur: 6, hl: [16], end: 60, lit: '从里面带来的', mean: '内在的；固有的', draw: s => {
+      return GND() + `<g ${s.a({0: T(0, 0, 'rotate(0deg)'), 14: T(0, 0, 'rotate(0deg)'), 22: T(-20, 4, 'rotate(-20deg)'), 92: T(-20, 4, 'rotate(-20deg)'), 100: T(0, 0, 'rotate(0deg)')}, ORG(150, 80))}><path d="M150 44a36 36 0 0 0 0 72z" fill="#f2a03a"/></g>` +
+        `<g ${s.a({0: T(0, 0, 'rotate(0deg)'), 14: T(0, 0, 'rotate(0deg)'), 22: T(20, 4, 'rotate(20deg)'), 92: T(20, 4, 'rotate(20deg)'), 100: T(0, 0, 'rotate(0deg)')}, ORG(150, 80))}><path d="M150 44a36 36 0 0 1 0 72z" fill="#f2a03a"/></g>` +
+        `<g ${s.a(showAt(20))}><circle cx="150" cy="80" r="26" fill="#f6d08a"/>${[...Array(8)].map((_, i) => `<path d="M150 80L${f1(150 + 24 * Math.cos(i * Math.PI / 4))} ${f1(80 + 24 * Math.sin(i * Math.PI / 4))}" ${sk('#f2a03a', 1.5)}/>`).join('')}</g>` +
+        `<circle cx="150" cy="80" r="8" fill="#fff8c0" ${s.a({0: 'opacity:0', 22: 'opacity:0', 30: 'opacity:1', 60: 'opacity:.5', 92: 'opacity:1', 100: 'opacity:0'})}/>` +
+        `<path d="M150 38v-8" ${sk('#5e8a3a', 3)}/>` +
+        `<g ${s.a(pop(34), ORG(240, 60))}><rect x="204" y="50" width="72" height="20" rx="4" fill="#f2a03a"/><text x="240" y="64" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">天生就有的</text></g>` +
+        chip(s, 60, 22, 76, '从里面带来的', CL.t, 16) + chip(s, 230, 142, 88, '内在的；固有的', '#d23c2f', 44);
+    }},
+    jean: {dur: 6, hl: [16], end: 60, lit: '做牛仔裤的布', mean: '牛仔布；斜纹布', draw: s => {
+      return GND() + `<circle cx="60" cy="100" r="22" fill="#3a6ea0"/><circle cx="60" cy="100" r="8" fill="#2a4e70"/>` +
+        `<g ${s.a(growX(6, 22), ORG(60, 78))}><rect x="60" y="78" width="110" height="44" fill="#4a7ab0"/>${[0, 1, 2, 3, 4, 5].map(i => `<path d="M${70 + i * 18} 78l-8 44" ${sk('#5a8ac0', 2)}/>`).join('')}</g>` +
+        `<g ${s.a(pop(30), ORG(230, 80))}><path d="M206 40h48l4 84h-20l-6-56-6 56h-20z" fill="#4a7ab0"/><path d="M206 48h48" ${sk('#c98a12', 2)}/><path d="M214 56q8 6 14 0M232 56q8 6 14 0" ${sk('#f6c43a', 1.2)} stroke-dasharray="2 2"/></g>` +
+        `<path d="M176 90l20-4" ${sk('#9aa8b8', 2)} ${s.a(showAt(30))}/>` +
+        `<g ${s.a(pop(40), ORG(120, 40))}><rect x="84" y="30" width="72" height="20" rx="4" fill="#3a6ea0"/><text x="120" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">加 s 才是裤子</text></g>` +
+        chip(s, 60, 22, 76, '做牛仔裤的布', CL.t, 16) + chip(s, 150, 142, 88, '牛仔布；斜纹布', '#d23c2f', 44);
+    }},
+    jerk: {dur: 6, hl: [16], end: 60, lit: '一把猛拉', mean: '猛拉；抽动', draw: s => {
+      return GND() + `<rect x="80" y="100" width="120" height="6" fill="#a0805a"/><path d="M90 106v22M190 106v22" ${sk('#a0805a', 4)}/>` +
+        `<path d="M80 98h120" ${sk('#e2473a', 4)} ${s.a({0: T(0, 0) + ';opacity:1', 24: T(0, 0) + ';opacity:1', 28: T(80, 0) + ';opacity:1', 30: T(80, 0) + ';opacity:0', 100: 'opacity:0'})}/>` +
+        `<g ${s.a({0: 'opacity:0', 28: 'opacity:0', 30: 'opacity:1', 92: 'opacity:1', 100: 'opacity:0'})}><path d="M200 98q30 10 40 0" ${sk('#e2473a', 4)}/></g>` +
+        [110, 140, 170].map(x => `<ellipse cx="${x}" cy="94" rx="10" ry="3" fill="#fff" stroke="#9aa8b8"/>`).join('') + `<path d="M136 94v-10h8v10" fill="#e8f4f8" stroke="#9aa8b8"/>` +
+        `<g ${s.a({0: T(0, 0), 24: T(0, 0), 28: T(14, 0), 36: T(10, 0), 100: T(10, 0)})}>${kid(240, 128, '#4a90d0', {aL: [-22, -30], aR: [-16, -28]})}</g>` +
+        `<path d="M212 80l14-4M210 90l16 0" ${sk('#9aa8b8', 2)} ${s.a(showAt(26, 36))}/>` +
+        `<g ${s.a(pop(36), ORG(140, 40))}><rect x="104" y="30" width="72" height="20" rx="4" fill="#e2473a"/><text x="140" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">嗖地一拽</text></g>` +
+        chip(s, 50, 22, 56, '一把猛拉', CL.t, 16) + chip(s, 60, 142, 66, '猛拉；抽动', '#d23c2f', 44);
+    }},
+    jog: {dur: 7, hl: [14], end: 60, lit: '慢慢地跑', mean: '慢跑；轻推', draw: s => {
+      const L = walkLegs(s, 40, 128, 6, 86, 20);
+      return GND() + `<circle cx="250" cy="34" r="14" fill="#f6c43a"/>` + [60, 140, 220].map(x => `<path d="M${x} 128V100" ${sk('#8b5a3a', 3)}/><circle cx="${x}" cy="92" r="12" fill="#5bbf6a"/>`).join('') +
+        `<g ${s.a(move([[6, 0, 0], [86, 220, 0]]))}><g ${s.a({0: T(0, 0), 25: T(0, -3), 50: T(0, 0), 75: T(0, -3), 100: T(0, 0)}, '', .5)}>${kid(40, 128, '#e2473a', {aL: [-10, -24], aR: [12, -18], legL: L.legL, legR: L.legR})}<path d="M29 72h22" ${sk('#fff', 3)}/></g></g>` +
+        `<g ${s.a(pop(40), ORG(150, 40))}><rect x="114" y="30" width="72" height="20" rx="4" fill="#e2473a"/><text x="150" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">不紧不慢</text></g>` +
+        chip(s, 50, 22, 56, '慢慢地跑', CL.t, 14) + chip(s, 150, 142, 66, '慢跑；轻推', '#d23c2f', 44);
+    }},
+    lily: {dur: 6, hl: [16], end: 60, lit: '纯洁的白花', mean: '百合', draw: s => {
+      const petal = d => `<path d="M150 70q-10-24 0-40q10 16 0 40z" fill="#fff" stroke="#e0d8e8" ${s.a({0: R(0), 10: R(0), 30: R(d), 92: R(d), 100: R(0)}, ORG(150, 70))}/>`;
+      return GND() + `<path d="M150 128V70" ${sk('#3f8f4f', 3)}/><path d="M150 110q-24-4-30-20q24 4 30 20zM150 100q24-4 30-20q-24 4-30 20z" fill="#5bbf6a"/>` +
+        [-60, -30, 0, 30, 60].map(petal).join('') +
+        `<g ${s.a(showAt(30))}><path d="M150 70l-6-14M150 70v-16M150 70l6-14" ${sk('#c98a12', 1.2)}/><circle cx="144" cy="56" r="2" fill="#c98a12"/><circle cx="150" cy="54" r="2" fill="#c98a12"/><circle cx="156" cy="56" r="2" fill="#c98a12"/></g>` +
+        `<g ${s.a(pop(36), ORG(240, 50))}><rect x="204" y="40" width="72" height="20" rx="4" fill="#8e6bd0"/><text x="240" y="54" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">像女孩莉莉</text></g>` +
+        `<g ${s.a(pop(32), ORG(110, 50))}>${sparkle(110, 50, 4)}${sparkle(190, 40, 4)}</g>` +
+        chip(s, 60, 22, 64, '纯洁的白花', CL.t, 16) + chip(s, 60, 142, 44, '百合', '#d23c2f', 44);
+    }},
+    limp: {dur: 6, hl: [16], end: 60, lit: '腿脚不利索', mean: '跛行；软弱无力的', draw: s => {
+      const hop = {0: T(0, 0, 'rotate(0deg)'), 100: T(130, 0, 'rotate(0deg)')}; for (let i = 0; i < 6; i++) { hop[f1(8 + i * 8)] = T(i * 20, 0, 'rotate(-6deg)'); hop[f1(12 + i * 8)] = T(i * 20 + 10, 0, 'rotate(6deg)'); } hop[60] = T(130, 0, 'rotate(0deg)'); hop[92] = T(130, 0, 'rotate(0deg)');
+      return GND() + `<g ${s.a(hop, ORG(60, 128))}>${kid(60, 128, '#4a90d0', {mood: 'sad', aL: [-16, -28], aR: [14, -22]})}<rect x="61" y="116" width="9" height="8" rx="2" fill="#fff" stroke="#c0c8d0"/><path d="M74 66q3 5 0 7q-3-2 0-7z" fill="#6fb8ff" ${s.a(showAt(14))}/></g>` +
+        `<g ${s.a(pop(30), ORG(230, 50))}><rect x="194" y="40" width="72" height="20" rx="4" fill="#4a90d0"/><text x="230" y="54" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">扭了脚踝</text></g>` +
+        `<text x="230" y="80" font-size="9" font-weight="700" text-anchor="middle" fill="var(--ink3)" ${s.a(showAt(44))}>一瘸一拐地走</text>` +
+        chip(s, 60, 22, 64, '腿脚不利索', CL.t, 16) + chip(s, 150, 142, 100, '跛行；软弱无力的', '#d23c2f', 44);
+    }},
+    litter: {dur: 6, hl: [16], end: 60, lit: '乱扔的垃圾', mean: '垃圾；乱扔', draw: s => {
+      return GND() + kid(70, 128, '#e2473a', {aR: [20, -30]}) +
+        [[0, 30, 'rect'], [10, 50, 'circle'], [20, 70, 'rect']].map(([d, dx, k], i) => `<g ${s.a({0: T(0, 0) + ';opacity:0', [6 + i * 6]: T(0, 0) + ';opacity:1', [14 + i * 6]: T(dx, 30) + ';opacity:1', 92: T(dx, 30) + ';opacity:1', 100: 'opacity:0'})}>${k === 'rect' ? `<rect x="88" y="92" width="10" height="7" fill="#f6c43a" transform="rotate(20 93 95)"/>` : `<circle cx="92" cy="96" r="4" fill="#9fd4f5"/>`}</g>`).join('') +
+        `<rect x="200" y="40" width="70" height="44" rx="4" ${fs('#fff', '#d23c2f', 3)} ${s.a(pop(30), ORG(235, 62))}/>` +
+        `<g ${s.a(pop(30), ORG(235, 62))}><path d="M226 54h16l-2 20h-12z" ${fs('none', '#5a5f6a', 2)}/><path d="M222 54h24" ${sk('#5a5f6a', 2)}/><path d="M212 48l46 30" ${sk('#d23c2f', 3)}/></g>` +
+        `<path d="M235 84v44" ${sk('#5a5f6a', 3)}/>` +
+        `<text x="235" y="98" font-size="9" font-weight="700" text-anchor="middle" fill="#d23c2f" ${s.a(showAt(36))}>禁止乱扔</text>` +
+        `<g ${s.a(pop(46), ORG(130, 40))}><rect x="94" y="30" width="72" height="20" rx="4" fill="#5a5f6a"/><text x="130" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">扔了一地</text></g>` +
+        chip(s, 50, 22, 64, '乱扔的垃圾', CL.t, 16) + chip(s, 150, 142, 66, '垃圾；乱扔', '#d23c2f', 44);
+    }},
+    mall: {dur: 6, hl: [16], end: 60, lit: '大大的购物中心', mean: '购物中心', draw: s => {
+      return GND() + `<g ${s.a(growY(4, 18), ORG(150, 128))}><rect x="40" y="40" width="220" height="88" fill="#e8dcc0"/><rect x="40" y="34" width="220" height="10" fill="#c0603a"/>` +
+        [0, 1, 2].map(r => [0, 1, 2, 3, 4].map(c => `<rect x="${52 + c * 42}" y="${50 + r * 24}" width="30" height="16" fill="${['#9fd4f5', '#f4a8c0', '#f6e07a', '#a8e0b0', '#c8b8f0'][(r + c) % 5]}"/>`).join('')).join('') +
+        `<rect x="130" y="104" width="40" height="24" fill="#5a6a7a"/></g>` +
+        `<g ${s.a(pop(20), ORG(150, 22))}><rect x="100" y="12" width="100" height="18" rx="4" fill="#c0603a"/><text x="150" y="25" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">购物中心</text></g>` +
+        [[90, '#4a90d0', 1], [210, '#e2477a', -1]].map(([x, c, d], i) => `<g ${s.a(move([[24 + i * 4, d * -40, 0], [50 + i * 4, 0, 0]]))}>${kid(x, 128, c, {k: .7, aR: [14, -14]})}<rect x="${x + 6}" y="114" width="10" height="10" rx="2" fill="#f2a03a"/></g>`).join('') +
+        chip(s, 60, 142, 88, '大大的购物中心', CL.t, 16) + chip(s, 240, 142, 56, '购物中心', '#d23c2f', 44);
+    }},
+    martyr: {dur: 6, hl: [16], end: 60, lit: '用生命作证的人', mean: '烈士；殉道者', draw: s => {
+      return GND() + `<path d="M140 128V40l10-14 10 14v88z" fill="#c0c8d0"/><path d="M120 128v-12h60v12z" fill="#9aa8b8"/>${star5(150, 54, 7, 3, '#d23c2f')}` +
+        [[96, '#3a3f4a'], [204, '#3a3f4a']].map(([x, c], i) => `<g ${s.a({0: R(0), 20: R(0), 30: R(14 * (i ? -1 : 1)), 50: R(14 * (i ? -1 : 1)), 60: R(0), 100: R(0)}, ORG(x, 128))}>${kid(x, 128, c, {noFace: true, aL: [-6, -20], aR: [6, -20]})}<path d="M${x - 6} 76h4M${x + 2} 76h4M${x - 3} 83h6" ${sk(INK, 1.6)}/></g>`).join('') +
+        `<g ${s.a(moveIn([[10, -20, -20], [24, 0, 0]]))}>${[0, 1, 2].map(i => `<circle cx="${140 + i * 10}" cy="112" r="5" fill="${['#f6c43a', '#fff', '#f6c43a'][i]}"/>`).join('')}<path d="M150 116v8" ${sk('#3f8f4f', 2)}/></g>` +
+        `<g ${s.a(pop(40), ORG(240, 40))}><rect x="204" y="30" width="72" height="20" rx="4" fill="#5a5f6a"/><text x="240" y="44" font-size="10" font-weight="700" text-anchor="middle" fill="#fff">永远怀念</text></g>` +
+        chip(s, 70, 22, 88, '用生命作证的人', CL.t, 16) + chip(s, 150, 142, 88, '烈士；殉道者', '#d23c2f', 44);
+    }},
   };
   // 同一个标签上写了两个 style（颜色 + 动画）时合并成一个，否则浏览器只认第一个
   const mergeStyles = html => html.replace(/<[a-z][^>]*>/gi, tag => {
