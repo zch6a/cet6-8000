@@ -193,7 +193,9 @@ main{padding:18px 0 60px}
 .psg.off{padding-bottom:6px}
 .psg.off .psg-h{border-bottom:0;margin-bottom:0}
 .psg.off .psg-t,.psg.off .psg-f{display:none}
-.psg-tip{margin:0 2px 14px;padding:10px 14px;border:1px dashed var(--line);border-radius:10px;font-size:13px;line-height:1.6;color:var(--ink3)}
+.psg-tip{margin:0 2px 14px;padding:12px 14px;border:1px dashed var(--accent);border-radius:10px;font-size:13.5px;line-height:1.7;color:var(--ink3)}
+.psg-tip b{color:var(--ink)}
+.psg-go{display:inline-block;margin:6px 0 0 8px;font:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;padding:6px 12px;cursor:pointer}
 @keyframes cardFlash{0%,60%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--shadow)}}
 .card.flash{animation:cardFlash 1.4s ease-out}
 .gno{display:inline-block;font:600 12px/1 Georgia,serif;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:3px 6px;margin-right:8px;vertical-align:3px;letter-spacing:.02em}
@@ -1622,10 +1624,12 @@ window.CET6 = {
   }
   function renderPassage(){
     const box = $('#psg');
-    if (!psgMode() || !current.length) { box.hidden = true; return; }
-    if (!PSG_LV.includes(st.lv)) {
+    if (st.q || !current.length) { box.hidden = true; return; }
+    // 不在短文模式（没选级别、换了排序 / 字母 / 频率、每组不是 20 词）：给一个一键切过去的按钮
+    if (!psgMode() || !PSG_LV.includes(st.lv)) {
+      const lv = PSG_LV.includes(st.lv) ? st.lv : 'basic';
       box.className = 'psg-tip'; box.hidden = false;
-      box.innerHTML = '每组配套短文：在「筛选」里选一个级别（基础 / 四级 / 六级 / 超纲），每组 20 个词会配一篇六级阅读难度的英文短文。';
+      box.innerHTML = `<b>每组配套短文</b>：字母排序、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组上面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
       return;
     }
     if (!CET6.passageData) { box.hidden = true; loadPassages().then(ok => { if (ok) renderPassage(); }); return; }
@@ -1647,6 +1651,15 @@ window.CET6 = {
   }
   $('#psg').addEventListener('click', e => {
     const b = e.target.closest('[data-psg]'), pw = e.target.closest('.pw');
+    if (b && b.dataset.psg === 'go') {
+      // 一键切到短文模式：字母排序、频率全部、不限字母、每组 20 词，级别用当前的（没选就用基础）
+      Object.assign(st, {sort: 'alpha', band: 'all', letter: 'all', rareOnly: false, topicOnly: false, gsize: 20, lv: b.dataset.lv});
+      document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.sort === 'alpha')));
+      document.querySelectorAll('#lvChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === st.lv)));
+      document.querySelectorAll('#bandChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === 'all')));
+      $('#rareOnly').checked = false; $('#topicOnly').checked = false; markLetters();
+      apply(true); return;
+    }
     if (b && b.dataset.psg === 'tog') { st.psgOff = !st.psgOff; save(); try { speechSynthesis.cancel(); } catch (err) {} renderPassage(); return; }
     if (b && b.dataset.psg === 'say') {
       try {
