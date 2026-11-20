@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>六级 8000 词</title>
-<link rel="preload" href="data/core.js?v=bc34a8eb" as="script">
+<link rel="preload" href="data/core.js?v=123058a9" as="script">
 <meta name="description" content="大学英语六级 8000 词：近六年 13 次真题词频统计，只留考试常考义；每个词有助记，配词根积木和动画、500 多组形近词和翻译话题串记、熟词僻义和写作翻译搭配；支持间隔复习背诵、快速过词、四种自测，可导出 PDF。打开即用，不用登录。">
 <meta property="og:title" content="六级 8000 词 · 真题词频 + 助记 + 背诵">
 <meta property="og:description" content="近六年 13 次六级真题词频，8000 词每个都有精选释义和助记：词根动画、形近词串记段子、写作搭配，带间隔复习和自测，打开即用。">
@@ -69,8 +69,8 @@ h1 em{font-style:normal;color:var(--accent)}
 .progress i{display:block;height:100%;width:0;background:var(--known);border-radius:99px;transition:width .3s}
 
 /* ---------- toolbar ---------- */
-.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);
-  backdrop-filter:saturate(1.2) blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+/* 顶栏用不透明底色，不用毛玻璃（backdrop-filter 滚动时每帧都要重新模糊，手机上会卡） */
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);
   transition:transform .25s ease}
 /* 往下滚时整条顶栏滑出屏幕，往上滚或按 / 时回来：读词时屏幕上只剩单词 */
 .bar.away{transform:translateY(-100%)}
@@ -178,7 +178,7 @@ main{padding:18px 0 60px}
 .gbar .gb-size{margin-left:auto}
 .gbar-b .gb-info b{color:var(--ink)}
 /* 每组配套短文：按读文章的习惯排——衬线正文、舒适行宽和行距、段间留白，加粗词用强调色 */
-.psg{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px 26px 16px;margin:0 2px 18px}
+.psg{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px 26px 16px;margin:20px 2px 18px}
 .psg-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .psg-k{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
 .psg-title{flex:1 1 auto;margin:0;font:700 21px/1.3 Georgia,"Times New Roman",serif;color:var(--ink)}
@@ -194,7 +194,7 @@ main{padding:18px 0 60px}
 .psg.off{padding-bottom:6px}
 .psg.off .psg-h{border-bottom:0;margin-bottom:0}
 .psg.off .psg-t,.psg.off .psg-f{display:none}
-.psg-tip{margin:0 2px 14px;padding:12px 14px;border:1px dashed var(--accent);border-radius:10px;font-size:13.5px;line-height:1.7;color:var(--ink3)}
+.psg-tip{margin:18px 2px 14px;padding:12px 14px;border:1px dashed var(--accent);border-radius:10px;font-size:13.5px;line-height:1.7;color:var(--ink3)}
 .psg-tip b{color:var(--ink)}
 .psg-go{display:inline-block;margin:6px 0 0 8px;font:inherit;font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:8px;padding:6px 12px;cursor:pointer}
 @keyframes cardFlash{0%,60%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--shadow)}}
@@ -703,9 +703,9 @@ body.simple .sc-np>.anim-btn{display:none}
   <div class="wrap">
     <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布和近义词 · 「词根拆解」里有同根词 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
     <div class="gbar" id="gbar" hidden></div>
-    <div id="psg" hidden></div>
     <div id="list"><div class="empty" id="loading">正在加载 8000 词的数据（约 650 KB），网速慢时要等几秒…</div></div>
     <button class="more" id="more" hidden>继续加载</button>
+    <div id="psg" hidden></div>
     <div class="gbar gbar-b" id="gbar2" hidden></div>
     <section class="legend" id="legend"></section>
   </div>
@@ -745,7 +745,7 @@ window.CET6 = {
   }
 };
 </script>
-<script src="data/core.js?v=bc34a8eb"></script>
+<script src="data/core.js?v=123058a9"></script>
 <script>
 (function(){
   'use strict';
@@ -1267,12 +1267,11 @@ window.CET6 = {
   // 没有合适画面的：把这一段字母写大，下面画一道线
   const letterArt = seg => { const n = seg.length, fs = n <= 2 ? 26 : n <= 4 ? 21 : n <= 6 ? 16 : 12; return `<text x="32" y="${f1(30 + fs * .34)}" text-anchor="middle" font-size="${fs}" font-family="Georgia,serif" font-weight="700" class="ff">${esc(seg)}</text><path d="M16 46h32" stroke-width="2.5" ${DRAW} ${S('qDraw')}/>`; };
   /* ===== 单词场景（逐词手绘）===== */
-  // 逐词手绘场景放在 data/scenes.js（约 200 KB），不拖慢首屏：页面空闲时加载，点「▶ 动画」时若还没到就先等它
+  // 逐词手绘场景放在 data/scenes.js（压缩后约 850 KB）：不预先下载，点「▶ 动画」时才去拿，免得拖慢页面
   window.CET6_LIB = {f1, burst, rays, flame, esc, role, shortMean};
   let scenesReady = null;
   // 网络卡住或失败会自动换地址重试（CET6.loadJs）；都不行先用通用画面，下次点「▶ 动画」再重新下载
   const loadScenes = () => window.CET6_SCENES ? Promise.resolve(true) : scenesReady || (scenesReady = CET6.loadJs((window.CET6 && CET6.scenesUrl) || 'data/scenes.js', 3, 25000).then(ok => { ok = ok || !!window.CET6_SCENES; if (!ok) scenesReady = null; return ok; }));
-  (window.requestIdleCallback || (f => setTimeout(f, 1500)))(() => loadScenes());
   // 有手绘场景的词用场景，没有的用通用画面串
   const animBlockHtml = w => window.CET6_SCENES && CET6_SCENES.has(w.w) ? CET6_SCENES.html(w) : animStripHtml(w);
   // 没有词根拆分的词：手绘场景走单独的「动画」入口（卡片、背诵、快速过词都用 pgroup，在那里加一栏）
@@ -1534,7 +1533,7 @@ window.CET6 = {
     return `<article class="card${isK ? ' known' : ''}" data-w="${esc(w.w)}">
       <div class="head"><div class="w">${gno.has(w.w) ? `<span class="gno" title="第 ${gno.get(w.w).replace('-', ' 组第 ')} 个">${gno.get(w.w)}</span>` : ''}${rank}${esc(w.w)}</div>
         <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div>
-        <div class="tools"><button class="ib spk" title="朗读" aria-label="朗读">${ICON_SPK}</button><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
+        <div class="tools"><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${pgroup(w, w.parts ? partsHtml(w) + familyHtml(w) : '', vsHtml(w), storyHtml(w, true))}</div>
       <div class="freq" title="近六年真题出现 ${w.n} 次（${YEARS[0]}–${YEARS[YEARS.length-1]} 逐年）"><div class="spark">${spark}</div><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span><small>次</small></div></div>
@@ -1604,13 +1603,14 @@ window.CET6 = {
       else if (e.target.matches('[data-gsize]')) { st.gKeep = ((st.g || 1) - 1) * (st.gsize || 0); st.gsize = +e.target.value; apply(); }
     });
   }
-  /* ---------- 每组配套短文：字母排序 + 频率全部 + 选一个级别、每组 20 词时显示在这一组上面 ---------- */
-  let psgReady = null;
-  CET6.passages = d => { CET6.passageData = d; };
-  const loadPassages = () => CET6.passageData ? Promise.resolve(true) : psgReady || (psgReady = CET6.loadJs(CET6.passagesUrl || 'data/passages.js', 3, 20000).then(ok => { ok = ok || !!CET6.passageData; if (!ok) psgReady = null; return ok; }));
-  const PSG_LV = ['basic', 'cet4', 'cet6', 'ext'];
+  /* ---------- 每组配套短文：字母排序 + 频率全部 + 选一个级别、每组 20 词时显示在这一组下面 ---------- */
   // 短文按「排序 + 级别」分套：字母排序用 basic/cet4/…，频率排序用 freq.basic/freq.cet4/…
+  // 每套一个文件（data/psg-<套>.js，几十到一百多 KB），只下载正在看的那一套
+  const psgData = {}, psgReady = {};
+  CET6.passages = (k, d) => { psgData[k] = d; };
   const psgKey = () => st.sort === 'alpha' ? st.lv : st.sort + '.' + st.lv;
+  const loadPassages = k => psgData[k] ? Promise.resolve(true) : psgReady[k] || (psgReady[k] = CET6.loadJs((CET6.passageUrls && CET6.passageUrls[k]) || `data/psg-${k}.js`, 3, 20000).then(ok => { ok = ok || !!psgData[k]; if (!ok) delete psgReady[k]; return ok; }));
+  const PSG_LV = ['basic', 'cet4', 'cet6', 'ext'];
   const PSG_SORT = {alpha: '', freq: '（频率排序）'};
   function psgMode(){ return (st.sort in PSG_SORT) && st.band === 'all' && st.letter === 'all' && !st.q && !st.rareOnly && !st.topicOnly && st.gsize === 20; }
   function psgHtml(p){
@@ -1626,11 +1626,12 @@ window.CET6 = {
     if (!psgMode() || !PSG_LV.includes(st.lv)) {
       const lv = PSG_LV.includes(st.lv) ? st.lv : 'basic';
       box.className = 'psg-tip'; box.hidden = false;
-      box.innerHTML = `<b>每组配套短文</b>：字母排序（或频率排序）、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组上面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
+      box.innerHTML = `<b>每组配套短文</b>：字母排序（或频率排序）、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组下面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
       return;
     }
-    if (!CET6.passageData) { box.hidden = true; loadPassages().then(ok => { if (ok) renderPassage(); }); return; }
-    const all = CET6.passageData[psgKey()] || {}, p = all[st.g], tag = PSG_SORT[st.sort] || '';
+    const key = psgKey();
+    if (!psgData[key] && (!CET6.passageUrls || CET6.passageUrls[key])) { box.hidden = true; loadPassages(key).then(ok => { if (ok && psgKey() === key) renderPassage(); }); return; }
+    const all = psgData[key] || {}, p = all[st.g], tag = PSG_SORT[st.sort] || '';
     const ws = gAll.slice((st.g - 1) * 20, st.g * 20).map(w => w.w);
     box.hidden = false;
     if (!p || p.w.join(',') !== ws.join(',')) {
@@ -1642,7 +1643,7 @@ window.CET6 = {
     const n = p.t.replace(/\*\*([^*|]+?)(\|[^*]+?)?\*\*/g, '$1').split(/\s+/).filter(Boolean).length;
     box.className = 'psg' + (st.psgOff ? ' off' : '');
     box.innerHTML = `<div class="psg-h"><span class="psg-k">第 ${st.g} 组短文${tag}</span><h3 class="psg-title">${esc(p.title)}</h3>
-      <div class="psg-tools"><button type="button" class="psg-b" data-psg="say">朗读</button><button type="button" class="psg-b" data-psg="tog">${st.psgOff ? '展开' : '收起'}</button></div></div>
+      <div class="psg-tools"><button type="button" class="psg-b" data-psg="tog">${st.psgOff ? '展开' : '收起'}</button></div></div>
       <div class="psg-t" lang="en">${psgHtml(p)}</div>
       <div class="psg-f">${n} 词 · 本组 ${p.w.length} 个词都已加粗，点加粗的词跳到它的卡片</div>`;
   }
@@ -1657,16 +1658,7 @@ window.CET6 = {
       $('#rareOnly').checked = false; $('#topicOnly').checked = false; markLetters();
       apply(true); return;
     }
-    if (b && b.dataset.psg === 'tog') { st.psgOff = !st.psgOff; save(); try { speechSynthesis.cancel(); } catch (err) {} renderPassage(); return; }
-    if (b && b.dataset.psg === 'say') {
-      try {
-        if (speechSynthesis.speaking) { speechSynthesis.cancel(); b.textContent = '朗读'; return; }
-        const u = new SpeechSynthesisUtterance($('#psg .psg-t').innerText); u.lang = 'en-US'; u.rate = .9;
-        u.onend = u.onerror = () => { b.textContent = '朗读'; };
-        speechSynthesis.speak(u); b.textContent = '停止';
-      } catch (err) {}
-      return;
-    }
+    if (b && b.dataset.psg === 'tog') { st.psgOff = !st.psgOff; save(); renderPassage(); return; }
     if (pw && pw.dataset.pw) {
       const c = [...document.querySelectorAll('#list .card')].find(x => x.dataset.w === pw.dataset.pw); if (!c) return;
       c.scrollIntoView({behavior: 'smooth', block: 'center'}); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash');
@@ -1720,10 +1712,6 @@ window.CET6 = {
       store.set('cet6-known', [...known]);
       c.classList.toggle('known', known.has(w)); e.target.closest('.ok').classList.toggle('on', known.has(w));
       updateKnown(); return;
-    }
-    if (e.target.closest('.spk')) {
-      try { const u = new SpeechSynthesisUtterance(w); u.lang = 'en-US'; u.rate = .9; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch(err){}
-      return;
     }
     if (st.cover && e.target.closest('.body')) { c.classList.toggle('reveal'); return; }
     c.classList.toggle('open');
@@ -1804,7 +1792,8 @@ window.CET6 = {
   }
   const ov = $('#ov'), fc = $('#fc');
   let session = null;
-  function openOv(title){ $('#ovTitle').textContent = title; ov.classList.add('show'); document.body.style.overflow = 'hidden'; }
+  // 背诵卡片背面会放手绘场景：打开背诵时才去下载场景文件
+  function openOv(title){ $('#ovTitle').textContent = title; ov.classList.add('show'); document.body.style.overflow = 'hidden'; loadScenes(); }
   function closeOv(){ flowStop(); ov.classList.remove('show'); document.body.style.overflow = ''; session = null; updateDue(); apply(); }
   $('#ovClose').onclick = closeOv;
   // 手机震动反馈（支持的安卓浏览器才有；iPhone 和电脑上自动无效）
@@ -1988,10 +1977,9 @@ window.CET6 = {
     fc.innerHTML = `<div class="fc-word">${esc(w.w)}</div>
       <div class="fc-sub">先在心里说出意思，再看答案</div>
       <div class="fc-pic" id="fcHint"></div>
-      <div class="fc-acts"><button id="hintB">提示<span class="kh">（H）</span></button><button id="spkB">朗读<span class="kh">（S）</span></button><button class="primary" id="showB">看答案<span class="kh">（空格）</span></button></div>
+      <div class="fc-acts"><button id="hintB">提示<span class="kh">（H）</span></button><button class="primary" id="showB">看答案<span class="kh">（空格）</span></button></div>
       <div class="swipe-help">也可以直接轻点卡片看答案</div>`;
     $('#hintB').onclick = () => { $('#fcHint').innerHTML = w.parts ? `<div class="in" style="display:flex;justify-content:center">${partsHtml(w, {noResult: true})}</div>` : '<div class="fc-sub">这个词没有词根拆解，看看首字母和长度：' + esc(w.w[0]) + ' · ' + w.w.length + ' 个字母</div>'; };
-    $('#spkB').onclick = () => speak(w.w);
     $('#showB').onclick = reveal;
   }
   function reveal(){
