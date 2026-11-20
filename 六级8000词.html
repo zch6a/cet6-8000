@@ -1614,10 +1614,11 @@ window.CET6 = {
   // 每套一个文件（data/psg-<套>.js，几十到一百多 KB），只下载正在看的那一套
   const psgData = {}, psgReady = {};
   CET6.passages = (k, d) => { psgData[k] = d; };
-  const psgKey = () => st.sort === 'alpha' ? st.lv : st.sort + '.' + st.lv;
+  // 会写词汇勾了「按写作翻译出现次数排」时顺序不同，用 writef.<级别>（还没写），不会错配字母顺序那套
+  const psgKey = () => st.sort === 'alpha' ? st.lv : (st.sort === 'write' && st.wfreq ? 'writef' : st.sort) + '.' + st.lv;
   const loadPassages = k => psgData[k] ? Promise.resolve(true) : psgReady[k] || (psgReady[k] = CET6.loadJs((CET6.passageUrls && CET6.passageUrls[k]) || `data/psg-${k}.js`, 3, 20000).then(ok => { ok = ok || !!psgData[k]; if (!ok) delete psgReady[k]; return ok; }));
   const PSG_LV = ['basic', 'cet4', 'cet6', 'ext'];
-  const PSG_SORT = {alpha: '', freq: '（频率排序）'};
+  const PSG_SORT = {alpha: '', freq: '（频率排序）', write: '（会写词汇）'};
   function psgMode(){ return (st.sort in PSG_SORT) && st.band === 'all' && st.letter === 'all' && !st.q && !st.rareOnly && !st.topicOnly && st.gsize === 20; }
   function psgHtml(p){
     // **form** 或 **form|lemma** → 可以点的加粗词（点一下跳到下面这个词的卡片）
@@ -1632,7 +1633,7 @@ window.CET6 = {
     if (!psgMode() || !PSG_LV.includes(st.lv)) {
       const lv = PSG_LV.includes(st.lv) ? st.lv : 'basic';
       box.className = 'psg-tip'; box.hidden = false;
-      box.innerHTML = `<b>每组配套短文</b>：字母排序（或频率排序）、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组下面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
+      box.innerHTML = `<b>每组配套短文</b>：字母排序（或频率排序、会写词汇）、频率「全部」、选一个级别（基础 / 四级 / 六级 / 超纲）、每组 20 词时，每组下面会出现一篇六级阅读难度的英文短文，这组 20 个词都加粗。<button type="button" class="psg-go" data-psg="go" data-lv="${lv}">打开${LV[lv]}短文 ›</button>`;
       return;
     }
     const key = psgKey();
@@ -1643,7 +1644,8 @@ window.CET6 = {
     if (!p || p.w.join(',') !== ws.join(',')) {
       const done = Object.keys(all).map(Number).sort((a, b) => a - b);
       box.className = 'psg-tip';
-      box.innerHTML = `第 ${st.g} 组的短文还在写。` + (done.length ? `${LV[st.lv]}${tag}已写好：第 ${done.length > 8 ? done[0] + '–' + done[done.length - 1] : done.join('、')} 组（共 ${done.length} 篇）。` : (tag ? `${LV[st.lv]}${tag}的短文正在依次写，字母排序的 402 篇已全部写好。` : ''));
+      box.innerHTML = `第 ${st.g} 组的短文还在写。` + (done.length ? `${LV[st.lv]}${tag}已写好：第 ${done.length > 8 ? done[0] + '–' + done[done.length - 1] : done.join('、')} 组（共 ${done.length} 篇）。` : (tag ? `${LV[st.lv]}${tag}的短文正在依次写，字母排序、频率排序各 402 篇已全部写好。` : ''))
+        + (key.startsWith('writef.') ? '（会写词汇的短文按字母顺序分组，取消勾选「按写作翻译出现次数排」就能看到。）' : '');
       return;
     }
     const n = p.t.replace(/\*\*([^*|]+?)(\|[^*]+?)?\*\*/g, '$1').split(/\s+/).filter(Boolean).length;
