@@ -2,10 +2,10 @@
 // 词表数据（data/core.js / extra.js / scenes.js?v=内容指纹）内容一变地址就变，所以可以放心长期缓存。
 // 数据放在一个不随版本改名的缓存里：网站更新后只重新下载真正变了的文件（没变的 extra.js 不用再下一遍）。
 // 页面本身先走网络拿最新版，断网时才用缓存。
-const VERSION = '14a69b19ff57d6cd';
+const VERSION = 'd63eaeedff57d6cd';
 const PAGE_CACHE = 'cet6-page', DATA_CACHE = 'cet6-data';
 const PAGE = './';
-const DATA = ['data/core.js?v=14a69b19', 'data/extra.js?v=ff57d6cd', 'data/scenes.js?v=78e6b624', "data/psg-basic.js?v=ae0d24dc", "data/psg-cet4.js?v=312d078e", "data/psg-cet6.js?v=80790aae", "data/psg-ext.js?v=554d342a", "data/psg-freq.basic.js?v=2176d149", "data/psg-freq.cet4.js?v=7cae48b2", "data/psg-freq.cet6.js?v=6d8fdbf0", "data/psg-freq.ext.js?v=c49b7e68", "data/psg-write.basic.js?v=07870748", "data/psg-write.cet4.js?v=8418a5a9"];
+const DATA = ['data/core.js?v=d63eaeed', 'data/extra.js?v=ff57d6cd', 'data/scenes.js?v=78e6b624', "data/psg-basic.js?v=ae0d24dc", "data/psg-cet4.js?v=312d078e", "data/psg-cet6.js?v=80790aae", "data/psg-ext.js?v=554d342a", "data/psg-freq.basic.js?v=2176d149", "data/psg-freq.cet4.js?v=7cae48b2", "data/psg-freq.cet6.js?v=6d8fdbf0", "data/psg-freq.ext.js?v=c49b7e68", "data/psg-write.basic.js?v=07870748", "data/psg-write.cet4.js?v=841172b7"];
 const abs = u => new URL(u, self.registration.scope).href;
 // 页面重试时会在地址后加 &r=1、&r=2：存缓存时去掉它，当成同一个文件
 const dataKey = url => { const k = new URL(url); k.searchParams.delete('r'); return k.href; };
