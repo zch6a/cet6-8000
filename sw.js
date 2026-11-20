@@ -2,10 +2,10 @@
 // 词表数据（data/core.js / extra.js / scenes.js?v=内容指纹）内容一变地址就变，所以可以放心长期缓存。
 // 数据放在一个不随版本改名的缓存里：网站更新后只重新下载真正变了的文件（没变的 extra.js 不用再下一遍）。
 // 页面本身先走网络拿最新版，断网时才用缓存。
-const VERSION = 'edc01058ff57d6cd';
+const VERSION = '6f7c34b3ff57d6cd';
 const PAGE_CACHE = 'cet6-page', DATA_CACHE = 'cet6-data';
 const PAGE = './';
-const DATA = ['data/core.js?v=edc01058', 'data/extra.js?v=ff57d6cd', 'data/scenes.js?v=78e6b624', 'data/passages.js?v=ee7eeb60'];
+const DATA = ['data/core.js?v=6f7c34b3', 'data/extra.js?v=ff57d6cd', 'data/scenes.js?v=78e6b624', 'data/passages.js?v=911819d2'];
 const abs = u => new URL(u, self.registration.scope).href;
 // 页面重试时会在地址后加 &r=1、&r=2：存缓存时去掉它，当成同一个文件
 const dataKey = url => { const k = new URL(url); k.searchParams.delete('r'); return k.href; };
