@@ -25,7 +25,7 @@
   --teal:#1f6f6b; --teal-soft:#dcefed; --gold:#a8741a; --gold-soft:#f5ead2;
   --violet:#5b4b9a; --violet-soft:#e7e3f4; --gray-soft:#ecebe6;
   --mem-bg:#fbf4e4; --mem-line:#ecd9ad; --shadow:0 1px 2px rgba(40,30,10,.05),0 4px 18px rgba(40,30,10,.05);
-  --known:#3d8b5a;
+  --known:#3d8b5a; --fav:var(--gold);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -82,6 +82,9 @@ h1 em{font-style:normal;color:var(--accent)}
 .fbtn b{font-weight:600;color:var(--ink)}
 .fbtn[aria-expanded="true"]{border-color:var(--ink);box-shadow:0 0 0 3px var(--line2)}
 .fbtn span:not(:empty){background:var(--accent);color:#fff;border-radius:99px;padding:0 6px;font-size:12px;line-height:18px}
+.favbtn span:not(:empty){background:var(--fav)}
+.favbtn[aria-pressed="true"]{border-color:var(--fav);color:var(--fav);box-shadow:0 0 0 3px color-mix(in srgb,var(--fav) 22%,transparent)}
+.favbtn[aria-pressed="true"] svg{fill:currentColor}
 .row1{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .search{flex:1 1 240px;position:relative}
 .search input{width:100%;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--paper);
@@ -394,6 +397,8 @@ button:active,.chip:active,.opt:active,.mode:active,.ib:active,.cta:active,.fbtn
 .ib:hover{color:var(--ink);border-color:var(--ink3)}
 .ib svg{width:16px;height:16px}
 .ib.on{background:var(--known);border-color:var(--known);color:#fff}
+.ib.fav.on{background:var(--paper);border-color:var(--fav);color:var(--fav)}
+.ib.fav.on svg{fill:currentColor}
 .card .freq{padding-bottom:34px}
 .detail{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:8px;margin-top:4px;font-size:13px;color:var(--ink2);display:none}
 .card.open .detail{display:block}
@@ -664,6 +669,9 @@ body.simple .sc-np>.anim-btn{display:none}
       </label>
       <button class="cta" id="studyBtn" title="间隔复习背单词">背诵<span id="dueBadge"></span></button>
       <button class="cta ghost" id="quizBtn" title="选择题 / 拼写 / 听音自测">自测</button>
+      <button class="fbtn favbtn" id="favBtn" aria-pressed="false" title="只看我收藏的单词（再点一次回到词表）">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg><b>收藏</b><span id="favN"></span>
+      </button>
       <button class="fbtn" id="filterBtn" aria-expanded="false" aria-controls="panel" title="排序、级别、频率、字母筛选">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg><b id="viewName">字母</b><span id="fCount"></span>
       </button>
@@ -700,7 +708,7 @@ body.simple .sc-np>.anim-btn{display:none}
 
 <main>
   <div class="wrap">
-    <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布和近义词 · 「词根拆解」里有同根词 · 点「✓」标记已掌握（只保存在本机浏览器）</span></div>
+    <div class="resinfo"><span id="resinfo"></span><span id="hint">点单词看真题分布和近义词 · 「词根拆解」里有同根词 · 点「☆」收藏、「✓」标记已掌握（只保存在本机浏览器）</span></div>
     <div class="gbar" id="gbar" hidden></div>
     <div id="list"><div class="empty" id="loading">正在加载 8000 词的数据（约 650 KB），网速慢时要等几秒…</div></div>
     <button class="more" id="more" hidden>继续加载</button>
@@ -798,7 +806,10 @@ window.CET6 = {
   const ALIAS = meta.alias || {};
   const TOPICS = new Set(meta.topics || []);   // 翻译话题词：中国文化、社会热点（真题翻译给中文，英文里多为 0 次）
   const known = new Set(store.get('cet6-known', []).map(w => ALIAS[w] || w));
+  // 收藏：按收藏先后存成数组（最近收藏的在最后），只保存在本机浏览器
+  const favs = [...new Set(store.get('cet6-fav', []).map(w => ALIAS[w] || w))], favSet = new Set(favs);
   const st = Object.assign({sort:'alpha', lv:'all', band:'all', letter:'all', q:'', cover:false, hideKnown:false, simple:true, gsize:20, g:1}, store.get('cet6-view', {}));
+  st.favOnly = false;   // 每次打开都从词表开始，不停在收藏里
   document.body.classList.toggle('simple', st.simple);
   st.q = '';
   const PAGE = 120;
@@ -876,6 +887,14 @@ window.CET6 = {
     }, true);
     $('#cover').onchange = e => { st.cover = e.target.checked; document.body.classList.toggle('cover', st.cover); save(); const c = $('#fCount'); c.textContent = String((+c.textContent || 0) + (st.cover ? 1 : -1)).replace(/^0$/, ''); };
     $('#hideKnown').onchange = e => { st.hideKnown = e.target.checked; apply(); };
+    $('#favBtn').onclick = () => { st.favOnly = !st.favOnly; updateFav(); apply(true); };
+    // 在「我的收藏」里改了排序 / 级别 / 字母等筛选，就回到普通词表（先于各按钮自己的处理执行）
+    $('#panel').addEventListener('click', e => {
+      const t = e.target.closest('button,input');
+      if (!st.favOnly || !t || ['theme2', 'pdfBtn', 'cover', 'simple'].includes(t.id)) return;
+      st.favOnly = false; updateFav();
+    }, true);
+    updateFav();
     $('#rareOnly').checked = !!st.rareOnly;
     $('#rareOnly').onchange = e => { st.rareOnly = e.target.checked; apply(true); };
     $('#topicOnly').checked = !!st.topicOnly;
@@ -1019,6 +1038,7 @@ window.CET6 = {
     const nf = [st.lv !== 'all', st.band !== 'all', st.letter !== 'all', st.cover, st.hideKnown, st.rareOnly, st.topicOnly].filter(Boolean).length;
     $('#fCount').textContent = nf ? String(nf) : '';
     $('#gbar').hidden = $('#gbar2').hidden = $('#psg').hidden = true; gno = new Map();
+    if (st.favOnly) { renderFavs(scrollUp); return; }
     if (st.sort === 'stories') { renderStories(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     if (st.sort === 'roots') { renderRoots(); if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10}); return; }
     const q = st.q;
@@ -1089,6 +1109,33 @@ window.CET6 = {
 
   /* ---------- rendering ---------- */
   let lastGroup = null, listEl = null;
+  /* ---------- 收藏 ---------- */
+  function updateFav(){
+    $('#favN').textContent = favs.length ? String(favs.length) : '';
+    $('#favBtn').setAttribute('aria-pressed', String(!!st.favOnly));
+  }
+  function toggleFav(w){
+    if (favSet.has(w)) { favSet.delete(w); favs.splice(favs.indexOf(w), 1); } else { favSet.add(w); favs.push(w); }
+    store.set('cet6-fav', favs); updateFav();
+    return favSet.has(w);
+  }
+  // 「我的收藏」：不管级别、频率、字母等筛选，列出全部收藏，最近收藏的在前；搜索框仍可在收藏里找
+  function renderFavs(scrollUp){
+    const q = st.q;
+    current = favs.slice().reverse().map(w => byWord.get(w)).filter(Boolean)
+      .filter(w => !q || w.w.startsWith(q) || (/[^\x00-\x7f]/.test(q) && zhHit(w, q)) || (q.length > 2 && w.w.includes(q)));
+    gAll = current; gno = new Map(); gCount = 1; viewList = current;
+    $('#list').innerHTML = ''; shown = 0; lastGroup = null;
+    $('#resinfo').textContent = `我的收藏 · 共 ${current.length.toLocaleString()} 词` + (q ? ` · 搜索「${q}」` : ' · 最近收藏的在前') + ' · 再点顶部「收藏」回到词表';
+    if (!current.length) {
+      $('#list').innerHTML = `<div class="empty">${q && favs.length ? '收藏里没有找到这个词' : '还没有收藏单词'}<br><span style="font-size:13px">点单词卡片右上角的 ☆ 就能收藏，之后点顶部「收藏」随时查看</span><br><button class="chip" id="favExit" style="margin-top:12px">回到词表</button></div>`;
+      $('#favExit').onclick = () => { st.favOnly = false; updateFav(); apply(true); };
+      $('#more').hidden = true; return;
+    }
+    renderMore();
+    if (scrollUp && scrollY > $('main').offsetTop) scrollTo({top: $('main').offsetTop - 10});
+  }
+  const ICON_STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>';
   const ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 12 5 5 9-10"/></svg>';
   const ICON_SPK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   function memHtml(m){
@@ -1539,7 +1586,7 @@ window.CET6 = {
     return `<article class="card${isK ? ' known' : ''}" data-w="${esc(w.w)}">
       <div class="head"><div class="w">${gno.has(w.w) ? `<span class="gno" title="第 ${gno.get(w.w).replace('-', ' 组第 ')} 个">${gno.get(w.w)}</span>` : ''}${rank}${esc(w.w)}</div>
         <div class="badges"><span class="lv ${w.lv}">${LV[w.lv]}</span>${hot}${w.wr ? '<span class="lv basic" title="写作翻译要会拼会用">会写</span>' : ''}${w.rs ? '<span class="hot" title="熟词僻义：考试常用不常见的意思">僻义</span>' : ''}</div>
-        <div class="tools"><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
+        <div class="tools"><button class="ib fav${favSet.has(w.w) ? ' on' : ''}" title="${favSet.has(w.w) ? '取消收藏' : '收藏'}" aria-label="收藏" aria-pressed="${favSet.has(w.w)}">${ICON_STAR}</button><button class="ib ok${isK ? ' on' : ''}" title="标记已掌握" aria-label="标记已掌握">${ICON_OK}</button></div></div>
       <div class="body"><ul class="mean">${w.zh.map(([p,t]) => `<li>${p ? `<span class="pos">${esc(p)}</span>` : ''}${esc(t)}</li>`).join('')}</ul>
         ${pgroup(w, w.parts ? partsHtml(w) + familyHtml(w) : '', vsHtml(w), storyHtml(w, true))}</div>
       <div class="freq" title="近六年真题出现 ${w.n} 次（${YEARS[0]}–${YEARS[YEARS.length-1]} 逐年）"><div class="spark">${spark}</div><div><span class="num${w.n ? '' : ' zero'}">${w.n}</span><small>次</small></div></div>
@@ -1558,7 +1605,7 @@ window.CET6 = {
     let html = '';
     for (let i = shown; i < end; i++) {
       const w = viewList[i];
-      if ((st.sort === 'alpha' || (st.sort === 'write' && !st.wfreq)) && !st.q) {
+      if ((st.sort === 'alpha' || (st.sort === 'write' && !st.wfreq)) && !st.q && !st.favOnly) {
         const g = w.w[0];
         if (g !== lastGroup) {
           if (listEl !== null) html += '</div>';
@@ -1715,6 +1762,12 @@ window.CET6 = {
     if (rp) { const strip = rp.closest('.anim-strip,.scene'), w = byWord.get(rp.closest('.card').dataset.w); strip.outerHTML = animBlockHtml(w); return; }
     const c = e.target.closest('.card'); if (!c) return;
     const w = c.dataset.w;
+    const fb = e.target.closest('.fav');
+    if (fb) {
+      const on = toggleFav(w); buzz(10);
+      fb.classList.toggle('on', on); fb.setAttribute('aria-pressed', String(on)); fb.title = on ? '取消收藏' : '收藏';
+      return;
+    }
     if (e.target.closest('.ok')) {
       if (known.has(w)) known.delete(w); else known.add(w);
       buzz(10);
@@ -1859,7 +1912,7 @@ window.CET6 = {
     const gh = $('#goHard'); if (gh) gh.onclick = startHard;
   }
   /* 进度备份：导出 / 导入（掌握标记、复习排程、打卡、计划） */
-  const PROGRESS_KEYS = ['cet6-known', 'cet6-srs', 'cet6-daylog', 'cet6-plan', 'cet6-newlog'];
+  const PROGRESS_KEYS = ['cet6-known', 'cet6-srs', 'cet6-daylog', 'cet6-plan', 'cet6-newlog', 'cet6-fav'];
   function exportProgress(){
     const data = {app: 'cet6-8000', version: 1, exported: new Date().toISOString(), data: {}};
     for (const k of PROGRESS_KEYS) data.data[k] = store.get(k, null);
